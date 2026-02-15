@@ -1,0 +1,22 @@
+# Configuración de Netlify para MyBikeGestor
+
+# Desactivar procesamiento de scripts
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = false
+  minify = false
+
+[build.processing.js]
+  bundle = false
+  minify = false
+
+[build.processing.html]
+  pretty_urls = false
+
+# Desactivar protección de email que inyecta scripts
+[[plugins]]
+  package = "@netlify/plugin-emails"
+  [plugins.inputs]
+    enabled = false
