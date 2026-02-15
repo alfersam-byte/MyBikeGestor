@@ -1801,9 +1801,10 @@
         // ========================================
         const STRAVA_CLIENT_ID = '201273';
         const STRAVA_CLIENT_SECRET = '778fd4bdc03d2ffbb57bb52f83c5ae6b4f73a776';
+        // Detecta automáticamente: localhost, GitHub Pages, o Netlify
         const STRAVA_REDIRECT_URI = window.location.hostname === 'localhost' 
             ? 'http://localhost:5500' 
-            : 'https://mybikegestor.netlify.app';
+            : window.location.origin; // Usa la URL actual (funciona en GitHub Pages y Netlify)
         const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
         const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
         const STRAVA_API_URL = 'https://www.strava.com/api/v3';
