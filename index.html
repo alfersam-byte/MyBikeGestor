@@ -905,7 +905,7 @@
                 </div>
                 <input type="file" id="photo-input" accept="image/*" style="display: none;" onchange="handlePhotoSelected(event)">
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
-                <div class="card-subtitle" id="dashboard-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="debbb3bfb7b29ebbb4bbb3aeb2b1f0bdb1b3">[email&#160;protected]</a></div>
+                <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
             </div>
 
             <!-- Resumen de bicis -->
@@ -1902,7 +1902,7 @@
     <!-- ========================================
          JAVASCRIPT - LÓGICA DE LA APP
     ======================================== -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // ========================================
         // CONFIGURACIÓN DE FIREBASE
         // ========================================
@@ -1950,7 +1950,6 @@
             options.classList.toggle('active');
         }
 
-        // Cerrar opciones al hacer click fuera
         document.addEventListener('click', (e) => {
             const container = document.getElementById('profile-photo-container');
             const options = document.getElementById('photo-options');
@@ -1974,13 +1973,11 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validar tamaño (máx 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 mostrarNotificacion('La imagen es demasiado grande. Máximo 5MB.', 'error');
                 return;
             }
 
-            // Validar tipo
             if (!file.type.startsWith('image/')) {
                 mostrarNotificacion('Por favor selecciona una imagen válida.', 'error');
                 return;
@@ -1989,22 +1986,18 @@
             try {
                 mostrarNotificacion('Subiendo foto...', 'exito');
 
-                // Comprimir imagen antes de subir
                 const compressedFile = await compressImage(file);
 
-                // Subir a Firebase Storage
                 const storageRef = storage.ref();
                 const photoRef = storageRef.child(`profile-photos/${usuarioActual.uid}`);
                 
                 await photoRef.put(compressedFile);
                 const photoURL = await photoRef.getDownloadURL();
 
-                // Guardar URL en Firestore
                 await db.collection('usuarios').doc(usuarioActual.uid).update({
                     photoURL: photoURL
                 });
 
-                // Actualizar interfaz
                 mostrarFotoPerfil(photoURL);
                 mostrarNotificacion('Foto actualizada correctamente', 'exito');
 
@@ -2013,7 +2006,6 @@
                 mostrarNotificacion('Error al subir la foto', 'error');
             }
 
-            // Limpiar input
             event.target.value = '';
         }
 
@@ -2027,7 +2019,6 @@
                         let width = img.width;
                         let height = img.height;
                         
-                        // Redimensionar si es muy grande
                         const maxSize = 800;
                         if (width > height && width > maxSize) {
                             height = (height * maxSize) / width;
@@ -2086,17 +2077,14 @@
             try {
                 document.getElementById('photo-options').classList.remove('active');
                 
-                // Eliminar de Storage
                 const storageRef = storage.ref();
                 const photoRef = storageRef.child(`profile-photos/${usuarioActual.uid}`);
-                await photoRef.delete().catch(() => {}); // Ignorar si no existe
+                await photoRef.delete().catch(() => {});
 
-                // Eliminar URL de Firestore
                 await db.collection('usuarios').doc(usuarioActual.uid).update({
                     photoURL: firebase.firestore.FieldValue.delete()
                 });
 
-                // Restaurar iniciales
                 const photoImg = document.getElementById('dashboard-photo-img');
                 const initials = document.getElementById('dashboard-initials');
                 photoImg.style.display = 'none';
@@ -3997,4 +3985,15 @@
                         navegar('sec-dashboard');
                     }
                 } else {
-                    // N
+                    // No hay usuario autenticado
+                    usuarioActual = null;
+                    datosUsuario = null;
+                    navegar('sec-login');
+                }
+            });
+        };
+
+    </script>
+
+</body>
+</html>
