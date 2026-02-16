@@ -905,7 +905,7 @@
                 </div>
                 <input type="file" id="photo-input" accept="image/*" style="display: none;" onchange="handlePhotoSelected(event)">
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
-                <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
+                <div class="card-subtitle" id="dashboard-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="debbb3bfb7b29ebbb4bbb3aeb2b1f0bdb1b3">[email&#160;protected]</a></div>
             </div>
 
             <!-- Resumen de bicis -->
@@ -1902,7 +1902,7 @@
     <!-- ========================================
          JAVASCRIPT - LÓGICA DE LA APP
     ======================================== -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ========================================
         // CONFIGURACIÓN DE FIREBASE
         // ========================================
@@ -2275,6 +2275,13 @@
             
             document.getElementById('dashboard-usuario').textContent = nombreCompleto;
             document.getElementById('dashboard-email').textContent = datosUsuario.email || 'Sin email';
+
+            // Cargar foto de perfil
+            if (datosUsuario.photoURL) {
+                mostrarFotoPerfil(datosUsuario.photoURL);
+            } else {
+                document.getElementById('dashboard-initials').textContent = mostrarIniciales(datosUsuario.nombre || usuarioActual.email);
+            }
 
             // Resumen de bicis
             const bicisActivas = datosUsuario.garaje.filter(b => b.activa !== false);
@@ -3990,15 +3997,4 @@
                         navegar('sec-dashboard');
                     }
                 } else {
-                    // No hay usuario autenticado
-                    usuarioActual = null;
-                    datosUsuario = null;
-                    navegar('sec-login');
-                }
-            });
-        };
-
-    </script>
-
-</body>
-</html>
+                    // N
