@@ -560,7 +560,7 @@
             <!-- Logo de la aplicación -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="width: 200px; height: 200px; margin: 0 auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="./logo.png" alt="MyBikeGestor" style="width: 100%; height: 100%; object-fit: contain;">
+                    <img src="/mnt/user-data/uploads/1770839537946_logo5-generator-image__1_.png" alt="MyBikeGestor" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
 
@@ -623,7 +623,7 @@
         ======================================== -->
         <section id="sec-terminos" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-login')">←</button>
+                <button class="btn-back" onclick="history.back()">←</button>
                 <div class="topbar-title">Términos y Condiciones</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -667,7 +667,7 @@
                     Los cambios entrarán en vigor inmediatamente después de su publicación.
                 </p>
 
-                <button class="btn btn-primary mt-20" onclick="navegar('sec-login')">Cerrar</button>
+                <button class="btn btn-primary mt-20" onclick="history.back()">Cerrar</button>
             </div>
         </section>
 
@@ -676,7 +676,7 @@
         ======================================== -->
         <section id="sec-privacidad" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-login')">←</button>
+                <button class="btn-back" onclick="history.back()">←</button>
                 <div class="topbar-title">Política de Privacidad</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -764,7 +764,7 @@
                     cambio significativo.
                 </p>
 
-                <button class="btn btn-primary mt-20" onclick="navegar('sec-login')">Cerrar</button>
+                <button class="btn btn-primary mt-20" onclick="history.back()">Cerrar</button>
             </div>
         </section>
 
@@ -781,7 +781,7 @@
             <div class="card" style="text-align: center; margin-top: 20px;">
                 <div style="font-size: 4em; margin-bottom: 10px;">👤</div>
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
-                <div class="card-subtitle" id="dashboard-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddb8b0bcb4b19db8b7b8b0adb1b2f3beb2b0">[email&#160;protected]</a></div>
+                <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
             </div>
 
             <!-- Resumen de bicis -->
@@ -1801,10 +1801,9 @@
         // ========================================
         const STRAVA_CLIENT_ID = '201273';
         const STRAVA_CLIENT_SECRET = '778fd4bdc03d2ffbb57bb52f83c5ae6b4f73a776';
-        // Detecta automáticamente: localhost, GitHub Pages, o Netlify
         const STRAVA_REDIRECT_URI = window.location.hostname === 'localhost' 
             ? 'http://localhost:5500' 
-            : window.location.origin; // Usa la URL actual (funciona en GitHub Pages y Netlify)
+            : 'https://alfersam-byte.github.io/MyBikeGestor/';
         const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
         const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
         const STRAVA_API_URL = 'https://www.strava.com/api/v3';
@@ -2640,7 +2639,7 @@
                 'todos': ['Maneta Izquierda', 'Maneta Derecha', 'Pinza Delantera', 'Pinza Trasera', 'Disco Delantero', 'Disco Trasero']
             },
             'Ruedas': {
-                'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cámaras/Válvulas/Tubeless', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo']
+                'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo']
             },
             'Periféricos': {
                 'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS']
@@ -2727,7 +2726,7 @@
                         </div>
                         <div style="text-align: right;">
                             <div class="badge badge-primary">${kmUso} km</div>
-                            <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${formatearDuracion(diasUso)}</div>
+                            <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${diasUso} días</div>
                         </div>
                     </div>
                 `;
@@ -2878,10 +2877,7 @@
                 const idx = biciActual.componentesV2[seccionActual].findIndex(c => c.id === componenteActual.id);
                 if (idx !== -1) {
                     comp.subpiezas = biciActual.componentesV2[seccionActual][idx].subpiezas || {};
-                    const precioAnterior = biciActual.componentesV2[seccionActual][idx].precio || 0;
                     biciActual.componentesV2[seccionActual][idx] = comp;
-                    // Ajustar inversión: quitar precio anterior y sumar nuevo precio
-                    biciActual.inversion = (parseFloat(biciActual.inversion || 0) - precioAnterior + precio).toFixed(2);
                 }
             } else {
                 biciActual.componentesV2[seccionActual].push(comp);
@@ -3700,4 +3696,15 @@
                         navegar('sec-dashboard');
                     }
                 } else {
-                    // N
+                    // No hay usuario autenticado
+                    usuarioActual = null;
+                    datosUsuario = null;
+                    navegar('sec-login');
+                }
+            });
+        };
+
+    </script>
+
+</body>
+</html>
