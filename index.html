@@ -560,7 +560,7 @@
             <!-- Logo de la aplicación -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="width: 200px; height: 200px; margin: 0 auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="/mnt/user-data/uploads/1770839537946_logo5-generator-image__1_.png" alt="MyBikeGestor" style="width: 100%; height: 100%; object-fit: contain;">
+                    <img src="./logo.png" alt="MyBikeGestor" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
 
@@ -781,7 +781,7 @@
             <div class="card" style="text-align: center; margin-top: 20px;">
                 <div style="font-size: 4em; margin-bottom: 10px;">👤</div>
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
-                <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
+                <div class="card-subtitle" id="dashboard-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="20454d41494c60454a454d504c4f0e434f4d">[email&#160;protected]</a></div>
             </div>
 
             <!-- Resumen de bicis -->
@@ -1778,7 +1778,7 @@
     <!-- ========================================
          JAVASCRIPT - LÓGICA DE LA APP
     ======================================== -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ========================================
         // CONFIGURACIÓN DE FIREBASE
         // ========================================
@@ -3696,15 +3696,4 @@
                         navegar('sec-dashboard');
                     }
                 } else {
-                    // No hay usuario autenticado
-                    usuarioActual = null;
-                    datosUsuario = null;
-                    navegar('sec-login');
-                }
-            });
-        };
-
-    </script>
-
-</body>
-</html>
+                    // N
