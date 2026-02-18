@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyBikeGestor v3.0</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA -->
     <meta name="theme-color" content="#4CAF50">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyBikeGestor">
-    
-    <!-- Iconos para móvil -->
-    <link rel="icon" type="image/png" sizes="192x192" href="./logo.png">
+    <link rel="icon" type="image/png" href="./logo.png">
     <link rel="apple-touch-icon" href="./logo.png">
-    <link rel="shortcut icon" href="./logo.png">
     <link rel="manifest" href="./manifest.json">
     
     <!-- Firebase SDK -->
@@ -551,103 +549,94 @@
             color: var(--dark);
         }
 
-
         .modal-confirmar-botones {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
+        .profile-photo-container {
+            position: relative; width: 120px; height: 120px;
+            margin: 0 auto 15px auto; cursor: pointer;
+        }
+        .profile-photo {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 4px solid var(--primary); background: var(--light-gray);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3em; overflow: hidden;
+        }
+        .profile-photo-overlay {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border-radius: 50%;
+            background: rgba(0,0,0,0.6); display: flex;
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s; color: white; font-size: 2em;
+        }
+        .profile-photo-container:hover .profile-photo-overlay { opacity: 1; }
+        .photo-options {
+            display: none; position: absolute; top: 100%; left: 50%;
+            transform: translateX(-50%); background: white;
+            border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 10px; margin-top: 10px; z-index: 1000; min-width: 200px;
+        }
+        .photo-options.active { display: block; }
+        .photo-option-btn {
+            width: 100%; padding: 12px; border: none; background: none;
+            text-align: left; cursor: pointer; border-radius: 5px;
+            transition: background 0.3s; display: flex; align-items: center;
+            gap: 10px; font-size: 1em;
+        }
+        .photo-option-btn:hover { background: var(--light-gray); }
 
         /* ========================================
-           FOTO DE PERFIL
+           PANEL ADMINISTRACIÓN
         ======================================== */
-        .profile-photo-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 15px auto;
-            cursor: pointer;
+        .admin-user-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
-        .profile-photo {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--primary);
-            background: var(--light-gray);
+        .admin-user-name {
+            font-weight: 700;
+            font-size: 1em;
+            color: var(--dark);
+        }
+        .admin-user-email {
+            font-size: 0.82em;
+            color: var(--text);
+            margin-top: 2px;
+        }
+        .admin-user-meta {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.78em;
             color: var(--text);
         }
-
-        .profile-photo-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            color: white;
-            font-size: 2em;
-        }
-
-        .profile-photo-container:hover .profile-photo-overlay {
-            opacity: 1;
-        }
-
-        .profile-photo-small {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-        }
-
-        .photo-options {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            padding: 10px;
-            margin-top: 10px;
-            z-index: 1000;
-            min-width: 200px;
-        }
-
-        .photo-options.active {
-            display: block;
-        }
-
-        .photo-option-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            font-size: 1em;
+            margin-bottom: 20px;
         }
-
-        .photo-option-btn:hover {
+        .admin-stat-box {
             background: var(--light-gray);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .admin-stat-num {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .admin-stat-label {
+            font-size: 0.72em;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
     </style>
@@ -886,24 +875,18 @@
             <!-- Perfil de usuario -->
             <div class="card" style="text-align: center; margin-top: 20px;">
                 <div class="profile-photo-container" id="profile-photo-container" onclick="togglePhotoOptions()">
-                    <div class="profile-photo" id="dashboard-photo">
+                    <div class="profile-photo">
                         <span id="dashboard-initials">👤</span>
-                        <img id="dashboard-photo-img" style="display: none; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        <img id="dashboard-photo-img" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
                     </div>
                     <div class="profile-photo-overlay">📷</div>
                     <div class="photo-options" id="photo-options">
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('camera')">
-                            <span>📷</span> Tomar foto
-                        </button>
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('gallery')">
-                            <span>🖼️</span> Elegir de galería
-                        </button>
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); removeProfilePhoto()" style="color: var(--danger);">
-                            <span>🗑️</span> Eliminar foto
-                        </button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('camera')">📷 Tomar foto</button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('gallery')">🖼️ Elegir de galería</button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); removeProfilePhoto()" style="color:var(--danger)">🗑️ Eliminar foto</button>
                     </div>
                 </div>
-                <input type="file" id="photo-input" accept="image/*" style="display: none;" onchange="handlePhotoSelected(event)">
+                <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
                 <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
             </div>
@@ -1057,9 +1040,6 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" onclick="sincronizarStravaManual()">
-                        🔄 Sincronizar ahora
-                    </button>
                     <button class="btn btn-danger mt-10" onclick="desconectarStrava()">
                         Desconectar Strava
                     </button>
@@ -1102,8 +1082,8 @@
         ======================================== -->
         <section id="sec-nueva-bici" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
-                <div class="topbar-title">Nueva Bici</div>
+                <button class="btn-back" id="btn-back-nueva-bici" onclick="navegar('sec-garaje')">←</button>
+                <div class="topbar-title" id="titulo-nueva-bici">Nueva Bici</div>
                 <div style="width: 40px;"></div>
             </div>
 
@@ -1116,25 +1096,28 @@
                 <label>Marca</label>
                 <select id="nueva-marca">
                     <option value="">Selecciona una marca</option>
-                    <option value="Specialized">Specialized</option>
-                    <option value="Trek">Trek</option>
-                    <option value="Giant">Giant</option>
-                    <option value="Canyon">Canyon</option>
-                    <option value="Scott">Scott</option>
-                    <option value="Cannondale">Cannondale</option>
-                    <option value="Cervélo">Cervélo</option>
-                    <option value="Pinarello">Pinarello</option>
+                    <option value="Basso">Basso</option>
+                    <option value="BH">BH</option>
                     <option value="Bianchi">Bianchi</option>
                     <option value="BMC">BMC</option>
+                    <option value="Cannondale">Cannondale</option>
+                    <option value="Canyon">Canyon</option>
+                    <option value="Cervélo">Cervélo</option>
+                    <option value="Colnago">Colnago</option>
                     <option value="Cube">Cube</option>
+                    <option value="Factor">Factor</option>
+                    <option value="Focus">Focus</option>
+                    <option value="Giant">Giant</option>
+                    <option value="Kona">Kona</option>
                     <option value="Merida">Merida</option>
                     <option value="Orbea">Orbea</option>
-                    <option value="BH">BH</option>
-                    <option value="Colnago">Colnago</option>
-                    <option value="Wilier">Wilier</option>
-                    <option value="Focus">Focus</option>
-                    <option value="Santa Cruz">Santa Cruz</option>
+                    <option value="Pinarello">Pinarello</option>
                     <option value="Pivot">Pivot</option>
+                    <option value="Santa Cruz">Santa Cruz</option>
+                    <option value="Scott">Scott</option>
+                    <option value="Specialized">Specialized</option>
+                    <option value="Trek">Trek</option>
+                    <option value="Wilier">Wilier</option>
                     <option value="Yeti">Yeti</option>
                     <option value="Otra">Otra</option>
                 </select>
@@ -1167,8 +1150,8 @@
                 <input type="number" id="nueva-km" placeholder="0" value="0">
             </div>
 
-            <button class="btn btn-primary" onclick="crearBicicleta()">Crear Bicicleta</button>
-            <button class="btn btn-secondary mt-20" onclick="navegar('sec-garaje')">Cancelar</button>
+            <button class="btn btn-primary" id="btn-guardar-bici" onclick="guardarBici()">Crear Bicicleta</button>
+            <button class="btn btn-secondary mt-20" onclick="cancelarFormBici()">Cancelar</button>
         </section>
 
         <!-- ========================================
@@ -1187,6 +1170,38 @@
 
             <div id="lista-bicis-retiradas" class="mt-20">
                 <!-- Aquí se generarán las tarjetas de las bicis retiradas -->
+            </div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: PANEL ADMINISTRACIÓN
+        ======================================== -->
+        <section id="sec-admin" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <div class="topbar-title">👑 Panel Admin</div>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <!-- Estadísticas globales -->
+            <div class="admin-stats" id="admin-stats">
+                <div class="admin-stat-box">
+                    <div class="admin-stat-num" id="admin-total-usuarios">-</div>
+                    <div class="admin-stat-label">Usuarios</div>
+                </div>
+                <div class="admin-stat-box">
+                    <div class="admin-stat-num" id="admin-total-bicis">-</div>
+                    <div class="admin-stat-label">Bicis</div>
+                </div>
+                <div class="admin-stat-box">
+                    <div class="admin-stat-num" id="admin-con-strava">-</div>
+                    <div class="admin-stat-label">Con Strava</div>
+                </div>
+            </div>
+
+            <!-- Lista de usuarios -->
+            <div id="admin-lista-usuarios">
+                <div class="text-center text-muted">Cargando usuarios...</div>
             </div>
         </section>
 
@@ -1211,8 +1226,13 @@
                 </div>
                 
                 <!-- Indicador de Strava -->
-                <div id="taller-strava-vinculado" style="background: #FC4C02; color: white; padding: 8px 12px; border-radius: 8px; margin-top: 15px; font-size: 0.85em; display: none; text-align: center;">
-                    🚴 Vinculada con Strava: <span id="taller-strava-nombre" style="font-weight: bold;"></span>
+                <div id="taller-strava-vinculado" style="display: none; margin-top: 15px;">
+                    <div style="background: #FC4C02; color: white; padding: 8px 12px; border-radius: 8px 8px 0 0; font-size: 0.85em; text-align: center;">
+                        🚴 Vinculada con Strava: <span id="taller-strava-nombre" style="font-weight: bold;"></span>
+                    </div>
+                    <button onclick="sincronizarBiciStrava()" style="width:100%; background:#E34402; color:white; border:none; padding:10px; border-radius:0 0 8px 8px; font-size:0.9em; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onmouseover="this.style.background='#cc3d02'" onmouseout="this.style.background='#E34402'">
+                        🔄 Sincronizar KM con Strava
+                    </button>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;">
@@ -1238,7 +1258,7 @@
             <!-- Botones de acción -->
             <div class="btn-grid">
                 <button class="btn-grid-item" onclick="navegar('sec-componentes')">
-                    <div class="btn-grid-item-icon">🔧</div>
+                    <div class="btn-grid-item-icon">🧱</div>
                     <div class="btn-grid-item-text">Componentes</div>
                 </button>
                 <button class="btn-grid-item" onclick="navegar('sec-historial')">
@@ -1249,9 +1269,9 @@
                     <div class="btn-grid-item-icon">📏</div>
                     <div class="btn-grid-item-text">Añadir KM</div>
                 </button>
-                <button class="btn-grid-item" onclick="abrirModalVincularStrava()">
-                    <div class="btn-grid-item-icon">🚴</div>
-                    <div class="btn-grid-item-text">Vincular Strava</div>
+                <button class="btn-grid-item" id="btn-vincular-strava" onclick="accionStravaBici()">
+                    <div class="btn-grid-item-icon" id="btn-vincular-strava-icon">🚴</div>
+                    <div class="btn-grid-item-text" id="btn-vincular-strava-texto">Vincular Strava</div>
                 </button>
                 <button class="btn-grid-item" onclick="mostrarNotificacion('Próximamente: Estadísticas', 'info')">
                     <div class="btn-grid-item-icon">📊</div>
@@ -1439,16 +1459,20 @@
                     <option value="Canyon">Canyon</option>
                     <option value="Campagnolo">Campagnolo</option>
                     <option value="Continental">Continental</option>
+                    <option value="Basso">Basso</option>
                     <option value="DT Swiss">DT Swiss</option>
                     <option value="Fizik">Fizik</option>
                     <option value="Fox">Fox</option>
                     <option value="Garmin">Garmin</option>
+                    <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
+                    <option value="Magura">Magura</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
+                    <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Selle Italia">Selle Italia</option>
@@ -1594,16 +1618,20 @@
                     <option value="Canyon">Canyon</option>
                     <option value="Campagnolo">Campagnolo</option>
                     <option value="Continental">Continental</option>
+                    <option value="Basso">Basso</option>
                     <option value="DT Swiss">DT Swiss</option>
                     <option value="Fizik">Fizik</option>
                     <option value="Fox">Fox</option>
                     <option value="Garmin">Garmin</option>
+                    <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
+                    <option value="Magura">Magura</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
+                    <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Selle Italia">Selle Italia</option>
@@ -1707,16 +1735,20 @@
                     <option value="Canyon">Canyon</option>
                     <option value="Campagnolo">Campagnolo</option>
                     <option value="Continental">Continental</option>
+                    <option value="Basso">Basso</option>
                     <option value="DT Swiss">DT Swiss</option>
                     <option value="Fizik">Fizik</option>
                     <option value="Fox">Fox</option>
                     <option value="Garmin">Garmin</option>
+                    <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
+                    <option value="Magura">Magura</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
+                    <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Selle Italia">Selle Italia</option>
@@ -1942,73 +1974,38 @@
         let callbackConfirmacion = null;
 
         // ========================================
-        // FUNCIONES DE FOTO DE PERFIL
+        // FUNCIONES FOTO DE PERFIL
         // ========================================
-        
+
         function togglePhotoOptions() {
-            const options = document.getElementById('photo-options');
-            options.classList.toggle('active');
+            document.getElementById('photo-options').classList.toggle('active');
         }
-
         document.addEventListener('click', (e) => {
-            const container = document.getElementById('profile-photo-container');
-            const options = document.getElementById('photo-options');
-            if (container && !container.contains(e.target)) {
-                options.classList.remove('active');
-            }
+            const c = document.getElementById('profile-photo-container');
+            if (c && !c.contains(e.target)) document.getElementById('photo-options').classList.remove('active');
         });
-
         function selectPhotoSource(source) {
             const input = document.getElementById('photo-input');
-            if (source === 'camera') {
-                input.setAttribute('capture', 'environment');
-            } else {
-                input.removeAttribute('capture');
-            }
+            source === 'camera' ? input.setAttribute('capture','environment') : input.removeAttribute('capture');
             input.click();
             document.getElementById('photo-options').classList.remove('active');
         }
-
         async function handlePhotoSelected(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                mostrarNotificacion('La imagen es demasiado grande. Máximo 5MB.', 'error');
-                return;
-            }
-
-            if (!file.type.startsWith('image/')) {
-                mostrarNotificacion('Por favor selecciona una imagen válida.', 'error');
-                return;
-            }
-
+            if (file.size > 5*1024*1024) { mostrarNotificacion('Imagen demasiado grande. Máx 5MB.','error'); return; }
             try {
-                mostrarNotificacion('Subiendo foto...', 'exito');
-
-                const compressedFile = await compressImage(file);
-
-                const storageRef = storage.ref();
-                const photoRef = storageRef.child(`profile-photos/${usuarioActual.uid}`);
-                
-                await photoRef.put(compressedFile);
-                const photoURL = await photoRef.getDownloadURL();
-
-                await db.collection('usuarios').doc(usuarioActual.uid).update({
-                    photoURL: photoURL
-                });
-
-                mostrarFotoPerfil(photoURL);
-                mostrarNotificacion('Foto actualizada correctamente', 'exito');
-
-            } catch (error) {
-                console.error('Error al subir foto:', error);
-                mostrarNotificacion('Error al subir la foto', 'error');
-            }
-
+                mostrarNotificacion('Subiendo foto...','exito');
+                const compressed = await compressImage(file);
+                const ref = storage.ref().child(`profile-photos/${usuarioActual.uid}`);
+                await ref.put(compressed);
+                const url = await ref.getDownloadURL();
+                await db.collection('usuarios').doc(usuarioActual.uid).update({ photoURL: url });
+                mostrarFotoPerfil(url);
+                mostrarNotificacion('Foto actualizada correctamente','exito');
+            } catch(e) { console.error(e); mostrarNotificacion('Error al subir la foto','error'); }
             event.target.value = '';
         }
-
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -2016,85 +2013,151 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        const maxSize = 800;
-                        if (width > height && width > maxSize) {
-                            height = (height * maxSize) / width;
-                            width = maxSize;
-                        } else if (height > maxSize) {
-                            width = (width * maxSize) / height;
-                            height = maxSize;
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        canvas.toBlob((blob) => {
-                            resolve(new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            }));
-                        }, 'image/jpeg', 0.8);
+                        let w = img.width, h = img.height, max = 800;
+                        if (w > h && w > max) { h = h*max/w; w = max; }
+                        else if (h > max) { w = w*max/h; h = max; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img,0,0,w,h);
+                        canvas.toBlob(blob => resolve(new File([blob],file.name,{type:'image/jpeg'})),'image/jpeg',0.8);
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });
         }
-
-        function mostrarFotoPerfil(photoURL) {
-            const photoImg = document.getElementById('dashboard-photo-img');
-            const initials = document.getElementById('dashboard-initials');
-            
-            if (photoURL) {
-                photoImg.src = photoURL;
-                photoImg.style.display = 'block';
-                initials.style.display = 'none';
-            } else {
-                photoImg.style.display = 'none';
-                initials.style.display = 'block';
-            }
+        function mostrarFotoPerfil(url) {
+            const img = document.getElementById('dashboard-photo-img');
+            const ini = document.getElementById('dashboard-initials');
+            if (!img || !ini) return;
+            if (url) { img.src = url; img.style.display = 'block'; ini.style.display = 'none'; }
+            else { img.style.display = 'none'; ini.style.display = 'block'; }
         }
-
         function mostrarIniciales(nombre) {
             if (!nombre) return '👤';
-            
-            const palabras = nombre.trim().split(' ');
-            if (palabras.length >= 2) {
-                return (palabras[0][0] + palabras[palabras.length - 1][0]).toUpperCase();
-            }
-            return nombre.substring(0, 2).toUpperCase();
+            const p = nombre.trim().split(' ');
+            return p.length >= 2 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : nombre.substring(0,2).toUpperCase();
         }
-
         async function removeProfilePhoto() {
             if (!confirm('¿Eliminar foto de perfil?')) return;
+            document.getElementById('photo-options').classList.remove('active');
+            try {
+                await storage.ref().child(`profile-photos/${usuarioActual.uid}`).delete().catch(()=>{});
+                await db.collection('usuarios').doc(usuarioActual.uid).update({ photoURL: firebase.firestore.FieldValue.delete() });
+                mostrarFotoPerfil(null);
+                mostrarNotificacion('Foto eliminada','exito');
+            } catch(e) { mostrarNotificacion('Error al eliminar','error'); }
+        }
+
+        // Sincronizar KM de la bici actual desde Strava
+        async function sincronizarBiciStrava() {
+            if (!biciActual || !biciActual.stravaBiciId) {
+                mostrarNotificacion('Esta bici no está vinculada con Strava','error'); return;
+            }
+            if (!await renovarTokenStrava()) {
+                mostrarNotificacion('Token de Strava expirado. Reconecta tu cuenta.','error'); return;
+            }
+            mostrarNotificacion('Sincronizando KM con Strava...','info');
+            try {
+                const response = await fetch(`${STRAVA_API_URL}/gear/${biciActual.stravaBiciId}`, {
+                    headers: { 'Authorization': `Bearer ${datosUsuario.stravaAccessToken}` }
+                });
+                if (!response.ok) throw new Error('Error obteniendo datos de la bici en Strava');
+                const gearData = await response.json();
+                const kmStrava = Math.round(gearData.distance / 1000);
+                const biciIndex = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
+                if (biciIndex !== -1) {
+                    const kmAnteriores = datosUsuario.garaje[biciIndex].kmTotales || 0;
+                    datosUsuario.garaje[biciIndex].kmTotales = kmStrava;
+                    datosUsuario.garaje[biciIndex].ultimaSincronizacion = new Date().toISOString();
+                    biciActual = datosUsuario.garaje[biciIndex];
+                    await guardarDatosUsuario();
+                    cargarTaller();
+                    mostrarNotificacion(`✅ KM actualizados: ${kmStrava.toLocaleString()} km (antes: ${kmAnteriores.toLocaleString()} km)`,'exito');
+                }
+            } catch(error) {
+                console.error('Error sincronizando bici:', error);
+                mostrarNotificacion('Error al sincronizar con Strava','error');
+            }
+        }
+
+        // ========================================
+        // PANEL DE ADMINISTRACIÓN
+        // ========================================
+        async function cargarAdmin() {
+            if (!usuarioActual || usuarioActual.email !== 'alfersam@gmail.com') {
+                navegar('sec-dashboard');
+                return;
+            }
+
+            const container = document.getElementById('admin-lista-usuarios');
+            container.innerHTML = '<div class="text-center text-muted">Cargando...</div>';
 
             try {
-                document.getElementById('photo-options').classList.remove('active');
+                const snapshot = await db.collection('usuarios').get();
+                const usuarios = [];
                 
-                const storageRef = storage.ref();
-                const photoRef = storageRef.child(`profile-photos/${usuarioActual.uid}`);
-                await photoRef.delete().catch(() => {});
-
-                await db.collection('usuarios').doc(usuarioActual.uid).update({
-                    photoURL: firebase.firestore.FieldValue.delete()
+                snapshot.forEach(doc => {
+                    usuarios.push({ id: doc.id, ...doc.data() });
                 });
 
-                const photoImg = document.getElementById('dashboard-photo-img');
-                const initials = document.getElementById('dashboard-initials');
-                photoImg.style.display = 'none';
-                initials.style.display = 'block';
+                // Estadísticas globales
+                const totalBicis = usuarios.reduce((t, u) => t + (u.garaje ? u.garaje.filter(b => b.activa !== false).length : 0), 0);
+                const conStrava = usuarios.filter(u => u.stravaAccessToken).length;
 
-                mostrarNotificacion('Foto eliminada', 'exito');
+                document.getElementById('admin-total-usuarios').textContent = usuarios.length;
+                document.getElementById('admin-total-bicis').textContent = totalBicis;
+                document.getElementById('admin-con-strava').textContent = conStrava;
+
+                // Lista de usuarios ordenados por fecha de registro
+                usuarios.sort((a, b) => {
+                    const fa = a.fechaRegistro || a.fechaCreacion || '';
+                    const fb = b.fechaRegistro || b.fechaCreacion || '';
+                    return fb.localeCompare(fa);
+                });
+
+                if (usuarios.length === 0) {
+                    container.innerHTML = '<div class="lista-vacia"><div class="lista-vacia-icon">👥</div><p>No hay usuarios registrados</p></div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                usuarios.forEach(u => {
+                    const nombre = u.nombre && u.apellidos
+                        ? `${u.nombre} ${u.apellidos}`
+                        : u.nombre || u.email || 'Sin nombre';
+                    
+                    const fechaReg = u.fechaRegistro || u.fechaCreacion
+                        ? new Date(u.fechaRegistro || u.fechaCreacion).toLocaleDateString('es-ES')
+                        : 'Desconocida';
+                    
+                    const ultimaConexion = u.ultimaConexion
+                        ? new Date(u.ultimaConexion).toLocaleDateString('es-ES')
+                        : 'Sin datos';
+
+                    const bicisActivas = u.garaje ? u.garaje.filter(b => b.activa !== false).length : 0;
+                    const stravaStatus = u.stravaAccessToken ? '🟢 Strava' : '⚪ Sin Strava';
+                    const esAdmin = u.email === 'alfersam@gmail.com' ? ' 👑' : '';
+
+                    const card = document.createElement('div');
+                    card.className = 'admin-user-card';
+                    card.innerHTML = `
+                        <div class="admin-user-name">${nombre}${esAdmin}</div>
+                        <div class="admin-user-email">${u.email || 'Sin email'}</div>
+                        <div class="admin-user-meta">
+                            <span>📅 Registro: ${fechaReg}</span>
+                            <span>🕐 Última: ${ultimaConexion}</span>
+                        </div>
+                        <div class="admin-user-meta" style="margin-top: 5px;">
+                            <span>🚴 ${bicisActivas} bici${bicisActivas !== 1 ? 's' : ''}</span>
+                            <span>${stravaStatus}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
 
             } catch (error) {
-                console.error('Error al eliminar foto:', error);
-                mostrarNotificacion('Error al eliminar la foto', 'error');
+                console.error('Error cargando admin:', error);
+                container.innerHTML = '<div class="text-center text-muted">Error al cargar usuarios</div>';
             }
         }
 
@@ -2135,7 +2198,11 @@
                 const doc = await db.collection('usuarios').doc(uid).get();
                 if (doc.exists) {
                     datosUsuario = { id: doc.id, ...doc.data() };
-                    console.log('Datos del usuario cargados');
+                    // Guardar última conexión
+            db.collection('usuarios').doc(usuarioActual.uid).update({
+                ultimaConexion: new Date().toISOString()
+            }).catch(() => {});
+            console.log('Datos del usuario cargados');
                 } else {
                     // Si no existe, crear documento inicial
                     datosUsuario = {
@@ -2245,6 +2312,8 @@
                 cargarHistorial();
             } else if (seccionId === 'sec-bicis-retiradas') {
                 cargarBicisRetiradas();
+            } else if (seccionId === 'sec-admin') {
+                cargarAdmin();
             } else if (seccionId === 'sec-perfil') {
                 cargarPerfil();
             }
@@ -2264,11 +2333,18 @@
             document.getElementById('dashboard-usuario').textContent = nombreCompleto;
             document.getElementById('dashboard-email').textContent = datosUsuario.email || 'Sin email';
 
+            // Mostrar botón admin solo para alfersam@gmail.com
+            const btnAdmin = document.getElementById('btn-admin-dashboard');
+            if (btnAdmin) {
+                btnAdmin.style.display = usuarioActual.email === 'alfersam@gmail.com' ? 'flex' : 'none';
+            }
+
             // Cargar foto de perfil
             if (datosUsuario.photoURL) {
                 mostrarFotoPerfil(datosUsuario.photoURL);
             } else {
-                document.getElementById('dashboard-initials').textContent = mostrarIniciales(datosUsuario.nombre || usuarioActual.email);
+                const ini = document.getElementById('dashboard-initials');
+                if (ini) ini.textContent = mostrarIniciales(datosUsuario.nombre || usuarioActual.email);
             }
 
             // Resumen de bicis
@@ -2628,14 +2704,7 @@
                             Abrir
                         </button>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 0.85em;" onclick="retirarBici('${bici.id}')">
-                            📦 Retirar
-                        </button>
-                        <button class="btn btn-danger" style="flex: 1; padding: 8px; font-size: 0.85em;" onclick="eliminarBici('${bici.id}')">
-                            🗑️ Eliminar
-                        </button>
-                    </div>
+
                 `;
                 container.appendChild(card);
             });
@@ -2647,13 +2716,13 @@
 
             confirmar(
                 '¿Retirar bici?',
-                `¿Quieres retirar "${bici.alias}" del garaje activo? Se guardará en tu historial pero no aparecerá en la lista principal.`,
-                () => {
+                `"${bici.alias}" se guardará en Bicis Retiradas. Podrás reactivarla cuando quieras.`,
+                async () => {
                     bici.activa = false;
                     bici.fechaRetiro = new Date().toISOString();
-                    guardarDatosUsuario();
-                    cargarGaraje();
+                    await guardarDatosUsuario();
                     mostrarNotificacion(`"${bici.alias}" retirada del garaje`, 'info');
+                    navegar('sec-garaje');
                 }
             );
         }
@@ -2732,11 +2801,12 @@
 
             confirmar(
                 '¿Reactivar bici?',
-                `¿Quieres volver a activar "${bici.alias}" en tu garaje?`,
-                () => {
+                `"${bici.alias}" volverá a tu garaje activo.`,
+                async () => {
                     bici.activa = true;
                     delete bici.fechaRetiro;
-                    guardarDatosUsuario();
+                    await guardarDatosUsuario();
+                    mostrarNotificacion(`"${bici.alias}" reactivada ✅`, 'exito');
                     cargarBicisRetiradas();
                     mostrarNotificacion(`"${bici.alias}" reactivada en el garaje`, 'exito');
                 }
@@ -2860,8 +2930,12 @@
             if (biciActual.stravaBiciId) {
                 document.getElementById('taller-strava-vinculado').style.display = 'block';
                 document.getElementById('taller-strava-nombre').textContent = biciActual.stravaBiciNombre || 'Bici de Strava';
+                document.getElementById('btn-vincular-strava-icon').textContent = '🔓';
+                document.getElementById('btn-vincular-strava-texto').textContent = 'Desvincular';
             } else {
                 document.getElementById('taller-strava-vinculado').style.display = 'none';
+                document.getElementById('btn-vincular-strava-icon').textContent = '🚴';
+                document.getElementById('btn-vincular-strava-texto').textContent = 'Vincular Strava';
             }
         }
 
@@ -2870,7 +2944,140 @@
         }
 
         function mostrarMenuBici() {
-            mostrarNotificacion('Función de edición próximamente', 'info');
+            if (!biciActual) return;
+
+            // Crear modal dinámico de menú
+            const modalExistente = document.getElementById('modal-menu-bici');
+            if (modalExistente) modalExistente.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'modal-menu-bici';
+            modal.className = 'modal activo';
+            modal.innerHTML = `
+                <div class="modal-contenido" style="max-width: 320px;">
+                    <div class="modal-confirmar-titulo" style="font-size: 1.1em; margin-bottom: 5px;">⚙️ ${biciActual.alias}</div>
+                    <div class="text-muted" style="font-size: 0.85em; margin-bottom: 20px; text-align: center;">${biciActual.marca} ${biciActual.modelo}</div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-bottom: 10px;" onclick="cerrarMenuBici(); editarBici();">
+                        ✏️ Editar datos
+                    </button>
+                    <button class="btn btn-secondary" style="width:100%; margin-bottom: 10px;" onclick="cerrarMenuBici(); retirarBici(biciActual.id);">
+                        📦 Retirar bici
+                    </button>
+                    <button class="btn btn-danger" style="width:100%; margin-bottom: 15px;" onclick="cerrarMenuBici(); eliminarBici(biciActual.id);">
+                        🗑️ Eliminar bici
+                    </button>
+                    <button class="btn btn-secondary" onclick="cerrarMenuBici();">
+                        ← Cancelar
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function cerrarMenuBici() {
+            const modal = document.getElementById('modal-menu-bici');
+            if (modal) modal.remove();
+        }
+
+        function editarBici() {
+            if (!biciActual) return;
+            window._editandoBiciId = biciActual.id;
+
+            // Modo edición: cambiar textos
+            document.getElementById('titulo-nueva-bici').textContent = 'Editar Bici';
+            document.getElementById('btn-guardar-bici').textContent = '💾 Guardar Cambios';
+            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "cancelarFormBici()");
+
+            // Rellenar formulario con datos actuales
+            document.getElementById('nueva-alias').value = biciActual.alias || '';
+            document.getElementById('nueva-marca').value = biciActual.marca || '';
+            document.getElementById('nueva-modelo').value = biciActual.modelo || '';
+            document.getElementById('nueva-disciplina').value = biciActual.disciplina || 'Carretera';
+            document.getElementById('nueva-fecha').value = biciActual.fechaCompra || '';
+            document.getElementById('nueva-km').value = biciActual.kmTotales || 0;
+
+            // Cambiar label de KM
+            const labelKm = document.querySelector('label[for="nueva-km"]');
+            if (labelKm) labelKm.textContent = 'Kilómetros totales';
+            else {
+                const kmInput = document.getElementById('nueva-km');
+                if (kmInput && kmInput.previousElementSibling) {
+                    kmInput.previousElementSibling.textContent = 'Kilómetros totales';
+                }
+            }
+
+            navegar('sec-nueva-bici');
+        }
+
+        function cancelarFormBici() {
+            const editando = window._editandoBiciId;
+            window._editandoBiciId = null;
+
+            // Resetear formulario
+            document.getElementById('titulo-nueva-bici').textContent = 'Nueva Bici';
+            document.getElementById('btn-guardar-bici').textContent = 'Crear Bicicleta';
+            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "navegar('sec-garaje')");
+
+            // Limpiar campos
+            document.getElementById('nueva-alias').value = '';
+            document.getElementById('nueva-marca').value = '';
+            document.getElementById('nueva-modelo').value = '';
+            document.getElementById('nueva-fecha').value = '';
+            document.getElementById('nueva-km').value = '0';
+
+            navegar(editando ? 'sec-taller' : 'sec-garaje');
+        }
+
+        function guardarBici() {
+            if (window._editandoBiciId) {
+                guardarEdicionBici();
+            } else {
+                crearBicicleta();
+            }
+        }
+
+        async function guardarEdicionBici() {
+            const alias = document.getElementById('nueva-alias').value.trim();
+            const marca = document.getElementById('nueva-marca').value;
+            const modelo = document.getElementById('nueva-modelo').value.trim();
+            const disciplina = document.getElementById('nueva-disciplina').value;
+            const fechaCompra = document.getElementById('nueva-fecha').value;
+            const kmTotales = parseFloat(document.getElementById('nueva-km').value) || 0;
+
+            if (!alias || !marca || !modelo) {
+                mostrarNotificacion('Completa alias, marca y modelo', 'error');
+                return;
+            }
+            if (!fechaCompra) {
+                mostrarNotificacion('Indica la fecha de compra', 'error');
+                return;
+            }
+
+            const biciIndex = datosUsuario.garaje.findIndex(b => b.id === window._editandoBiciId);
+            if (biciIndex === -1) {
+                mostrarNotificacion('Error: No se encontró la bici', 'error');
+                return;
+            }
+
+            // Actualizar conservando componentes, historial, etc.
+            datosUsuario.garaje[biciIndex] = {
+                ...datosUsuario.garaje[biciIndex],
+                alias, marca, modelo, disciplina, fechaCompra, kmTotales
+            };
+
+            biciActual = datosUsuario.garaje[biciIndex];
+            await guardarDatosUsuario();
+
+            // Resetear
+            window._editandoBiciId = null;
+            document.getElementById('titulo-nueva-bici').textContent = 'Nueva Bici';
+            document.getElementById('btn-guardar-bici').textContent = 'Crear Bicicleta';
+            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "navegar('sec-garaje')");
+
+            mostrarNotificacion('✅ Bici actualizada correctamente', 'exito');
+            navegar('sec-taller');
+            cargarTaller();
         }
 
         // ========================================
@@ -2956,7 +3163,7 @@
             const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
             
             grid.innerHTML = '';
-            const iconos = {'Cuadro': '🚲', 'Transmisión': '⚙️', 'Frenos': '🛑', 'Ruedas': '⭕', 'Periféricos': '🎯', 'Suspensiones': '🔧'};
+            const iconos = {'Cuadro': '🚲', 'Transmisión': '⚙️', 'Frenos': '🛑', 'Ruedas': '⭕', 'Periféricos': '🎯', 'Suspensiones': '🦘'};
             
             secciones.forEach(seccion => {
                 const card = document.createElement('div');
@@ -3802,6 +4009,32 @@
         }
 
         // Abrir modal para vincular bici con Strava
+        function accionStravaBici() {
+            if (biciActual && biciActual.stravaBiciId) {
+                desvinculaBiciStrava();
+            } else {
+                abrirModalVincularStrava();
+            }
+        }
+
+        async function desvinculaBiciStrava() {
+            confirmar(
+                '¿Desvincular bici de Strava?',
+                `Se quitará la vinculación de "${biciActual.alias}" con Strava. Los KM actuales se conservan.`,
+                async () => {
+                    const biciIndex = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
+                    if (biciIndex !== -1) {
+                        delete datosUsuario.garaje[biciIndex].stravaBiciId;
+                        delete datosUsuario.garaje[biciIndex].stravaBiciNombre;
+                        biciActual = datosUsuario.garaje[biciIndex];
+                        await guardarDatosUsuario();
+                        cargarTaller();
+                        mostrarNotificacion('Bici desvinculada de Strava', 'info');
+                    }
+                }
+            );
+        }
+
         async function abrirModalVincularStrava() {
             if (!biciActual) return;
 
