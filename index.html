@@ -888,7 +888,7 @@
                 </div>
                 <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
                 <div class="card-title" id="dashboard-usuario">Usuario</div>
-                <div class="card-subtitle" id="dashboard-email">email@ejemplo.com</div>
+                <div class="card-subtitle" id="dashboard-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f49199959d98b4919e919984989bda979b99">[email&#160;protected]</a></div>
             </div>
 
             <!-- Resumen de bicis -->
@@ -919,6 +919,10 @@
                 <button class="btn-grid-item" onclick="mostrarNotificacion('Próximamente: Configuración', 'info')">
                     <div class="btn-grid-item-icon">⚙️</div>
                     <div class="btn-grid-item-text">Ajustes</div>
+                </button>
+                <button class="btn-grid-item" id="btn-admin-dashboard" style="display:none; grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="navegar('sec-admin')">
+                    <div class="btn-grid-item-icon">👑</div>
+                    <div class="btn-grid-item-text">Panel Admin</div>
                 </button>
             </div>
         </section>
@@ -1109,6 +1113,7 @@
                     <option value="Focus">Focus</option>
                     <option value="Giant">Giant</option>
                     <option value="Kona">Kona</option>
+                    <option value="Lifefitness">Lifefitness</option>
                     <option value="Merida">Merida</option>
                     <option value="Orbea">Orbea</option>
                     <option value="Pinarello">Pinarello</option>
@@ -1136,6 +1141,7 @@
                     <option value="Gravel">Gravel</option>
                     <option value="Urbana">Urbana</option>
                     <option value="Eléctrica">Eléctrica</option>
+                    <option value="Indoor">Indoor / Estática</option>
                     <option value="Otra">Otra</option>
                 </select>
             </div>
@@ -1242,7 +1248,7 @@
                     </div>
                     <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
                         <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Uso</div>
-                        <div style="font-size: 1.6em; font-weight: 700; color: var(--primary);" id="taller-uso">0 días</div>
+                        <div style="font-size: 1.6em; font-weight: 700; color: var(--primary);" id="taller-uso">0d</div>
                     </div>
                     <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
                         <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Peso</div>
@@ -1466,6 +1472,7 @@
                     <option value="Garmin">Garmin</option>
                     <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
+                    <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
@@ -1625,6 +1632,7 @@
                     <option value="Garmin">Garmin</option>
                     <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
+                    <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
@@ -1742,6 +1750,7 @@
                     <option value="Garmin">Garmin</option>
                     <option value="Giant">Giant</option>
                     <option value="Kodak">Kodak</option>
+                    <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
@@ -2072,16 +2081,28 @@
                     biciActual = datosUsuario.garaje[biciIndex];
                     await guardarDatosUsuario();
                     cargarTaller();
-                    mostrarNotificacion(`✅ KM actualizados: ${kmStrava.toLocaleString()} km (antes: ${kmAnteriores.toLocaleString()} km)`,'exito');
+                    mostrarNotificacion(`✅ KM actualizados: ${kmStrava.toLocaleString()} km (antes: ${kmAnteriores.toLocaleString()} km)`, 'exito');
                 }
-            } catch(error) {
-                console.error('Error sincronizando bici:', error);
-                mostrarNotificacion('Error al sincronizar con Strava','error');
+            } catch (error) {
+                console.error('Error sincronizando con Strava:', error);
+                mostrarNotificacion('Error al sincronizar con Strava', 'error');
             }
         }
 
         // ========================================
         // PANEL DE ADMINISTRACIÓN
+        // NOTA FIRESTORE PERMISOS: Para que el admin pueda leer todos los usuarios,
+        // actualiza las reglas en Firebase Console > Firestore > Reglas:
+        //
+        // rules_version = '2';
+        // service cloud.firestore {
+        //   match /databases/{database}/documents {
+        //     match /usuarios/{userId} {
+        //       allow read, write: if request.auth != null && request.auth.uid == userId;
+        //       allow read: if request.auth != null && request.auth.token.email == 'alfersam@gmail.com';
+        //     }
+        //   }
+        // }
         // ========================================
         async function cargarAdmin() {
             if (!usuarioActual || usuarioActual.email !== 'alfersam@gmail.com') {
@@ -2135,8 +2156,17 @@
                         : 'Sin datos';
 
                     const bicisActivas = u.garaje ? u.garaje.filter(b => b.activa !== false).length : 0;
+                    const bicisRetiradas = u.garaje ? u.garaje.filter(b => b.activa === false).length : 0;
                     const stravaStatus = u.stravaAccessToken ? '🟢 Strava' : '⚪ Sin Strava';
                     const esAdmin = u.email === 'alfersam@gmail.com' ? ' 👑' : '';
+
+                    // Calcular días desde registro
+                    let diasRegistro = '';
+                    const fechaReg2 = u.fechaRegistro || u.fechaCreacion;
+                    if (fechaReg2) {
+                        const dias = Math.floor((new Date() - new Date(fechaReg2)) / 86400000);
+                        diasRegistro = ` (${formatearDuracion(dias)})`;
+                    }
 
                     const card = document.createElement('div');
                     card.className = 'admin-user-card';
@@ -2144,11 +2174,12 @@
                         <div class="admin-user-name">${nombre}${esAdmin}</div>
                         <div class="admin-user-email">${u.email || 'Sin email'}</div>
                         <div class="admin-user-meta">
-                            <span>📅 Registro: ${fechaReg}</span>
+                            <span>📅 Registro: ${fechaReg}${diasRegistro}</span>
                             <span>🕐 Última: ${ultimaConexion}</span>
                         </div>
                         <div class="admin-user-meta" style="margin-top: 5px;">
-                            <span>🚴 ${bicisActivas} bici${bicisActivas !== 1 ? 's' : ''}</span>
+                            <span>🚴 ${bicisActivas} activa${bicisActivas !== 1 ? 's' : ''}</span>
+                            <span>📦 ${bicisRetiradas} retirada${bicisRetiradas !== 1 ? 's' : ''}</span>
                             <span>${stravaStatus}</span>
                         </div>
                     `;
@@ -2739,8 +2770,8 @@
                     if (index !== -1) {
                         datosUsuario.garaje.splice(index, 1);
                         guardarDatosUsuario();
-                        cargarGaraje();
                         mostrarNotificacion(`"${bici.alias}" eliminada correctamente`, 'exito');
+                        navegar('sec-garaje');
                     }
                 }
             );
@@ -3116,7 +3147,10 @@
         const SECCIONES_COMPONENTES = {
             'Carretera': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos'],
             'Gravel': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos'],
-            'MTB': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos', 'Suspensiones']
+            'MTB': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos', 'Suspensiones'],
+            'Indoor': ['Cuadro', 'Transmisión', 'Periféricos'],
+            'Urbana': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos'],
+            'Eléctrica': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos']
         };
         
         // Componentes por sección
@@ -3124,18 +3158,22 @@
             'Cuadro': {
                 'Carretera': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
                 'Gravel': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
-                'MTB': ['Cuadro', 'Dirección', 'Cierre Tija', 'Patilla de Cambio']
+                'MTB': ['Cuadro', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
+                'Indoor': ['Cuadro/Estructura', 'Manillar', 'Tija Sillín'],
+                'todos': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio']
             },
             'Transmisión': {
                 'Carretera': ['Cambio Trasero', 'Desviador Delantero', 'Cassette', 'Cadena', 'Bielas', 'Eje de Pedalier', 'Pedales', 'Batería de Cambio'],
                 'Gravel': ['Cambio Trasero', 'Desviador Delantero', 'Cassette', 'Cadena', 'Bielas', 'Eje de Pedalier', 'Pedales', 'Batería de Cambio'],
-                'MTB': ['Cambio Trasero', 'Desviador Delantero', 'Cassette', 'Cadena', 'Bielas', 'Eje de Pedalier', 'Pedales', 'Batería de Cambio', 'Mando Cambio Delantero', 'Mando Cambio Trasero']
+                'MTB': ['Cambio Trasero', 'Desviador Delantero', 'Cassette', 'Cadena', 'Bielas', 'Eje de Pedalier', 'Pedales', 'Batería de Cambio', 'Mando Cambio Delantero', 'Mando Cambio Trasero'],
+                'Indoor': ['Bielas', 'Pedales', 'Volante de Inercia', 'Sistema de Resistencia', 'Correa/Cadena'],
+                'todos': ['Cambio Trasero', 'Cassette', 'Cadena', 'Bielas', 'Eje de Pedalier', 'Pedales']
             },
             'Frenos': {
                 'todos': ['Maneta Izquierda', 'Maneta Derecha', 'Pinza Delantera', 'Pinza Trasera', 'Disco Delantero', 'Disco Trasero']
             },
             'Ruedas': {
-                'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo']
+                'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo', 'Cámaras/Válvulas/Tubeless']
             },
             'Periféricos': {
                 'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS']
@@ -3222,7 +3260,7 @@
                         </div>
                         <div style="text-align: right;">
                             <div class="badge badge-primary">${kmUso} km</div>
-                            <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${diasUso} días</div>
+                            <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${formatearDuracion(diasUso)}</div>
                         </div>
                     </div>
                 `;
