@@ -210,6 +210,38 @@
             opacity: 0.9;
         }
 
+        /* Tooltips en botones */
+        [title] {
+            position: relative;
+        }
+        [title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.78);
+            color: #fff;
+            padding: 4px 9px;
+            border-radius: 6px;
+            font-size: 0.72em;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 9999;
+            font-weight: 500;
+        }
+        [title]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 1px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0,0,0,0.78);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
         .btn-link {
             background: transparent;
             color: var(--secondary);
@@ -1161,6 +1193,78 @@
         </section>
 
         <!-- ========================================
+             SECCIÓN: GARAJE DE RUEDAS
+        ======================================== -->
+        <section id="sec-garaje-ruedas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-componentes')">←</button>
+                <div class="topbar-title" style="font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">⭕ Ruedas · <span id="garaje-ruedas-nombre-bici"></span></div>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div id="lista-juegos-ruedas" class="mt-20">
+                <!-- Generado dinámicamente -->
+            </div>
+
+            <button class="btn btn-primary mt-20" onclick="abrirModalNuevoJuegoRuedas()">➕ Añadir Juego de Ruedas</button>
+            <button id="btn-ver-ruedas-retiradas" class="btn btn-secondary mt-20" style="display:none;" onclick="navegar('sec-ruedas-retiradas')">📦 Ver Ruedas Retiradas</button>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: RUEDAS RETIRADAS
+        ======================================== -->
+        <section id="sec-ruedas-retiradas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-garaje-ruedas')">←</button>
+                <div class="topbar-title">📦 Ruedas Retiradas</div>
+                <div style="width: 40px;"></div>
+            </div>
+            <div class="text-muted text-center mb-20" style="margin-top:15px;">
+                <p>Juegos de ruedas retirados · Puedes reactivarlos cuando quieras</p>
+            </div>
+            <div id="lista-ruedas-retiradas" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: DETALLE JUEGO DE RUEDAS (Ver Ruedas)
+        ======================================== -->
+        <section id="sec-detalle-juego-ruedas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-garaje-ruedas')">←</button>
+                <div class="topbar-title" id="detalle-juego-ruedas-titulo">Juego de Ruedas</div>
+                <div style="width: 40px;"></div>
+            </div>
+            <div id="contenido-detalle-ruedas" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: DESPIECE DE RUEDA
+        ======================================== -->
+        <section id="sec-despiece-rueda" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-detalle-juego-ruedas')">←</button>
+                <div class="topbar-title" id="despiece-rueda-titulo">Despiece</div>
+                <div style="width: 40px;"></div>
+            </div>
+            <div id="contenido-despiece-rueda" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: CAJÓN DE PIEZAS
+        ======================================== -->
+        <section id="sec-cajon-piezas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-componentes')">←</button>
+                <div class="topbar-title">📦 Cajón de Piezas</div>
+                <div style="width: 40px;"></div>
+            </div>
+            <div class="text-muted text-center mb-20" style="margin-top:15px;">
+                <p>Piezas guardadas · Puedes reinstalarlas cuando quieras</p>
+            </div>
+            <div id="lista-cajon-piezas" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
              SECCIÓN: BICIS RETIRADAS
         ======================================== -->
         <section id="sec-bicis-retiradas" class="seccion">
@@ -1302,6 +1406,9 @@
             <div id="grid-secciones-componentes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;">
                 <!-- Se generará dinámicamente según la disciplina -->
             </div>
+
+            <!-- Cajón de piezas (solo visible si hay piezas) -->
+            <button id="btn-ver-cajon" class="btn btn-secondary mt-20" style="display:none;" onclick="navegar('sec-cajon-piezas')">📦 Cajón de piezas (<span id="cajon-count">0</span>)</button>
         </section>
 
         <!-- ========================================
@@ -1373,18 +1480,18 @@
             </div>
 
             <!-- Botones de acción -->
-            <div class="btn-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <button class="btn-grid-item" onclick="editarComponenteActual()">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-grid-item" style="flex:1;" title="Editar datos del componente" onclick="editarComponenteActual()">
                     <div class="btn-grid-item-icon">✏️</div>
-                    <div class="btn-grid-item-text">Editar</div>
                 </button>
-                <button class="btn-grid-item" onclick="repararComponenteActual()">
-                    <div class="btn-grid-item-icon">🔧</div>
-                    <div class="btn-grid-item-text">Reparar</div>
-                </button>
-                <button class="btn-grid-item" onclick="sustituirComponenteActual()">
+                <button class="btn-grid-item" style="flex:1;" title="Sustituir por otro componente" onclick="sustituirComponenteActual()">
                     <div class="btn-grid-item-icon">🔄</div>
-                    <div class="btn-grid-item-text">Sustituir</div>
+                </button>
+                <button class="btn-grid-item" style="flex:1;" title="Registrar reparación" onclick="repararComponenteActual()">
+                    <div class="btn-grid-item-icon">🔧</div>
+                </button>
+                <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar este componente" onclick="eliminarComponenteActual()">
+                    <div class="btn-grid-item-icon">🗑️</div>
                 </button>
             </div>
 
@@ -1426,15 +1533,15 @@
     ======================================== -->
     <div id="modal-km" class="modal">
         <div class="modal-contenido">
-            <div class="modal-header">
-                <h2 class="modal-title">Añadir Kilómetros</h2>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-km')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;">Añadir Kilómetros</h2>
             </div>
             <div class="form-group">
                 <label>¿Cuántos km has hecho?</label>
                 <input type="number" id="input-km" placeholder="Ej: 50">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-km')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarKm()">Guardar</button>
             </div>
         </div>
@@ -1445,8 +1552,9 @@
     ======================================== -->
     <div id="modal-componente" class="modal">
         <div class="modal-contenido" style="max-height: 85vh; overflow-y: auto;">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-componente-titulo">Nuevo Componente</h2>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-componente')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" id="modal-componente-titulo" style="margin:0;">Nuevo Componente</h2>
             </div>
             
             <!-- Tipo de componente (select que se genera dinámicamente) -->
@@ -1548,7 +1656,6 @@
             </div>
 
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-componente')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarComponente()">Guardar</button>
             </div>
         </div>
@@ -1587,7 +1694,6 @@
                 <input type="number" id="reparar-coste" placeholder="0" step="0.01">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-reparar')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarReparacion()">Guardar</button>
             </div>
         </div>
@@ -1598,13 +1704,13 @@
     ======================================== -->
     <div id="modal-sustituir" class="modal">
         <div class="modal-contenido" style="max-height: 85vh; overflow-y: auto;">
-            <div class="modal-header">
-                <h2 class="modal-title">Sustituir Componente</h2>
-                <p style="color: var(--text); font-size: 0.9em; margin-top: 10px;">Se guardará el historial del componente antiguo</p>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-sustituir')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;">Sustituir Componente</h2>
             </div>
 
             <!-- Resumen componente antiguo -->
-            <div class="card" style="background: var(--light-gray); margin-bottom: 20px;">
+            <div class="card" style="background: var(--light-gray); margin-bottom: 20px; margin-top:15px;">
                 <div style="font-size: 0.85em; color: var(--text); margin-bottom: 5px;">Componente a sustituir:</div>
                 <div style="font-weight: bold;" id="sustituir-componente-viejo">-</div>
                 <div style="margin-top: 10px; font-size: 0.9em;">
@@ -1705,9 +1811,21 @@
             <!-- Campos extra según tipo -->
             <div id="sustituir-campos-extra"></div>
 
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-sustituir')">Cancelar</button>
-                <button class="btn btn-primary" onclick="guardarSustitucion()">Sustituir</button>
+            <!-- Qué hacer con el componente viejo - al tocar confirma -->
+            <div style="background: var(--light-gray); border-radius: 12px; padding: 15px; margin-top: 20px; margin-bottom: 15px;">
+                <label style="font-weight: 700; margin-bottom: 10px; display:block;">¿Qué hacemos con el componente actual?</label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="guardarSustitucion('historial')" style="flex:1; cursor:pointer; text-align:center; padding: 12px; border-radius: 8px; border: 2px solid var(--primary); background: white;">
+                        <div style="font-size: 1.3em;">🗑️</div>
+                        <div style="font-size: 0.8em; font-weight: 600; margin-top: 4px;">Al historial</div>
+                        <div style="font-size: 0.72em; color: var(--text); margin-top: 2px;">Reemplazar</div>
+                    </button>
+                    <button type="button" onclick="guardarSustitucion('cajon')" style="flex:1; cursor:pointer; text-align:center; padding: 12px; border-radius: 8px; border: 2px solid #ccc; background: white;">
+                        <div style="font-size: 1.3em;">📦</div>
+                        <div style="font-size: 0.8em; font-weight: 600; margin-top: 4px;">Al cajón</div>
+                        <div style="font-size: 0.72em; color: var(--text); margin-top: 2px;">Guardar para reutilizar</div>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1717,9 +1835,12 @@
     ======================================== -->
     <div id="modal-subpieza" class="modal">
         <div class="modal-contenido" style="max-height: 85vh; overflow-y: auto;">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-subpieza-titulo">Añadir Subpieza</h2>
-                <p style="color: var(--text); font-size: 0.9em; margin-top: 10px;" id="modal-subpieza-subtitulo">-</p>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-subpieza')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <div>
+                    <h2 class="modal-title" id="modal-subpieza-titulo" style="margin:0;">Añadir Subpieza</h2>
+                    <p style="color: var(--text); font-size: 0.9em; margin-top: 4px;" id="modal-subpieza-subtitulo">-</p>
+                </div>
             </div>
 
             <!-- Datos heredados del padre (solo lectura visual) -->
@@ -1824,7 +1945,6 @@
             <div id="subpieza-campos-especificos"></div>
 
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-subpieza')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarSubpieza()">Guardar</button>
             </div>
         </div>
@@ -1835,8 +1955,9 @@
     ======================================== -->
     <div id="modal-mantenimiento" class="modal">
         <div class="modal-contenido">
-            <div class="modal-header">
-                <h2 class="modal-title">Registrar Mantenimiento</h2>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-mantenimiento')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;">Registrar Mantenimiento</h2>
             </div>
             <div class="form-group">
                 <label>Tipo</label>
@@ -1859,7 +1980,6 @@
                 <input type="number" id="mant-coste" placeholder="0">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-mantenimiento')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarMantenimiento()">Guardar</button>
             </div>
         </div>
@@ -1881,7 +2001,6 @@
                 <input type="email" id="recuperar-email" placeholder="tu@email.com">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-recuperar-password')">Cancelar</button>
                 <button class="btn btn-primary" onclick="enviarEmailRecuperacion()">Enviar enlace</button>
             </div>
         </div>
@@ -1922,6 +2041,264 @@
                     <button class="btn btn-secondary" onclick="cerrarModal('modal-vincular-strava')">Cancelar</button>
                     <button class="btn btn-primary" onclick="guardarVinculacionStrava()">Guardar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: NUEVO/EDITAR JUEGO DE RUEDAS
+    ======================================== -->
+    <div id="modal-juego-ruedas" class="modal">
+        <div class="modal-contenido">
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-juego-ruedas')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" id="juego-ruedas-modal-titulo" style="margin:0;">Nuevo Juego de Ruedas</h2>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="juego-marca-select" onchange="toggleMarcaJuegoOtra()">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Bontrager">Bontrager</option>
+                    <option value="Campagnolo">Campagnolo</option>
+                    <option value="Corima">Corima</option>
+                    <option value="DT Swiss">DT Swiss</option>
+                    <option value="Enve">Enve</option>
+                    <option value="Fulcrum">Fulcrum</option>
+                    <option value="Hunt">Hunt</option>
+                    <option value="Lightweight">Lightweight</option>
+                    <option value="Mavic">Mavic</option>
+                    <option value="Miche">Miche</option>
+                    <option value="Reynolds">Reynolds</option>
+                    <option value="Roval">Roval</option>
+                    <option value="Vision">Vision</option>
+                    <option value="Zipp">Zipp</option>
+                    <option value="Otra">Otra</option>
+                </select>
+                <input type="text" id="juego-marca" placeholder="Nombre de la marca" style="margin-top:8px; display:none;">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="juego-modelo" placeholder="Ej: 404 Firecrest, Ksyrium...">
+            </div>
+            <div class="form-group">
+                <label>Fecha de instalación</label>
+                <input type="date" id="juego-fecha">
+            </div>
+            <div class="form-group">
+                <label>KM en instalación</label>
+                <input type="number" id="juego-km" placeholder="0" value="0">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="guardarJuegoRuedas()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: COMPONENTE DE RUEDA
+    ======================================== -->
+    <div id="modal-comp-rueda" class="modal">
+        <div class="modal-contenido">
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-comp-rueda')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" id="modal-comp-rueda-titulo" style="margin:0;">Añadir Componente</h2>
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="comp-rueda-tipo">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Llanta">Llanta</option>
+                    <option value="Buje">Buje</option>
+                    <option value="Cubierta">Cubierta</option>
+                    <option value="Disco">Disco</option>
+                    <option value="Cierre">Cierre</option>
+                    <option value="Cámara">Cámara</option>
+                    <option value="Válvula">Válvula</option>
+                    <option value="Tubeless">Tubeless</option>
+                    <option value="Radios/Niples">Radios/Niples</option>
+                    <option value="Núcleo">Núcleo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="comp-rueda-marca-select" onchange="toggleMarcaRuedaOtra()">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Bontrager">Bontrager</option>
+                    <option value="Continental">Continental</option>
+                    <option value="DT Swiss">DT Swiss</option>
+                    <option value="Lifefitness">Lifefitness</option>
+                    <option value="Maxxis">Maxxis</option>
+                    <option value="Mavic">Mavic</option>
+                    <option value="Michelin">Michelin</option>
+                    <option value="Pirelli">Pirelli</option>
+                    <option value="Schwalbe">Schwalbe</option>
+                    <option value="Shimano">Shimano</option>
+                    <option value="Specialized">Specialized</option>
+                    <option value="Zipp">Zipp</option>
+                    <option value="Otra">Otra</option>
+                </select>
+                <input type="text" id="comp-rueda-marca" placeholder="Nombre de la marca" style="margin-top:8px; display:none;">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="comp-rueda-modelo" placeholder="Ej: GP5000, 404...">
+            </div>
+            <div class="form-group">
+                <label>Peso (gramos)</label>
+                <input type="number" id="comp-rueda-peso" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="comp-rueda-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Fecha de instalación</label>
+                <input type="date" id="comp-rueda-fecha">
+            </div>
+            <div class="form-group">
+                <label>KM en instalación</label>
+                <input type="number" id="comp-rueda-km" placeholder="0">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="guardarCompRueda()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: RUEDA (AÑADIR / EDITAR)
+    ======================================== -->
+    <div id="modal-rueda" class="modal">
+        <div class="modal-contenido" style="max-height: 85vh; overflow-y: auto;">
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-rueda')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" id="modal-rueda-titulo" style="margin:0;">Añadir Rueda</h2>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="rueda-marca-select" onchange="toggleMarcaRuedaModal()">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Bontrager">Bontrager</option>
+                    <option value="Campagnolo">Campagnolo</option>
+                    <option value="Corima">Corima</option>
+                    <option value="DT Swiss">DT Swiss</option>
+                    <option value="Enve">Enve</option>
+                    <option value="Fulcrum">Fulcrum</option>
+                    <option value="Hunt">Hunt</option>
+                    <option value="Lightweight">Lightweight</option>
+                    <option value="Mavic">Mavic</option>
+                    <option value="Miche">Miche</option>
+                    <option value="Reynolds">Reynolds</option>
+                    <option value="Roval">Roval</option>
+                    <option value="Vision">Vision</option>
+                    <option value="Zipp">Zipp</option>
+                    <option value="Otra">Otra</option>
+                </select>
+                <input type="text" id="rueda-marca-input" placeholder="Nombre de la marca" style="margin-top:8px; display:none;">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="rueda-modelo" placeholder="Ej: 404 Firecrest">
+            </div>
+            <div class="form-group">
+                <label>Material</label>
+                <select id="rueda-material">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Aluminio">Aluminio</option>
+                    <option value="Carbono">Carbono</option>
+                    <option value="Carbono/Aluminio">Carbono/Aluminio</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Peso (gramos)</label>
+                <input type="number" id="rueda-peso" placeholder="0" step="1">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="rueda-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Fecha de instalación</label>
+                <input type="date" id="rueda-fecha">
+            </div>
+            <div class="form-group">
+                <label>KM en instalación</label>
+                <input type="number" id="rueda-km" placeholder="0" step="1">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="guardarRueda()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: PIEZA DE RUEDA (DESPIECE)
+    ======================================== -->
+    <div id="modal-pieza-rueda" class="modal">
+        <div class="modal-contenido" style="max-height: 85vh; overflow-y: auto;">
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-pieza-rueda')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" id="modal-pieza-rueda-titulo" style="margin:0;">Añadir pieza</h2>
+            </div>
+            <div class="form-group">
+                <label>Tipo de pieza</label>
+                <select id="pieza-rueda-tipo"></select>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="pieza-rueda-marca-select">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Bontrager">Bontrager</option>
+                    <option value="Continental">Continental</option>
+                    <option value="DT Swiss">DT Swiss</option>
+                    <option value="Maxxis">Maxxis</option>
+                    <option value="Mavic">Mavic</option>
+                    <option value="Michelin">Michelin</option>
+                    <option value="Pirelli">Pirelli</option>
+                    <option value="Schwalbe">Schwalbe</option>
+                    <option value="Shimano">Shimano</option>
+                    <option value="Specialized">Specialized</option>
+                    <option value="Zipp">Zipp</option>
+                    <option value="Otra">Otra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="pieza-rueda-modelo" placeholder="Ej: GP5000, 404...">
+            </div>
+            <div class="form-group">
+                <label>Material</label>
+                <select id="pieza-rueda-material">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Aluminio">Aluminio</option>
+                    <option value="Carbono">Carbono</option>
+                    <option value="Caucho">Caucho</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Titanio">Titanio</option>
+                    <option value="Latón">Latón</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="pieza-rueda-peso-group" style="display:none;">
+                <label>Peso (gramos)</label>
+                <input type="number" id="pieza-rueda-peso" placeholder="0" step="1">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="pieza-rueda-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Fecha de instalación</label>
+                <input type="date" id="pieza-rueda-fecha">
+            </div>
+            <div class="form-group">
+                <label>KM en instalación</label>
+                <input type="number" id="pieza-rueda-km" placeholder="0" step="1">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="guardarPiezaRueda()">Guardar</button>
             </div>
         </div>
     </div>
@@ -2339,10 +2716,21 @@
                 cargarTaller();
             } else if (seccionId === 'sec-componentes') {
                 cargarSeccionesComponentes();
+                actualizarBotonCajon();
+            } else if (seccionId === 'sec-cajon-piezas') {
+                cargarCajonPiezas();
             } else if (seccionId === 'sec-historial') {
                 cargarHistorial();
             } else if (seccionId === 'sec-bicis-retiradas') {
                 cargarBicisRetiradas();
+            } else if (seccionId === 'sec-garaje-ruedas') {
+                cargarGarajeRuedas();
+            } else if (seccionId === 'sec-detalle-juego-ruedas') {
+                cargarDetalleJuegoRuedas();
+            } else if (seccionId === 'sec-despiece-rueda') {
+                cargarDespieceRueda();
+            } else if (seccionId === 'sec-ruedas-retiradas') {
+                cargarRuedasRetiradas();
             } else if (seccionId === 'sec-admin') {
                 cargarAdmin();
             } else if (seccionId === 'sec-perfil') {
@@ -3176,7 +3564,8 @@
                 'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo', 'Cámaras/Válvulas/Tubeless']
             },
             'Periféricos': {
-                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS']
+                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS'],
+                'Indoor': ['Consola', 'Manillar', 'Tija Sillín', 'Sillín', 'Portabidones', 'Acople GPS/Ciclocomputador', 'Soporte Tablet/Móvil', 'Ventilador', 'Alfombrilla Protectora', 'Protector Anticorrosión/Sudor']
             },
             'Suspensiones': {
                 'MTB': ['Horquilla', 'Amortiguador', 'Rodamientos/Casquillos', 'Mando Remoto Trasero', 'Mando Remoto Delantero']
@@ -3207,7 +3596,8 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style.cursor = 'pointer';
-                card.onclick = () => abrirSeccionComponentes(seccion);
+                // Ruedas tiene su propio sistema de juegos
+                card.onclick = () => seccion === 'Ruedas' ? abrirGarajeRuedas() : abrirSeccionComponentes(seccion);
                 card.innerHTML = `
                     <div style="text-align: center;">
                         <div style="font-size: 2.5em; margin-bottom: 10px;">${iconos[seccion]}</div>
@@ -3218,7 +3608,876 @@
             });
         }
         
-        // Abrir sección
+        // ========================================
+        // SISTEMA DE JUEGOS DE RUEDAS
+        // ========================================
+        let juegosRuedasActual = null; // juego de ruedas seleccionado
+
+        function abrirGarajeRuedas() {
+            navegar('sec-garaje-ruedas');
+        }
+
+        function cargarGarajeRuedas() {
+            if (!biciActual) return;
+            if (!biciActual.juegosRuedas) biciActual.juegosRuedas = [];
+            if (!biciActual.juegosRuedasRetiradas) biciActual.juegosRuedasRetiradas = [];
+
+            document.getElementById('garaje-ruedas-nombre-bici').textContent = biciActual.alias;
+            const container = document.getElementById('lista-juegos-ruedas');
+
+            // Juegos activos e inactivos (no retirados)
+            const juegosActivos = biciActual.juegosRuedas.filter(j => !j.retirado);
+
+            // Botón ver retiradas
+            const btnRetiradas = document.getElementById('btn-ver-ruedas-retiradas');
+            if (btnRetiradas) {
+                const numRetiradas = biciActual.juegosRuedas.filter(j => j.retirado).length;
+                btnRetiradas.style.display = numRetiradas > 0 ? 'block' : 'none';
+                btnRetiradas.textContent = `📦 Ver Ruedas Retiradas (${numRetiradas})`;
+            }
+
+            if (juegosActivos.length === 0) {
+                container.innerHTML = `
+                    <div class="lista-vacia">
+                        <div class="lista-vacia-icon">⭕</div>
+                        <p>No hay juegos de ruedas registrados</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            juegosActivos.forEach(juego => {
+                // KM acumulados: km previos + km del período actual si está activo
+                const kmPrevios = juego.kmAcumuladosPrevios || 0;
+                const kmRef = juego.kmActivacion !== undefined && juego.kmActivacion !== null
+                    ? juego.kmActivacion : (juego.kmInstalacion || 0);
+                const kmPeriodoActual = juego.activo
+                    ? Math.max(0, (biciActual.kmTotales || 0) - kmRef)
+                    : 0;
+                const kmTotalesJuego = kmPrevios + kmPeriodoActual;
+
+                // Días acumulados: días previos + días del período actual si está activo
+                const diasPrevios = juego.diasAcumuladosPrevios || 0;
+                const fechaRef = juego.fechaActivacion || juego.fechaInstalacion;
+                const diasPeriodoActual = juego.activo && fechaRef
+                    ? Math.floor((new Date() - new Date(fechaRef)) / 86400000)
+                    : 0;
+                const diasTotales = diasPrevios + diasPeriodoActual;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderLeftColor = juego.activo ? 'var(--primary)' : 'var(--text)';
+                card.style.opacity = juego.activo ? '1' : '0.75';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${juego.marca} ${juego.modelo}</div>
+                            <div class="card-subtitle">Desde: ${formatearFecha(juego.fechaInstalacion)} · ${juego.kmInstalacion || 0} km</div>
+                        </div>
+                        <span class="badge ${juego.activo ? 'badge-primary' : ''}" style="${juego.activo ? '' : 'background:#e0e0e0;color:#666;'}">${juego.activo ? '🟢 Activo' : '⚪ Disponible'}</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">KM ACUMULADOS</div>
+                            <div style="font-size:1.3em; font-weight:700; color:var(--primary);">${kmTotalesJuego}</div>
+                        </div>
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">TIEMPO USO</div>
+                            <div style="font-size:1.3em; font-weight:700; color:var(--secondary);">${formatearDuracion(diasTotales)}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Ver ruedas de este juego" onclick="abrirDetalleJuegoRuedas('${juego.id}')">
+                            🚲
+                        </button>
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" title="Editar datos del juego" onclick="editarJuegoRuedas('${juego.id}')">✏️</button>
+                        ${!juego.activo ? `<button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em; background:var(--secondary);" title="Activar este juego" onclick="activarJuegoRuedas('${juego.id}')">⚡</button>` : ''}
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em; background:var(--warning); color:white;" title="Retirar a ruedas retiradas" onclick="retirarJuegoRuedas('${juego.id}')">📦</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRuedas('${juego.id}')">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleMarcaJuegoOtra() {
+            const sel = document.getElementById('juego-marca-select');
+            const inp = document.getElementById('juego-marca');
+            if (sel.value === 'Otra') {
+                inp.style.display = 'block';
+                inp.value = '';
+                inp.focus();
+            } else {
+                inp.style.display = 'none';
+                inp.value = sel.value;
+            }
+        }
+
+        function abrirModalNuevoJuegoRuedas() {
+            document.getElementById('juego-ruedas-modal-titulo').textContent = 'Nuevo Juego de Ruedas';
+            document.getElementById('juego-marca-select').value = '';
+            document.getElementById('juego-marca').value = '';
+            document.getElementById('juego-marca').style.display = 'none';
+            document.getElementById('juego-modelo').value = '';
+
+            const hayJuegos = biciActual.juegosRuedas && biciActual.juegosRuedas.length > 0;
+            // Si ya hay juegos: fecha hoy y km actuales. Si es el primero: fecha compra bici y 0 km
+            document.getElementById('juego-fecha').value = hayJuegos
+                ? new Date().toISOString().split('T')[0]
+                : (biciActual.fechaCompra || new Date().toISOString().split('T')[0]);
+            document.getElementById('juego-km').value = hayJuegos ? (biciActual.kmTotales || 0) : 0;
+
+            window._editandoJuegoId = null;
+            abrirModal('modal-juego-ruedas');
+        }
+
+        function guardarJuegoRuedas() {
+            const marcaSel = document.getElementById('juego-marca-select').value;
+            const marcaInp = document.getElementById('juego-marca').value.trim();
+            const marca = marcaSel === 'Otra' ? marcaInp : marcaSel;
+            const modelo = document.getElementById('juego-modelo').value.trim();
+            const fecha = document.getElementById('juego-fecha').value;
+            const km = parseFloat(document.getElementById('juego-km').value) || 0;
+
+            if (!marca) {
+                mostrarNotificacion('Selecciona o indica la marca', 'error');
+                return;
+            }
+            if (!fecha) {
+                mostrarNotificacion('Indica la fecha de instalación', 'error');
+                return;
+            }
+
+            if (!biciActual.juegosRuedas) biciActual.juegosRuedas = [];
+
+            // Modo edición
+            if (window._editandoJuegoId) {
+                const juego = biciActual.juegosRuedas.find(j => j.id === window._editandoJuegoId);
+                if (juego) {
+                    juego.marca = marca;
+                    juego.modelo = modelo;
+                    juego.fechaInstalacion = fecha;
+                    juego.kmInstalacion = km;
+                }
+                window._editandoJuegoId = null;
+                guardarDatosUsuario();
+                cargarGarajeRuedas();
+                cerrarModal('modal-juego-ruedas');
+                mostrarNotificacion('Juego actualizado correctamente', 'exito');
+                return;
+            }
+
+            // Nuevo juego
+            const juegoActivo = biciActual.juegosRuedas.find(j => j.activo);
+            const nuevoJuego = {
+                id: Date.now().toString(),
+                marca, modelo,
+                fechaInstalacion: fecha,
+                kmInstalacion: km,
+                activo: false,
+                kmAcumuladosPrevios: 0,
+                diasAcumuladosPrevios: 0,
+                componentesRuedas: { delantera: [], trasera: [] }
+            };
+
+            const activarNuevo = () => {
+                // Congelar km y días del activo actual si lo hay
+                if (juegoActivo) {
+                    const kmRef = juegoActivo.kmActivacion !== undefined && juegoActivo.kmActivacion !== null
+                        ? juegoActivo.kmActivacion : (juegoActivo.kmInstalacion || 0);
+                    const fechaRef = juegoActivo.fechaActivacion || juegoActivo.fechaInstalacion;
+                    const kmPeriodo = Math.max(0, (biciActual.kmTotales || 0) - kmRef);
+                    const diasPeriodo = fechaRef
+                        ? Math.floor((new Date() - new Date(fechaRef)) / 86400000) : 0;
+                    juegoActivo.kmAcumuladosPrevios = (juegoActivo.kmAcumuladosPrevios || 0) + kmPeriodo;
+                    juegoActivo.diasAcumuladosPrevios = (juegoActivo.diasAcumuladosPrevios || 0) + diasPeriodo;
+                    juegoActivo.activo = false;
+                    juegoActivo.kmActivacion = null;
+                    juegoActivo.fechaActivacion = null;
+                }
+                nuevoJuego.activo = true;
+                nuevoJuego.kmActivacion = km; // km en el momento de instalación del nuevo juego
+                nuevoJuego.fechaActivacion = fecha + 'T00:00:00.000Z';
+                guardarDatosUsuario();
+                cargarGarajeRuedas();
+                mostrarNotificacion('✅ Juego añadido y activado', 'exito');
+            };
+
+            biciActual.juegosRuedas.push(nuevoJuego);
+            cerrarModal('modal-juego-ruedas');
+
+            if (!juegoActivo) {
+                // No hay activo → activar directamente
+                activarNuevo();
+            } else {
+                // Hay uno activo → preguntar
+                confirmar(
+                    '¿Activar este juego?',
+                    `"${juegoActivo.marca} ${juegoActivo.modelo}" quedará disponible. ¿Deseas activar el nuevo juego ahora?`,
+                    activarNuevo
+                );
+                // Si cancela, el juego queda disponible
+                guardarDatosUsuario();
+                cargarGarajeRuedas();
+            }
+        }
+
+        function editarJuegoRuedas(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juego) return;
+            window._editandoJuegoId = juegoId;
+            document.getElementById('juego-ruedas-modal-titulo').textContent = 'Editar Juego de Ruedas';
+            const sel = document.getElementById('juego-marca-select');
+            const inp = document.getElementById('juego-marca');
+            const optionExists = Array.from(sel.options).some(o => o.value === juego.marca);
+            if (optionExists) {
+                sel.value = juego.marca;
+                inp.style.display = 'none';
+                inp.value = juego.marca;
+            } else {
+                sel.value = 'Otra';
+                inp.style.display = 'block';
+                inp.value = juego.marca || '';
+            }
+            document.getElementById('juego-modelo').value = juego.modelo;
+            document.getElementById('juego-fecha').value = juego.fechaInstalacion || '';
+            document.getElementById('juego-km').value = juego.kmInstalacion || 0;
+            abrirModal('modal-juego-ruedas');
+        }
+
+        function activarJuegoRuedas(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId && !j.retirado);
+            if (!juego) return;
+            const juegoActivo = biciActual.juegosRuedas.find(j => j.activo);
+
+            const doActivar = async () => {
+                if (juegoActivo) {
+                    const kmPeriodo = Math.max(0, (biciActual.kmTotales || 0) - (juegoActivo.kmActivacion || juegoActivo.kmInstalacion || 0));
+                    const diasPeriodo = juegoActivo.fechaActivacion
+                        ? Math.floor((new Date() - new Date(juegoActivo.fechaActivacion)) / 86400000) : 0;
+                    juegoActivo.kmAcumuladosPrevios = (juegoActivo.kmAcumuladosPrevios || 0) + kmPeriodo;
+                    juegoActivo.diasAcumuladosPrevios = (juegoActivo.diasAcumuladosPrevios || 0) + diasPeriodo;
+                    juegoActivo.activo = false;
+                    juegoActivo.kmActivacion = null;
+                    juegoActivo.fechaActivacion = null;
+                }
+                juego.activo = true;
+                juego.kmActivacion = biciActual.kmTotales || 0;
+                juego.fechaActivacion = new Date().toISOString();
+                await guardarDatosUsuario();
+                cargarGarajeRuedas();
+                mostrarNotificacion(`"${juego.marca} ${juego.modelo}" activado ✅`, 'exito');
+            };
+
+            if (juegoActivo) {
+                confirmar(
+                    '¿Cambiar juego activo?',
+                    `"${juegoActivo.marca} ${juegoActivo.modelo}" quedará disponible y se activará "${juego.marca} ${juego.modelo}".`,
+                    doActivar
+                );
+            } else {
+                doActivar();
+            }
+        }
+
+        function retirarJuegoRuedas(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juego) return;
+            confirmar(
+                '¿Retirar juego de ruedas?',
+                `"${juego.marca} ${juego.modelo}" pasará a Ruedas Retiradas. Podrás reactivarlo cuando quieras.`,
+                async () => {
+                    if (juego.activo) {
+                        const kmPeriodo = Math.max(0, (biciActual.kmTotales || 0) - (juego.kmActivacion || juego.kmInstalacion || 0));
+                        const diasPeriodo = juego.fechaActivacion
+                            ? Math.floor((new Date() - new Date(juego.fechaActivacion)) / 86400000) : 0;
+                        juego.kmAcumuladosPrevios = (juego.kmAcumuladosPrevios || 0) + kmPeriodo;
+                        juego.diasAcumuladosPrevios = (juego.diasAcumuladosPrevios || 0) + diasPeriodo;
+                        juego.activo = false;
+                        juego.kmActivacion = null;
+                        juego.fechaActivacion = null;
+                        const disponibles = biciActual.juegosRuedas.filter(j => !j.activo && !j.retirado && j.id !== juegoId);
+                        if (disponibles.length === 1) {
+                            disponibles[0].activo = true;
+                            disponibles[0].kmActivacion = biciActual.kmTotales || 0;
+                            disponibles[0].fechaActivacion = new Date().toISOString();
+                            mostrarNotificacion(`"${disponibles[0].marca} ${disponibles[0].modelo}" activado automáticamente`, 'info');
+                        } else if (disponibles.length > 1) {
+                            mostrarNotificacion('Recuerda activar otro juego de ruedas', 'info');
+                        }
+                    }
+                    juego.retirado = true;
+                    juego.fechaRetiro = new Date().toISOString();
+                    await guardarDatosUsuario();
+                    cargarGarajeRuedas();
+                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" retirado 📦`, 'info');
+                }
+            );
+        }
+
+        function eliminarJuegoRuedas(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juego) return;
+            confirmar(
+                '¿Eliminar juego de ruedas?',
+                `¿Estás seguro de eliminar "${juego.marca} ${juego.modelo}"? Se perderán todos sus datos.`,
+                async () => {
+                    const eraActivo = juego.activo;
+                    biciActual.juegosRuedas = biciActual.juegosRuedas.filter(j => j.id !== juegoId);
+                    if (eraActivo) {
+                        const disponibles = biciActual.juegosRuedas.filter(j => !j.activo && !j.retirado);
+                        if (disponibles.length === 1) {
+                            disponibles[0].activo = true;
+                            disponibles[0].kmActivacion = biciActual.kmTotales || 0;
+                            disponibles[0].fechaActivacion = new Date().toISOString();
+                            mostrarNotificacion(`"${disponibles[0].marca} ${disponibles[0].modelo}" activado automáticamente`, 'info');
+                        } else if (disponibles.length > 1) {
+                            mostrarNotificacion('Recuerda activar otro juego de ruedas', 'info');
+                        }
+                    }
+                    await guardarDatosUsuario();
+                    cargarGarajeRuedas();
+                    mostrarNotificacion('Juego eliminado', 'info');
+                }
+            );
+        }
+
+        function cargarRuedasRetiradas() {
+            if (!biciActual) return;
+            const retiradas = (biciActual.juegosRuedas || []).filter(j => j.retirado);
+            const container = document.getElementById('lista-ruedas-retiradas');
+            if (retiradas.length === 0) {
+                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">📦</div><p>No hay ruedas retiradas</p></div>`;
+                return;
+            }
+            container.innerHTML = '';
+            retiradas.forEach(juego => {
+                const kmTotales = juego.kmAcumuladosPrevios || 0;
+                const diasTotales = juego.diasAcumuladosPrevios || 0;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderLeftColor = 'var(--text)';
+                card.style.opacity = '0.85';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${juego.marca} ${juego.modelo}</div>
+                            <div class="card-subtitle">Instalado: ${formatearFecha(juego.fechaInstalacion)}</div>
+                            <div class="text-muted" style="font-size:0.75em; margin-top:3px;">Retirado: ${formatearFecha(juego.fechaRetiro)}</div>
+                        </div>
+                        <span class="badge" style="background:#e0e0e0;color:#666;">📦 Retirado</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">KM TOTALES</div>
+                            <div style="font-size:1.3em; font-weight:700; color:var(--primary);">${kmTotales}</div>
+                        </div>
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">TIEMPO USO</div>
+                            <div style="font-size:1.3em; font-weight:700; color:var(--secondary);">${formatearDuracion(diasTotales)}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Volver a disponible" onclick="reactivarJuegoRuedas('${juego.id}')">↩️ Reactivar</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRetirado('${juego.id}')">🗑️ Eliminar</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function reactivarJuegoRuedas(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juego) return;
+            confirmar(
+                '¿Reactivar juego de ruedas?',
+                `"${juego.marca} ${juego.modelo}" volverá como disponible con sus km y tiempo acumulados.`,
+                async () => {
+                    juego.retirado = false;
+                    juego.fechaRetiro = null;
+                    await guardarDatosUsuario();
+                    cargarRuedasRetiradas();
+                    cargarGarajeRuedas();
+                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" disponible ↩️`, 'exito');
+                }
+            );
+        }
+
+        function eliminarJuegoRetirado(juegoId) {
+            const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juego) return;
+            confirmar(
+                '¿Eliminar definitivamente?',
+                `¿Estás seguro de eliminar "${juego.marca} ${juego.modelo}"? Esta acción no se puede deshacer.`,
+                async () => {
+                    biciActual.juegosRuedas = biciActual.juegosRuedas.filter(j => j.id !== juegoId);
+                    await guardarDatosUsuario();
+                    cargarRuedasRetiradas();
+                    mostrarNotificacion('Juego eliminado definitivamente', 'info');
+                }
+            );
+        }
+
+
+        function abrirDetalleJuegoRuedas(juegoId) {
+            juegosRuedasActual = biciActual.juegosRuedas.find(j => j.id === juegoId);
+            if (!juegosRuedasActual) return;
+            navegar('sec-detalle-juego-ruedas');
+        }
+
+        function cargarDetalleJuegoRuedas() {
+            if (!juegosRuedasActual) return;
+            document.getElementById('detalle-juego-ruedas-titulo').textContent = `${juegosRuedasActual.marca} ${juegosRuedasActual.modelo}`;
+            const container = document.getElementById('contenido-detalle-ruedas');
+            container.innerHTML = '';
+
+            // Inicializar estructura si no existe
+            if (!juegosRuedasActual.ruedas) juegosRuedasActual.ruedas = {};
+
+            ['delantera', 'trasera'].forEach(lado => {
+                const rueda = juegosRuedasActual.ruedas[lado];
+                const titulo = lado === 'delantera' ? '⬆️ Rueda Delantera' : '⬇️ Rueda Trasera';
+
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '15px';
+
+                if (!rueda) {
+                    // Sin rueda — mostrar botón añadir
+                    div.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-title">${titulo}</div>
+                        </div>
+                        <div style="text-align:center; padding:15px 0;">
+                            <div style="color:var(--text); font-size:0.9em; margin-bottom:12px;">Sin rueda registrada</div>
+                            <button class="btn btn-primary" style="width:auto; padding:8px 20px;" onclick="abrirModalRueda('${lado}')">➕ Añadir rueda</button>
+                        </div>
+                    `;
+                } else {
+                    // Con rueda — mostrar tarjeta
+                    const kmUso = (biciActual.kmTotales || 0) - (rueda.kmInstalacion || 0);
+                    const diasUso = rueda.fechaInstalacion ? Math.floor((new Date() - new Date(rueda.fechaInstalacion)) / 86400000) : 0;
+                    const numPiezas = (rueda.piezas || []).length;
+                    div.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-title">${titulo}</div>
+                            <span class="badge badge-primary">${Math.max(0, kmUso)} km</span>
+                        </div>
+                        <div style="font-size:0.9em; margin-top:8px;">
+                            <strong>${rueda.marca} ${rueda.modelo || ''}</strong>
+                            ${rueda.material ? `<span style="color:var(--text); margin-left:8px;">${rueda.material}</span>` : ''}
+                            ${rueda.peso ? `<span style="color:var(--text); margin-left:8px;">· ${rueda.peso}g</span>` : ''}
+                        </div>
+                        <div style="color:var(--text); font-size:0.8em; margin-top:4px;">
+                            Desde: ${formatearFecha(rueda.fechaInstalacion)} · ${formatearDuracion(diasUso)}
+                        </div>
+                        <div style="display:flex; gap:8px; margin-top:12px;">
+                            <button class="btn-grid-item" style="flex:1;" title="Editar rueda" onclick="abrirModalRueda('${lado}', true)"><div class="btn-grid-item-icon">✏️</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Reparar rueda" onclick="repararRueda('${lado}')"><div class="btn-grid-item-icon">🔧</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Sustituir rueda" onclick="sustituirRueda('${lado}')"><div class="btn-grid-item-icon">🔄</div></button>
+                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar rueda" onclick="eliminarRueda('${lado}')"><div class="btn-grid-item-icon">🗑️</div></button>
+                        </div>
+                        <button class="btn btn-secondary" style="width:100%; margin-top:10px; font-size:0.85em;" onclick="abrirDespieceRueda('${lado}')">
+                            🔩 Despiece ${numPiezas > 0 ? `(${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'})` : ''}
+                        </button>
+                    `;
+                }
+                container.appendChild(div);
+            });
+        }
+
+        // ========================================
+        // MODAL RUEDA (Añadir / Editar)
+        // ========================================
+        function abrirModalRueda(lado, editar = false) {
+            window._ladoRuedaActual = lado;
+            const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
+            const tituloLado = lado === 'delantera' ? 'Delantera' : 'Trasera';
+
+            document.getElementById('modal-rueda-titulo').textContent = editar
+                ? `Editar · Rueda ${tituloLado}`
+                : `Añadir · Rueda ${tituloLado}`;
+
+            const sel = document.getElementById('rueda-marca-select');
+            const inp = document.getElementById('rueda-marca-input');
+
+            if (editar && rueda) {
+                const optExists = Array.from(sel.options).some(o => o.value === rueda.marca);
+                if (optExists) { sel.value = rueda.marca; inp.style.display = 'none'; inp.value = rueda.marca; }
+                else { sel.value = 'Otra'; inp.style.display = 'block'; inp.value = rueda.marca || ''; }
+                document.getElementById('rueda-modelo').value = rueda.modelo || '';
+                document.getElementById('rueda-material').value = rueda.material || '';
+                document.getElementById('rueda-peso').value = rueda.peso || '';
+                document.getElementById('rueda-precio').value = rueda.precio || '';
+                document.getElementById('rueda-fecha').value = rueda.fechaInstalacion || '';
+                document.getElementById('rueda-km').value = rueda.kmInstalacion || 0;
+            } else {
+                // Heredar del juego de ruedas
+                const marcaJuego = juegosRuedasActual.marca || '';
+                const sel2 = document.getElementById('rueda-marca-select');
+                const optExists = Array.from(sel2.options).some(o => o.value === marcaJuego);
+                if (optExists) { sel2.value = marcaJuego; inp.style.display = 'none'; inp.value = marcaJuego; }
+                else if (marcaJuego) { sel2.value = 'Otra'; inp.style.display = 'block'; inp.value = marcaJuego; }
+                else { sel2.value = ''; inp.style.display = 'none'; }
+                document.getElementById('rueda-modelo').value = juegosRuedasActual.modelo || '';
+                document.getElementById('rueda-material').value = juegosRuedasActual.material || '';
+                document.getElementById('rueda-peso').value = '';
+                document.getElementById('rueda-precio').value = '';
+                document.getElementById('rueda-fecha').value = juegosRuedasActual.fechaInstalacion || new Date().toISOString().split('T')[0];
+                document.getElementById('rueda-km').value = juegosRuedasActual.kmInstalacion || 0;
+            }
+            abrirModal('modal-rueda');
+        }
+
+        function toggleMarcaRuedaModal() {
+            const sel = document.getElementById('rueda-marca-select');
+            const inp = document.getElementById('rueda-marca-input');
+            if (sel.value === 'Otra') { inp.style.display = 'block'; inp.value = ''; inp.focus(); }
+            else { inp.style.display = 'none'; inp.value = sel.value; }
+        }
+
+        function guardarRueda() {
+            const lado = window._ladoRuedaActual;
+            const sel = document.getElementById('rueda-marca-select');
+            const inp = document.getElementById('rueda-marca-input');
+            const marca = sel.value === 'Otra' ? inp.value.trim() : sel.value;
+            const modelo = document.getElementById('rueda-modelo').value.trim();
+            const material = document.getElementById('rueda-material').value;
+            const peso = parseFloat(document.getElementById('rueda-peso').value) || 0;
+            const precio = parseFloat(document.getElementById('rueda-precio').value) || 0;
+            const fecha = document.getElementById('rueda-fecha').value;
+            const km = parseFloat(document.getElementById('rueda-km').value) || 0;
+
+            if (!marca) { mostrarNotificacion('Indica la marca', 'error'); return; }
+            if (!fecha) { mostrarNotificacion('Indica la fecha', 'error'); return; }
+
+            if (!juegosRuedasActual.ruedas) juegosRuedasActual.ruedas = {};
+            const ruedaExistente = juegosRuedasActual.ruedas[lado];
+            juegosRuedasActual.ruedas[lado] = {
+                marca, modelo, material, peso, precio,
+                fechaInstalacion: fecha,
+                kmInstalacion: km,
+                piezas: ruedaExistente ? (ruedaExistente.piezas || []) : []
+            };
+
+            guardarDatosUsuario();
+            cerrarModal('modal-rueda');
+            cargarDetalleJuegoRuedas();
+            mostrarNotificacion(`Rueda ${lado} guardada ✅`, 'exito');
+        }
+
+        function eliminarRueda(lado) {
+            const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
+            if (!rueda) return;
+            confirmar(
+                '¿Eliminar rueda?',
+                `Se eliminará la rueda ${lado} "${rueda.marca} ${rueda.modelo || ''}" y todo su despiece.`,
+                async () => {
+                    delete juegosRuedasActual.ruedas[lado];
+                    await guardarDatosUsuario();
+                    cargarDetalleJuegoRuedas();
+                    mostrarNotificacion('Rueda eliminada', 'info');
+                }
+            );
+        }
+
+        function repararRueda(lado) {
+            // Reutilizamos modal-reparar apuntando a la rueda
+            window._repararRuedaLado = lado;
+            const rueda = juegosRuedasActual.ruedas[lado];
+            document.getElementById('reparar-componente-nombre').textContent = `Rueda ${lado} · ${rueda.marca} ${rueda.modelo || ''}`;
+            document.getElementById('reparar-descripcion').value = '';
+            document.getElementById('reparar-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('reparar-km').value = biciActual.kmTotales || 0;
+            document.getElementById('reparar-coste').value = '';
+            window._repararModoRueda = true;
+            abrirModal('modal-reparar');
+        }
+
+        function sustituirRueda(lado) {
+            // Abrimos modal-rueda en modo edición — la sustitución es simplemente reemplazar datos
+            abrirModalRueda(lado, true);
+        }
+
+        // ========================================
+        // DESPIECE DE RUEDA
+        // ========================================
+        const PIEZAS_CON_PESO = ['Cubierta', 'Cámara', 'Válvula', 'Cierre', 'Tubeless'];
+        const PIEZAS_DELANTERA = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
+        const PIEZAS_TRASERA = [...PIEZAS_DELANTERA, 'Núcleo'];
+
+        function abrirDespieceRueda(lado) {
+            window._ladoRuedaActual = lado;
+            const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
+            if (!rueda) return;
+            document.getElementById('despiece-rueda-titulo').textContent = `🔩 ${rueda.marca} ${rueda.modelo || ''} · ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
+            navegar('sec-despiece-rueda');
+        }
+
+        function cargarDespieceRueda() {
+            const lado = window._ladoRuedaActual;
+            if (!lado || !juegosRuedasActual) return;
+            const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
+            if (!rueda) return;
+            if (!rueda.piezas) rueda.piezas = [];
+
+            const container = document.getElementById('contenido-despiece-rueda');
+            container.innerHTML = '';
+
+            if (rueda.piezas.length === 0) {
+                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">🔩</div><p>Sin piezas registradas</p></div>`;
+            } else {
+                rueda.piezas.forEach(pieza => {
+                    const kmUso = (biciActual.kmTotales || 0) - (pieza.kmInstalacion || 0);
+                    const diasUso = pieza.fechaInstalacion ? Math.floor((new Date() - new Date(pieza.fechaInstalacion)) / 86400000) : 0;
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.marginBottom = '12px';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div>
+                                <div style="font-weight:700;">${pieza.tipo}</div>
+                                <div style="font-size:0.85em; color:var(--text);">${pieza.marca || '-'} ${pieza.modelo || ''}</div>
+                                ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="badge badge-primary">${Math.max(0, kmUso)} km</div>
+                                <div style="font-size:0.75em; color:var(--text); margin-top:4px;">${formatearDuracion(diasUso)}</div>
+                                ${pieza.peso ? `<div style="font-size:0.75em; color:var(--text); margin-top:2px;">${pieza.peso}g</div>` : ''}
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px; margin-top:10px;">
+                            <button class="btn-grid-item" style="flex:1;" title="Editar pieza" onclick="editarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">✏️</div></button>
+                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🗑️</div></button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // Botón añadir pieza
+            const btnAdd = document.createElement('button');
+            btnAdd.className = 'btn btn-primary mt-20';
+            btnAdd.style.width = '100%';
+            btnAdd.textContent = '➕ Añadir pieza';
+            btnAdd.onclick = () => abrirModalPiezaRueda();
+            container.appendChild(btnAdd);
+        }
+
+        function abrirModalPiezaRueda(piezaId = null) {
+            const lado = window._ladoRuedaActual;
+            const opciones = lado === 'delantera' ? PIEZAS_DELANTERA : PIEZAS_TRASERA;
+            window._editandoPiezaRuedaId = piezaId;
+
+            // Poblar select de tipo
+            const sel = document.getElementById('pieza-rueda-tipo');
+            sel.innerHTML = '<option value="">-- Selecciona tipo --</option>';
+            opciones.forEach(o => sel.add(new Option(o, o)));
+
+            // Mostrar/ocultar peso según tipo seleccionado
+            sel.onchange = () => {
+                const conPeso = PIEZAS_CON_PESO.includes(sel.value);
+                document.getElementById('pieza-rueda-peso-group').style.display = conPeso ? 'block' : 'none';
+            };
+
+            const rueda = juegosRuedasActual.ruedas[lado];
+            const pieza = piezaId ? (rueda.piezas || []).find(p => p.id === piezaId) : null;
+
+            document.getElementById('modal-pieza-rueda-titulo').textContent = pieza ? 'Editar pieza' : 'Añadir pieza';
+
+            if (pieza) {
+                sel.value = pieza.tipo;
+                sel.onchange(); // trigger peso visibility
+                document.getElementById('pieza-rueda-marca-select').value = pieza.marca || '';
+                document.getElementById('pieza-rueda-modelo').value = pieza.modelo || '';
+                document.getElementById('pieza-rueda-material').value = pieza.material || '';
+                document.getElementById('pieza-rueda-peso').value = pieza.peso || '';
+                document.getElementById('pieza-rueda-precio').value = pieza.precio || '';
+                document.getElementById('pieza-rueda-fecha').value = pieza.fechaInstalacion || '';
+                document.getElementById('pieza-rueda-km').value = pieza.kmInstalacion || 0;
+            } else {
+                // Heredar de la rueda
+                const rueda = juegosRuedasActual.ruedas[lado];
+                const marcaRueda = rueda ? (rueda.marca || '') : '';
+                const selMarca = document.getElementById('pieza-rueda-marca-select');
+                const optExists = Array.from(selMarca.options).some(o => o.value === marcaRueda);
+                selMarca.value = optExists ? marcaRueda : (marcaRueda ? 'Otra' : '');
+                document.getElementById('pieza-rueda-modelo').value = rueda ? (rueda.modelo || '') : '';
+                document.getElementById('pieza-rueda-material').value = rueda ? (rueda.material || '') : '';
+                document.getElementById('pieza-rueda-peso').value = '';
+                document.getElementById('pieza-rueda-precio').value = '';
+                document.getElementById('pieza-rueda-fecha').value = rueda ? (rueda.fechaInstalacion || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0];
+                document.getElementById('pieza-rueda-km').value = rueda ? (rueda.kmInstalacion || 0) : (biciActual.kmTotales || 0);
+                document.getElementById('pieza-rueda-peso-group').style.display = 'none';
+            }
+            abrirModal('modal-pieza-rueda');
+        }
+
+        function guardarPiezaRueda() {
+            const lado = window._ladoRuedaActual;
+            const tipo = document.getElementById('pieza-rueda-tipo').value;
+            const marca = document.getElementById('pieza-rueda-marca-select').value;
+            const modelo = document.getElementById('pieza-rueda-modelo').value.trim();
+            const material = document.getElementById('pieza-rueda-material').value;
+            const peso = PIEZAS_CON_PESO.includes(tipo) ? (parseFloat(document.getElementById('pieza-rueda-peso').value) || 0) : null;
+            const precio = parseFloat(document.getElementById('pieza-rueda-precio').value) || 0;
+            const fecha = document.getElementById('pieza-rueda-fecha').value;
+            const km = parseFloat(document.getElementById('pieza-rueda-km').value) || 0;
+
+            if (!tipo) { mostrarNotificacion('Selecciona el tipo de pieza', 'error'); return; }
+            if (!marca) { mostrarNotificacion('Indica la marca', 'error'); return; }
+
+            const rueda = juegosRuedasActual.ruedas[lado];
+            if (!rueda.piezas) rueda.piezas = [];
+
+            if (window._editandoPiezaRuedaId) {
+                const pieza = rueda.piezas.find(p => p.id === window._editandoPiezaRuedaId);
+                if (pieza) { pieza.tipo = tipo; pieza.marca = marca; pieza.modelo = modelo; pieza.material = material; pieza.peso = peso; pieza.precio = precio; pieza.fechaInstalacion = fecha; pieza.kmInstalacion = km; }
+            } else {
+                rueda.piezas.push({ id: Date.now().toString(), tipo, marca, modelo, material, peso, precio, fechaInstalacion: fecha, kmInstalacion: km });
+            }
+
+            guardarDatosUsuario();
+            cerrarModal('modal-pieza-rueda');
+            cargarDespieceRueda();
+            cargarDetalleJuegoRuedas();
+            mostrarNotificacion('Pieza guardada ✅', 'exito');
+        }
+
+        function editarPiezaRueda(piezaId) { abrirModalPiezaRueda(piezaId); }
+
+        function eliminarPiezaRueda(piezaId) {
+            confirmar('¿Eliminar pieza?', 'Esta acción no se puede deshacer.',
+                async () => {
+                    const rueda = juegosRuedasActual.ruedas[window._ladoRuedaActual];
+                    rueda.piezas = rueda.piezas.filter(p => p.id !== piezaId);
+                    await guardarDatosUsuario();
+                    cargarDespieceRueda();
+                    cargarDetalleJuegoRuedas();
+                    mostrarNotificacion('Pieza eliminada', 'info');
+                }
+            );
+        }
+
+        function abrirModalCompRueda(lado) {
+            window._ladoRuedaActual = lado;
+            window._editandoCompRuedaId = null;
+            document.getElementById('modal-comp-rueda-titulo').textContent = `Añadir · Rueda ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
+
+            // Poblar select de tipo según el lado
+            const tipoSelect = document.getElementById('comp-rueda-tipo');
+            const opcionesDelantera = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
+            const opcionesTrasera  = [...opcionesDelantera, 'Núcleo'];
+            const opciones = lado === 'delantera' ? opcionesDelantera : opcionesTrasera;
+            tipoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+            opciones.forEach(o => tipoSelect.add(new Option(o, o)));
+
+            // Reset resto de campos
+            document.getElementById('comp-rueda-marca-select').value = '';
+            document.getElementById('comp-rueda-marca').value = '';
+            document.getElementById('comp-rueda-marca').style.display = 'none';
+            document.getElementById('comp-rueda-modelo').value = '';
+            document.getElementById('comp-rueda-peso').value = '';
+            document.getElementById('comp-rueda-precio').value = '';
+            document.getElementById('comp-rueda-fecha').value = juegosRuedasActual.fechaInstalacion || new Date().toISOString().split('T')[0];
+            document.getElementById('comp-rueda-km').value = juegosRuedasActual.kmInstalacion || 0;
+            abrirModal('modal-comp-rueda');
+        }
+
+        function editarCompRueda(lado, compId) {
+            if (!juegosRuedasActual.componentesRuedas) return;
+            const comp = juegosRuedasActual.componentesRuedas[lado].find(c => c.id === compId);
+            if (!comp) return;
+            window._ladoRuedaActual = lado;
+            window._editandoCompRuedaId = compId;
+            document.getElementById('modal-comp-rueda-titulo').textContent = `Editar · Rueda ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
+
+            // Poblar select de tipo según el lado
+            const tipoSelect = document.getElementById('comp-rueda-tipo');
+            const opcionesDelantera = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
+            const opcionesTrasera  = [...opcionesDelantera, 'Núcleo'];
+            const opciones = lado === 'delantera' ? opcionesDelantera : opcionesTrasera;
+            tipoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+            opciones.forEach(o => tipoSelect.add(new Option(o, o)));
+            tipoSelect.value = comp.tipo;
+
+            // Rellenar marca
+            const sel = document.getElementById('comp-rueda-marca-select');
+            const inp = document.getElementById('comp-rueda-marca');
+            const optionExists = Array.from(sel.options).some(o => o.value === comp.marca);
+            if (optionExists) {
+                sel.value = comp.marca;
+                inp.style.display = 'none';
+                inp.value = comp.marca;
+            } else {
+                sel.value = 'Otra';
+                inp.style.display = 'block';
+                inp.value = comp.marca || '';
+            }
+            document.getElementById('comp-rueda-modelo').value = comp.modelo || '';
+            document.getElementById('comp-rueda-peso').value = comp.peso || '';
+            document.getElementById('comp-rueda-precio').value = comp.precio || '';
+            document.getElementById('comp-rueda-fecha').value = comp.fechaInstalacion || '';
+            document.getElementById('comp-rueda-km').value = comp.kmInstalacion || 0;
+            abrirModal('modal-comp-rueda');
+        }
+
+        function toggleMarcaRuedaOtra() {
+            const sel = document.getElementById('comp-rueda-marca-select');
+            const inp = document.getElementById('comp-rueda-marca');
+            if (sel.value === 'Otra') {
+                inp.style.display = 'block';
+                inp.value = '';
+            } else {
+                inp.style.display = 'none';
+                inp.value = sel.value;
+            }
+        }
+
+        function guardarCompRueda() {
+            const tipo = document.getElementById('comp-rueda-tipo').value;
+            const marcaSel = document.getElementById('comp-rueda-marca-select').value;
+            const marcaInp = document.getElementById('comp-rueda-marca').value.trim();
+            const marca = marcaSel === 'Otra' ? marcaInp : marcaSel;
+            const modelo = document.getElementById('comp-rueda-modelo').value.trim();
+            const peso = parseFloat(document.getElementById('comp-rueda-peso').value) || 0;
+            const precio = parseFloat(document.getElementById('comp-rueda-precio').value) || 0;
+            const fecha = document.getElementById('comp-rueda-fecha').value;
+            const km = parseFloat(document.getElementById('comp-rueda-km').value) || 0;
+            const lado = window._ladoRuedaActual;
+
+            if (!tipo) { mostrarNotificacion('Selecciona el tipo de componente', 'error'); return; }
+            if (!marca) { mostrarNotificacion('Indica la marca', 'error'); return; }
+
+            if (!juegosRuedasActual.componentesRuedas) juegosRuedasActual.componentesRuedas = { delantera: [], trasera: [] };
+            if (!juegosRuedasActual.componentesRuedas[lado]) juegosRuedasActual.componentesRuedas[lado] = [];
+
+            if (window._editandoCompRuedaId) {
+                const comp = juegosRuedasActual.componentesRuedas[lado].find(c => c.id === window._editandoCompRuedaId);
+                if (comp) { comp.tipo = tipo; comp.marca = marca; comp.modelo = modelo; comp.peso = peso; comp.precio = precio; comp.fechaInstalacion = fecha; comp.kmInstalacion = km; }
+            } else {
+                juegosRuedasActual.componentesRuedas[lado].push({ id: Date.now().toString(), tipo, marca, modelo, peso, precio, fechaInstalacion: fecha, kmInstalacion: km });
+            }
+
+            guardarDatosUsuario();
+            cargarDetalleJuegoRuedas();
+            cerrarModal('modal-comp-rueda');
+            mostrarNotificacion(window._editandoCompRuedaId ? 'Componente actualizado' : 'Componente añadido', 'exito');
+        }
+
+        // ========================================
+        function eliminarCompRueda(lado, compId) {
+            confirmar('¿Eliminar componente?', 'Esta acción no se puede deshacer.', async () => {
+                juegosRuedasActual.componentesRuedas[lado] = juegosRuedasActual.componentesRuedas[lado].filter(c => c.id !== compId);
+                await guardarDatosUsuario();
+                cargarDetalleJuegoRuedas();
+                mostrarNotificacion('Componente eliminado', 'info');
+            });
+        }
+
+        // ========================================
+        // ABRIR SECCIÓN COMPONENTES (resto de secciones)
+        // ========================================
         function abrirSeccionComponentes(seccion) {
             seccionActual = seccion;
             document.getElementById('titulo-seccion-componentes').textContent = seccion;
@@ -3512,13 +4771,11 @@
             document.getElementById('sustituir-km').value = biciActual.kmTotales || 0;
             document.getElementById('sustituir-campos-extra').innerHTML = '';
             
-            // Sin campos extra en componentes principales
-            
             abrirModal('modal-sustituir');
         }
         
         // Guardar sustitución
-        function guardarSustitucion() {
+        function guardarSustitucion(destinoViejo) {
             let marca = document.getElementById('sustituir-marca').value;
             const modelo = document.getElementById('sustituir-modelo').value.trim();
             let material = document.getElementById('sustituir-material').value;
@@ -3534,16 +4791,38 @@
             const durKm = kmSustitucion - kmViejo;
             const diasUso = componenteActual.fechaInstalacion ? Math.floor((new Date(fecha) - new Date(componenteActual.fechaInstalacion)) / 86400000) : 0;
             
-            if (!biciActual.historial) biciActual.historial = [];
-            biciActual.historial.unshift({
-                id: Date.now().toString(),
-                fecha, tipo: 'Sustitución',
-                componente: componenteActual.tipo,
-                descripcion: `${componenteActual.marca} ${componenteActual.modelo} → ${marca} ${modelo}`,
-                km: kmSustitucion, coste: precio,
-                duracionKm: durKm, duracionDias: diasUso,
-                fechaCreacion: new Date().toISOString()
-            });
+            if (destinoViejo === 'cajon') {
+                // Enviar componente viejo al cajón
+                if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+                biciActual.cajonPiezas.push({
+                    id: Date.now().toString(),
+                    tipo: componenteActual.tipo,
+                    marca: componenteActual.marca,
+                    modelo: componenteActual.modelo || '',
+                    material: componenteActual.material,
+                    peso: componenteActual.peso,
+                    precio: componenteActual.precio,
+                    fechaInstalacion: componenteActual.fechaInstalacion,
+                    kmInstalacion: componenteActual.kmInstalacion,
+                    subpiezas: componenteActual.subpiezas,
+                    seccion: seccionActual,
+                    fechaRetiro: new Date().toISOString(),
+                    kmAlRetirar: kmSustitucion,
+                    diasUso: diasUso
+                });
+            } else {
+                // Enviar al historial como siempre
+                if (!biciActual.historial) biciActual.historial = [];
+                biciActual.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Sustitución',
+                    componente: componenteActual.tipo,
+                    descripcion: `${componenteActual.marca} ${componenteActual.modelo} → ${marca} ${modelo}`,
+                    km: kmSustitucion, coste: precio,
+                    duracionKm: durKm, duracionDias: diasUso,
+                    fechaCreacion: new Date().toISOString()
+                });
+            }
             
             componenteActual.marca = marca;
             componenteActual.modelo = modelo;
@@ -3553,18 +4832,194 @@
             componenteActual.fechaInstalacion = fecha;
             componenteActual.kmInstalacion = kmSustitucion;
             
-            // Sin campos extra en componentes principales
-            
             if (SUBPIEZAS[componenteActual.tipo]) componenteActual.subpiezas = {};
             
             biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
             
             guardarDatosUsuario();
             cerrarModal('modal-sustituir');
+            actualizarBotonCajon();
             abrirDetalleComponente(componenteActual);
-            mostrarNotificacion('Sustituido', 'exito');
+            mostrarNotificacion(destinoViejo === 'cajon' ? 'Pieza guardada en el cajón 📦' : 'Sustituido ✅', 'exito');
         }
         
+        // Eliminar componente actual
+        function eliminarComponenteActual() {
+            if (!componenteActual) return;
+            confirmar(
+                '¿Eliminar componente?',
+                `¿Estás seguro de eliminar "${componenteActual.marca} ${componenteActual.modelo}"? Esta acción no se puede deshacer.`,
+                async () => {
+                    biciActual.componentesV2[seccionActual] = biciActual.componentesV2[seccionActual].filter(c => c.id !== componenteActual.id);
+                    await guardarDatosUsuario();
+                    mostrarNotificacion('Componente eliminado', 'info');
+                    navegar('sec-lista-componentes-seccion');
+                }
+            );
+        }
+
+        // Retirar componente al cajón sin sustituir
+        function retirarComponenteActual() {
+            if (!componenteActual) return;
+            confirmar(
+                '¿Retirar al cajón?',
+                `"${componenteActual.marca} ${componenteActual.modelo || ''}" se guardará en el cajón de piezas con sus km y tiempo acumulados. No se instalará ningún componente en su lugar.`,
+                async () => {
+                    const kmUso = (biciActual.kmTotales || 0) - (componenteActual.kmInstalacion || 0);
+                    const diasUso = componenteActual.fechaInstalacion
+                        ? Math.floor((new Date() - new Date(componenteActual.fechaInstalacion)) / 86400000) : 0;
+                    if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+                    biciActual.cajonPiezas.push({
+                        id: Date.now().toString(),
+                        tipo: componenteActual.tipo,
+                        marca: componenteActual.marca,
+                        modelo: componenteActual.modelo || '',
+                        material: componenteActual.material,
+                        peso: componenteActual.peso,
+                        precio: componenteActual.precio,
+                        fechaInstalacion: componenteActual.fechaInstalacion,
+                        kmInstalacion: componenteActual.kmInstalacion,
+                        subpiezas: componenteActual.subpiezas,
+                        seccion: seccionActual,
+                        fechaRetiro: new Date().toISOString(),
+                        kmAlRetirar: biciActual.kmTotales || 0,
+                        diasUso: diasUso
+                    });
+                    biciActual.componentesV2[seccionActual] = biciActual.componentesV2[seccionActual].filter(c => c.id !== componenteActual.id);
+                    await guardarDatosUsuario();
+                    actualizarBotonCajon();
+                    mostrarNotificacion('Pieza guardada en el cajón 📦', 'info');
+                    navegar('sec-lista-componentes-seccion');
+                }
+            );
+        }
+
+        // ========================================
+        // CAJÓN DE PIEZAS
+        // ========================================
+        function actualizarBotonCajon() {
+            if (!biciActual) return;
+            const cajon = biciActual.cajonPiezas || [];
+            const btn = document.getElementById('btn-ver-cajon');
+            const count = document.getElementById('cajon-count');
+            if (btn) {
+                btn.style.display = cajon.length > 0 ? 'block' : 'none';
+                if (count) count.textContent = cajon.length;
+            }
+        }
+
+        function cargarCajonPiezas() {
+            if (!biciActual) return;
+            if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+            const container = document.getElementById('lista-cajon-piezas');
+            if (biciActual.cajonPiezas.length === 0) {
+                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">📦</div><p>El cajón está vacío</p></div>`;
+                return;
+            }
+            container.innerHTML = '';
+            biciActual.cajonPiezas.forEach(pieza => {
+                const kmUso = (pieza.kmAlRetirar || 0) - (pieza.kmInstalacion || 0);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${pieza.tipo}</div>
+                            <div class="card-subtitle">${pieza.marca} ${pieza.modelo || ''}</div>
+                            <div class="text-muted" style="font-size:0.75em; margin-top:3px;">Sección: ${pieza.seccion} · Retirado: ${formatearFecha(pieza.fechaRetiro)}</div>
+                        </div>
+                        <span class="badge" style="background:#e0e0e0;color:#666;">📦</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">KM ACUMULADOS</div>
+                            <div style="font-size:1.2em; font-weight:700; color:var(--primary);">${Math.max(0, kmUso)}</div>
+                        </div>
+                        <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
+                            <div style="font-size:0.75em; color:var(--text); font-weight:600;">TIEMPO USO</div>
+                            <div style="font-size:1.2em; font-weight:700; color:var(--secondary);">${formatearDuracion(pieza.diasUso || 0)}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Reinstalar este componente" onclick="reinstalarPieza('${pieza.id}')">⚡ Reinstalar</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarPiezaCajon('${pieza.id}')">🗑️ Eliminar</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function reinstalarPieza(piezaId) {
+            if (!biciActual.cajonPiezas) return;
+            const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
+            if (!pieza) return;
+
+            // Buscar si hay un componente activo del mismo tipo en esa sección
+            if (!biciActual.componentesV2) biciActual.componentesV2 = {};
+            if (!biciActual.componentesV2[pieza.seccion]) biciActual.componentesV2[pieza.seccion] = [];
+            const compsSeccion = biciActual.componentesV2[pieza.seccion];
+            const compActivo = compsSeccion.find(c => c.tipo === pieza.tipo);
+
+            const mensajeActivo = compActivo
+                ? `"${compActivo.marca} ${compActivo.modelo || ''}" (en uso actualmente) se enviará al cajón conservando sus datos.`
+                : '';
+
+            confirmar(
+                '¿Reinstalar componente?',
+                `"${pieza.marca} ${pieza.modelo || ''}" se instalará en ${pieza.seccion} con los km y fecha actuales. ${mensajeActivo} ¿Confirmar?`,
+                async () => {
+                    // Si hay componente activo del mismo tipo, mandarlo al cajón
+                    if (compActivo) {
+                        const kmUsoActivo = (biciActual.kmTotales || 0) - (compActivo.kmInstalacion || 0);
+                        const diasUsoActivo = compActivo.fechaInstalacion
+                            ? Math.floor((new Date() - new Date(compActivo.fechaInstalacion)) / 86400000) : 0;
+                        if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+                        biciActual.cajonPiezas.push({
+                            id: Date.now().toString(),
+                            ...compActivo,
+                            seccion: pieza.seccion,
+                            fechaRetiro: new Date().toISOString(),
+                            kmAlRetirar: biciActual.kmTotales || 0,
+                            diasUso: diasUsoActivo
+                        });
+                        biciActual.componentesV2[pieza.seccion] = compsSeccion.filter(c => c.id !== compActivo.id);
+                    }
+                    // Reinstalar la pieza del cajón con km y fecha actuales
+                    const nuevaInstalacion = {
+                        ...pieza,
+                        id: Date.now().toString() + '1',
+                        fechaInstalacion: new Date().toISOString().split('T')[0],
+                        kmInstalacion: biciActual.kmTotales || 0,
+                        fechaRetiro: undefined,
+                        kmAlRetirar: undefined,
+                        diasUso: undefined,
+                        seccion: undefined
+                    };
+                    biciActual.componentesV2[pieza.seccion].push(nuevaInstalacion);
+                    // Eliminar del cajón
+                    biciActual.cajonPiezas = biciActual.cajonPiezas.filter(p => p.id !== piezaId);
+                    await guardarDatosUsuario();
+                    cargarCajonPiezas();
+                    actualizarBotonCajon();
+                    mostrarNotificacion(`"${pieza.marca} ${pieza.modelo || ''}" reinstalado ✅`, 'exito');
+                }
+            );
+        }
+
+        function eliminarPiezaCajon(piezaId) {
+            confirmar(
+                '¿Eliminar definitivamente?',
+                '¿Estás seguro? Esta acción no se puede deshacer.',
+                async () => {
+                    biciActual.cajonPiezas = biciActual.cajonPiezas.filter(p => p.id !== piezaId);
+                    await guardarDatosUsuario();
+                    cargarCajonPiezas();
+                    actualizarBotonCajon();
+                    mostrarNotificacion('Pieza eliminada', 'info');
+                }
+            );
+        }
+
         // Volver
         function volverAListaComponentes() {
             navegar('sec-lista-componentes-seccion');
