@@ -693,12 +693,12 @@
 
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" id="login-usuario" placeholder="tu@email.com">
+                <input type="email" id="login-usuario" placeholder="tu@email.com" onkeydown="if(event.key==='Enter') iniciarSesion()">
             </div>
 
             <div class="form-group">
                 <label>Contraseña</label>
-                <input type="password" id="login-password" placeholder="Escribe tu contraseña">
+                <input type="password" id="login-password" placeholder="Escribe tu contraseña" onkeydown="if(event.key==='Enter') iniciarSesion()">
             </div>
 
             <button class="btn btn-primary" onclick="iniciarSesion()">Entrar</button>
@@ -2095,77 +2095,6 @@
     </div>
 
     <!-- ========================================
-         MODAL: COMPONENTE DE RUEDA
-    ======================================== -->
-    <div id="modal-comp-rueda" class="modal">
-        <div class="modal-contenido">
-            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
-                <button onclick="cerrarModal('modal-comp-rueda')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title" id="modal-comp-rueda-titulo" style="margin:0;">Añadir Componente</h2>
-            </div>
-            <div class="form-group">
-                <label>Tipo</label>
-                <select id="comp-rueda-tipo">
-                    <option value="">-- Selecciona --</option>
-                    <option value="Llanta">Llanta</option>
-                    <option value="Buje">Buje</option>
-                    <option value="Cubierta">Cubierta</option>
-                    <option value="Disco">Disco</option>
-                    <option value="Cierre">Cierre</option>
-                    <option value="Cámara">Cámara</option>
-                    <option value="Válvula">Válvula</option>
-                    <option value="Tubeless">Tubeless</option>
-                    <option value="Radios/Niples">Radios/Niples</option>
-                    <option value="Núcleo">Núcleo</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Marca</label>
-                <select id="comp-rueda-marca-select" onchange="toggleMarcaRuedaOtra()">
-                    <option value="">-- Selecciona --</option>
-                    <option value="Bontrager">Bontrager</option>
-                    <option value="Continental">Continental</option>
-                    <option value="DT Swiss">DT Swiss</option>
-                    <option value="Lifefitness">Lifefitness</option>
-                    <option value="Maxxis">Maxxis</option>
-                    <option value="Mavic">Mavic</option>
-                    <option value="Michelin">Michelin</option>
-                    <option value="Pirelli">Pirelli</option>
-                    <option value="Schwalbe">Schwalbe</option>
-                    <option value="Shimano">Shimano</option>
-                    <option value="Specialized">Specialized</option>
-                    <option value="Zipp">Zipp</option>
-                    <option value="Otra">Otra</option>
-                </select>
-                <input type="text" id="comp-rueda-marca" placeholder="Nombre de la marca" style="margin-top:8px; display:none;">
-            </div>
-            <div class="form-group">
-                <label>Modelo</label>
-                <input type="text" id="comp-rueda-modelo" placeholder="Ej: GP5000, 404...">
-            </div>
-            <div class="form-group">
-                <label>Peso (gramos)</label>
-                <input type="number" id="comp-rueda-peso" placeholder="0">
-            </div>
-            <div class="form-group">
-                <label>Precio (€)</label>
-                <input type="number" id="comp-rueda-precio" placeholder="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label>Fecha de instalación</label>
-                <input type="date" id="comp-rueda-fecha">
-            </div>
-            <div class="form-group">
-                <label>KM en instalación</label>
-                <input type="number" id="comp-rueda-km" placeholder="0">
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="guardarCompRueda()">Guardar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================
          MODAL: RUEDA (AÑADIR / EDITAR)
     ======================================== -->
     <div id="modal-rueda" class="modal">
@@ -2284,6 +2213,10 @@
             <div class="form-group" id="pieza-rueda-peso-group" style="display:none;">
                 <label>Peso (gramos)</label>
                 <input type="number" id="pieza-rueda-peso" placeholder="0" step="1">
+            </div>
+            <div class="form-group" id="pieza-rueda-numradios-group" style="display:none;">
+                <label>Nº de Radios</label>
+                <input type="number" id="pieza-rueda-numradios" placeholder="Ej: 24" step="1" min="1">
             </div>
             <div class="form-group">
                 <label>Precio (€)</label>
@@ -3317,13 +3250,13 @@
             document.getElementById('taller-disciplina').textContent = biciActual.disciplina;
             document.getElementById('taller-km').textContent = `${biciActual.kmTotales || 0} km`;
             
-            // Calcular peso total de todos los componentes V2
+            // Calcular peso total — excluir sección 'Ruedas' antigua
             let pesoTotal = 0;
             if (biciActual.componentesV2) {
                 Object.keys(biciActual.componentesV2).forEach(seccion => {
+                    if (seccion === 'Ruedas') return; // excluir antigua sección ruedas
                     biciActual.componentesV2[seccion].forEach(comp => {
                         pesoTotal += comp.peso || 0;
-                        // Sumar peso de subpiezas si existen
                         if (comp.subpiezas) {
                             Object.values(comp.subpiezas).forEach(sub => {
                                 pesoTotal += sub.peso || 0;
@@ -3331,6 +3264,20 @@
                         }
                     });
                 });
+            }
+            // Sumar pesos solo del juego activo
+            if (biciActual.juegosRuedas) {
+                const juegoActivo = biciActual.juegosRuedas.find(j => j.activo && !j.retirado);
+                if (juegoActivo && juegoActivo.ruedas) {
+                    Object.values(juegoActivo.ruedas).forEach(rueda => {
+                        pesoTotal += rueda.peso || 0;
+                        if (rueda.piezas) {
+                            rueda.piezas.forEach(pieza => {
+                                pesoTotal += pieza.peso || 0;
+                            });
+                        }
+                    });
+                }
             }
             
             const pesoKg = (pesoTotal / 1000).toFixed(2);
@@ -3776,8 +3723,7 @@
                 kmInstalacion: km,
                 activo: false,
                 kmAcumuladosPrevios: 0,
-                diasAcumuladosPrevios: 0,
-                componentesRuedas: { delantera: [], trasera: [] }
+                diasAcumuladosPrevios: 0
             };
 
             const activarNuevo = () => {
@@ -4203,7 +4149,7 @@
         // DESPIECE DE RUEDA
         // ========================================
         const PIEZAS_CON_PESO = ['Cubierta', 'Cámara', 'Válvula', 'Cierre', 'Tubeless'];
-        const PIEZAS_DELANTERA = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
+        const PIEZAS_DELANTERA = ['Llanta', 'Buje', 'Cubierta', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
         const PIEZAS_TRASERA = [...PIEZAS_DELANTERA, 'Núcleo'];
 
         function abrirDespieceRueda(lado) {
@@ -4239,6 +4185,7 @@
                                 <div style="font-weight:700;">${pieza.tipo}</div>
                                 <div style="font-size:0.85em; color:var(--text);">${pieza.marca || '-'} ${pieza.modelo || ''}</div>
                                 ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
+                            ${pieza.numRadios ? `<div style="font-size:0.8em; color:var(--text);">${pieza.numRadios} radios</div>` : ''}
                             </div>
                             <div style="text-align:right;">
                                 <div class="badge badge-primary">${Math.max(0, kmUso)} km</div>
@@ -4248,6 +4195,8 @@
                         </div>
                         <div style="display:flex; gap:8px; margin-top:10px;">
                             <button class="btn-grid-item" style="flex:1;" title="Editar pieza" onclick="editarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">✏️</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Reparar pieza" onclick="repararPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🔧</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Sustituir pieza" onclick="sustituirPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🔄</div></button>
                             <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🗑️</div></button>
                         </div>
                     `;
@@ -4274,10 +4223,11 @@
             sel.innerHTML = '<option value="">-- Selecciona tipo --</option>';
             opciones.forEach(o => sel.add(new Option(o, o)));
 
-            // Mostrar/ocultar peso según tipo seleccionado
+            // Mostrar/ocultar peso y nº radios según tipo seleccionado
             sel.onchange = () => {
                 const conPeso = PIEZAS_CON_PESO.includes(sel.value);
                 document.getElementById('pieza-rueda-peso-group').style.display = conPeso ? 'block' : 'none';
+                document.getElementById('pieza-rueda-numradios-group').style.display = sel.value === 'Radios/Niples' ? 'block' : 'none';
             };
 
             const rueda = juegosRuedasActual.ruedas[lado];
@@ -4287,28 +4237,29 @@
 
             if (pieza) {
                 sel.value = pieza.tipo;
-                sel.onchange(); // trigger peso visibility
+                sel.onchange(); // trigger visibility
                 document.getElementById('pieza-rueda-marca-select').value = pieza.marca || '';
                 document.getElementById('pieza-rueda-modelo').value = pieza.modelo || '';
                 document.getElementById('pieza-rueda-material').value = pieza.material || '';
                 document.getElementById('pieza-rueda-peso').value = pieza.peso || '';
+                document.getElementById('pieza-rueda-numradios').value = pieza.numRadios || '';
                 document.getElementById('pieza-rueda-precio').value = pieza.precio || '';
                 document.getElementById('pieza-rueda-fecha').value = pieza.fechaInstalacion || '';
                 document.getElementById('pieza-rueda-km').value = pieza.kmInstalacion || 0;
             } else {
-                // Heredar de la rueda
-                const rueda = juegosRuedasActual.ruedas[lado];
                 const marcaRueda = rueda ? (rueda.marca || '') : '';
                 const selMarca = document.getElementById('pieza-rueda-marca-select');
                 const optExists = Array.from(selMarca.options).some(o => o.value === marcaRueda);
-                selMarca.value = optExists ? marcaRueda : (marcaRueda ? 'Otra' : '');
+                selMarca.value = optExists ? marcaRueda : (marcaRueda ? '' : '');
                 document.getElementById('pieza-rueda-modelo').value = rueda ? (rueda.modelo || '') : '';
                 document.getElementById('pieza-rueda-material').value = rueda ? (rueda.material || '') : '';
                 document.getElementById('pieza-rueda-peso').value = '';
+                document.getElementById('pieza-rueda-numradios').value = '';
                 document.getElementById('pieza-rueda-precio').value = '';
                 document.getElementById('pieza-rueda-fecha').value = rueda ? (rueda.fechaInstalacion || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0];
                 document.getElementById('pieza-rueda-km').value = rueda ? (rueda.kmInstalacion || 0) : (biciActual.kmTotales || 0);
                 document.getElementById('pieza-rueda-peso-group').style.display = 'none';
+                document.getElementById('pieza-rueda-numradios-group').style.display = 'none';
             }
             abrirModal('modal-pieza-rueda');
         }
@@ -4320,6 +4271,7 @@
             const modelo = document.getElementById('pieza-rueda-modelo').value.trim();
             const material = document.getElementById('pieza-rueda-material').value;
             const peso = PIEZAS_CON_PESO.includes(tipo) ? (parseFloat(document.getElementById('pieza-rueda-peso').value) || 0) : null;
+            const numRadios = tipo === 'Radios/Niples' ? (parseInt(document.getElementById('pieza-rueda-numradios').value) || null) : null;
             const precio = parseFloat(document.getElementById('pieza-rueda-precio').value) || 0;
             const fecha = document.getElementById('pieza-rueda-fecha').value;
             const km = parseFloat(document.getElementById('pieza-rueda-km').value) || 0;
@@ -4332,9 +4284,9 @@
 
             if (window._editandoPiezaRuedaId) {
                 const pieza = rueda.piezas.find(p => p.id === window._editandoPiezaRuedaId);
-                if (pieza) { pieza.tipo = tipo; pieza.marca = marca; pieza.modelo = modelo; pieza.material = material; pieza.peso = peso; pieza.precio = precio; pieza.fechaInstalacion = fecha; pieza.kmInstalacion = km; }
+                if (pieza) { pieza.tipo = tipo; pieza.marca = marca; pieza.modelo = modelo; pieza.material = material; pieza.peso = peso; pieza.numRadios = numRadios; pieza.precio = precio; pieza.fechaInstalacion = fecha; pieza.kmInstalacion = km; }
             } else {
-                rueda.piezas.push({ id: Date.now().toString(), tipo, marca, modelo, material, peso, precio, fechaInstalacion: fecha, kmInstalacion: km });
+                rueda.piezas.push({ id: Date.now().toString(), tipo, marca, modelo, material, peso, numRadios, precio, fechaInstalacion: fecha, kmInstalacion: km });
             }
 
             guardarDatosUsuario();
@@ -4345,6 +4297,48 @@
         }
 
         function editarPiezaRueda(piezaId) { abrirModalPiezaRueda(piezaId); }
+
+        function repararPiezaRueda(piezaId) {
+            const lado = window._ladoRuedaActual;
+            const rueda = juegosRuedasActual.ruedas[lado];
+            const pieza = (rueda.piezas || []).find(p => p.id === piezaId);
+            if (!pieza) return;
+            window._repararPiezaRuedaId = piezaId;
+            window._repararModoRueda = false;
+            window._repararModoPiezaRueda = true;
+            document.getElementById('reparar-componente-nombre').textContent = `${pieza.tipo} · ${pieza.marca} ${pieza.modelo || ''}`;
+            document.getElementById('reparar-descripcion').value = '';
+            document.getElementById('reparar-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('reparar-km').value = biciActual.kmTotales || 0;
+            document.getElementById('reparar-coste').value = '';
+            abrirModal('modal-reparar');
+        }
+
+        function sustituirPiezaRueda(piezaId) {
+            const lado = window._ladoRuedaActual;
+            const rueda = juegosRuedasActual.ruedas[lado];
+            const pieza = (rueda.piezas || []).find(p => p.id === piezaId);
+            if (!pieza) return;
+            window._sustituirPiezaRuedaId = piezaId;
+            window._sustituirModoPiezaRueda = true;
+
+            document.getElementById('sustituir-componente-viejo').textContent = `${pieza.marca} ${pieza.modelo || ''}`;
+            document.getElementById('sustituir-km-instalacion').textContent = pieza.kmInstalacion || '0';
+            document.getElementById('sustituir-km-actual').textContent = biciActual.kmTotales || '0';
+            const durKm = (biciActual.kmTotales || 0) - (pieza.kmInstalacion || 0);
+            document.getElementById('sustituir-duracion-km').textContent = durKm;
+
+            document.getElementById('sustituir-marca').value = pieza.marca || '';
+            document.getElementById('sustituir-modelo').value = pieza.modelo || '';
+            document.getElementById('sustituir-material').value = pieza.material || '';
+            document.getElementById('sustituir-peso').value = pieza.peso || '';
+            document.getElementById('sustituir-precio').value = '';
+            document.getElementById('sustituir-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sustituir-km').value = biciActual.kmTotales || 0;
+            document.getElementById('sustituir-campos-extra').innerHTML = '';
+
+            abrirModal('modal-sustituir');
+        }
 
         function eliminarPiezaRueda(piezaId) {
             confirmar('¿Eliminar pieza?', 'Esta acción no se puede deshacer.',
@@ -4357,122 +4351,6 @@
                     mostrarNotificacion('Pieza eliminada', 'info');
                 }
             );
-        }
-
-        function abrirModalCompRueda(lado) {
-            window._ladoRuedaActual = lado;
-            window._editandoCompRuedaId = null;
-            document.getElementById('modal-comp-rueda-titulo').textContent = `Añadir · Rueda ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
-
-            // Poblar select de tipo según el lado
-            const tipoSelect = document.getElementById('comp-rueda-tipo');
-            const opcionesDelantera = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
-            const opcionesTrasera  = [...opcionesDelantera, 'Núcleo'];
-            const opciones = lado === 'delantera' ? opcionesDelantera : opcionesTrasera;
-            tipoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
-            opciones.forEach(o => tipoSelect.add(new Option(o, o)));
-
-            // Reset resto de campos
-            document.getElementById('comp-rueda-marca-select').value = '';
-            document.getElementById('comp-rueda-marca').value = '';
-            document.getElementById('comp-rueda-marca').style.display = 'none';
-            document.getElementById('comp-rueda-modelo').value = '';
-            document.getElementById('comp-rueda-peso').value = '';
-            document.getElementById('comp-rueda-precio').value = '';
-            document.getElementById('comp-rueda-fecha').value = juegosRuedasActual.fechaInstalacion || new Date().toISOString().split('T')[0];
-            document.getElementById('comp-rueda-km').value = juegosRuedasActual.kmInstalacion || 0;
-            abrirModal('modal-comp-rueda');
-        }
-
-        function editarCompRueda(lado, compId) {
-            if (!juegosRuedasActual.componentesRuedas) return;
-            const comp = juegosRuedasActual.componentesRuedas[lado].find(c => c.id === compId);
-            if (!comp) return;
-            window._ladoRuedaActual = lado;
-            window._editandoCompRuedaId = compId;
-            document.getElementById('modal-comp-rueda-titulo').textContent = `Editar · Rueda ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
-
-            // Poblar select de tipo según el lado
-            const tipoSelect = document.getElementById('comp-rueda-tipo');
-            const opcionesDelantera = ['Llanta', 'Buje', 'Cubierta', 'Disco', 'Cierre', 'Cámara', 'Válvula', 'Tubeless', 'Radios/Niples'];
-            const opcionesTrasera  = [...opcionesDelantera, 'Núcleo'];
-            const opciones = lado === 'delantera' ? opcionesDelantera : opcionesTrasera;
-            tipoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
-            opciones.forEach(o => tipoSelect.add(new Option(o, o)));
-            tipoSelect.value = comp.tipo;
-
-            // Rellenar marca
-            const sel = document.getElementById('comp-rueda-marca-select');
-            const inp = document.getElementById('comp-rueda-marca');
-            const optionExists = Array.from(sel.options).some(o => o.value === comp.marca);
-            if (optionExists) {
-                sel.value = comp.marca;
-                inp.style.display = 'none';
-                inp.value = comp.marca;
-            } else {
-                sel.value = 'Otra';
-                inp.style.display = 'block';
-                inp.value = comp.marca || '';
-            }
-            document.getElementById('comp-rueda-modelo').value = comp.modelo || '';
-            document.getElementById('comp-rueda-peso').value = comp.peso || '';
-            document.getElementById('comp-rueda-precio').value = comp.precio || '';
-            document.getElementById('comp-rueda-fecha').value = comp.fechaInstalacion || '';
-            document.getElementById('comp-rueda-km').value = comp.kmInstalacion || 0;
-            abrirModal('modal-comp-rueda');
-        }
-
-        function toggleMarcaRuedaOtra() {
-            const sel = document.getElementById('comp-rueda-marca-select');
-            const inp = document.getElementById('comp-rueda-marca');
-            if (sel.value === 'Otra') {
-                inp.style.display = 'block';
-                inp.value = '';
-            } else {
-                inp.style.display = 'none';
-                inp.value = sel.value;
-            }
-        }
-
-        function guardarCompRueda() {
-            const tipo = document.getElementById('comp-rueda-tipo').value;
-            const marcaSel = document.getElementById('comp-rueda-marca-select').value;
-            const marcaInp = document.getElementById('comp-rueda-marca').value.trim();
-            const marca = marcaSel === 'Otra' ? marcaInp : marcaSel;
-            const modelo = document.getElementById('comp-rueda-modelo').value.trim();
-            const peso = parseFloat(document.getElementById('comp-rueda-peso').value) || 0;
-            const precio = parseFloat(document.getElementById('comp-rueda-precio').value) || 0;
-            const fecha = document.getElementById('comp-rueda-fecha').value;
-            const km = parseFloat(document.getElementById('comp-rueda-km').value) || 0;
-            const lado = window._ladoRuedaActual;
-
-            if (!tipo) { mostrarNotificacion('Selecciona el tipo de componente', 'error'); return; }
-            if (!marca) { mostrarNotificacion('Indica la marca', 'error'); return; }
-
-            if (!juegosRuedasActual.componentesRuedas) juegosRuedasActual.componentesRuedas = { delantera: [], trasera: [] };
-            if (!juegosRuedasActual.componentesRuedas[lado]) juegosRuedasActual.componentesRuedas[lado] = [];
-
-            if (window._editandoCompRuedaId) {
-                const comp = juegosRuedasActual.componentesRuedas[lado].find(c => c.id === window._editandoCompRuedaId);
-                if (comp) { comp.tipo = tipo; comp.marca = marca; comp.modelo = modelo; comp.peso = peso; comp.precio = precio; comp.fechaInstalacion = fecha; comp.kmInstalacion = km; }
-            } else {
-                juegosRuedasActual.componentesRuedas[lado].push({ id: Date.now().toString(), tipo, marca, modelo, peso, precio, fechaInstalacion: fecha, kmInstalacion: km });
-            }
-
-            guardarDatosUsuario();
-            cargarDetalleJuegoRuedas();
-            cerrarModal('modal-comp-rueda');
-            mostrarNotificacion(window._editandoCompRuedaId ? 'Componente actualizado' : 'Componente añadido', 'exito');
-        }
-
-        // ========================================
-        function eliminarCompRueda(lado, compId) {
-            confirmar('¿Eliminar componente?', 'Esta acción no se puede deshacer.', async () => {
-                juegosRuedasActual.componentesRuedas[lado] = juegosRuedasActual.componentesRuedas[lado].filter(c => c.id !== compId);
-                await guardarDatosUsuario();
-                cargarDetalleJuegoRuedas();
-                mostrarNotificacion('Componente eliminado', 'info');
-            });
         }
 
         // ========================================
@@ -4736,15 +4614,44 @@
             if (!desc) return mostrarNotificacion('Añade descripción', 'error');
             
             if (!biciActual.historial) biciActual.historial = [];
-            
-            biciActual.historial.unshift({
-                id: Date.now().toString(),
-                fecha, tipo: 'Reparación',
-                componente: componenteActual.tipo,
-                descripcion: `${desc} (${lugar})`,
-                km, coste,
-                fechaCreacion: new Date().toISOString()
-            });
+
+            if (window._repararModoPiezaRueda && window._repararPiezaRuedaId) {
+                // Reparar pieza del despiece
+                const lado = window._ladoRuedaActual;
+                const rueda = juegosRuedasActual.ruedas[lado];
+                const pieza = (rueda.piezas || []).find(p => p.id === window._repararPiezaRuedaId);
+                biciActual.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Reparación',
+                    componente: pieza ? `${pieza.tipo} (${lado})` : 'Pieza rueda',
+                    descripcion: `${desc} (${lugar})`,
+                    km, coste,
+                    fechaCreacion: new Date().toISOString()
+                });
+                window._repararModoPiezaRueda = false;
+                window._repararPiezaRuedaId = null;
+            } else if (window._repararModoRueda && window._repararRuedaLado) {
+                // Reparar rueda completa
+                biciActual.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Reparación',
+                    componente: `Rueda ${window._repararRuedaLado}`,
+                    descripcion: `${desc} (${lugar})`,
+                    km, coste,
+                    fechaCreacion: new Date().toISOString()
+                });
+                window._repararModoRueda = false;
+            } else {
+                // Reparar componente normal
+                biciActual.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Reparación',
+                    componente: componenteActual.tipo,
+                    descripcion: `${desc} (${lugar})`,
+                    km, coste,
+                    fechaCreacion: new Date().toISOString()
+                });
+            }
             
             guardarDatosUsuario();
             cerrarModal('modal-reparar');
@@ -4786,13 +4693,53 @@
             
             if (marca === 'Otra') marca = document.getElementById('sustituir-marca-otra').value.trim() || 'Otra';
             if (material === 'Otro') material = document.getElementById('sustituir-material-otro').value.trim() || 'Otro';
-            
+
+            // MODO: Sustituir pieza del despiece de rueda
+            if (window._sustituirModoPiezaRueda && window._sustituirPiezaRuedaId) {
+                const lado = window._ladoRuedaActual;
+                const rueda = juegosRuedasActual.ruedas[lado];
+                const pieza = (rueda.piezas || []).find(p => p.id === window._sustituirPiezaRuedaId);
+                if (!pieza) return;
+
+                const durKm = kmSustitucion - (pieza.kmInstalacion || 0);
+                const diasUso = pieza.fechaInstalacion ? Math.floor((new Date(fecha) - new Date(pieza.fechaInstalacion)) / 86400000) : 0;
+
+                if (!biciActual.historial) biciActual.historial = [];
+                biciActual.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Sustitución',
+                    componente: `${pieza.tipo} (${lado})`,
+                    descripcion: `${pieza.marca} ${pieza.modelo || ''} → ${marca} ${modelo}`,
+                    km: kmSustitucion, coste: precio,
+                    duracionKm: durKm, duracionDias: diasUso,
+                    fechaCreacion: new Date().toISOString()
+                });
+
+                pieza.marca = marca;
+                pieza.modelo = modelo;
+                pieza.material = material;
+                pieza.peso = peso;
+                pieza.precio = precio;
+                pieza.fechaInstalacion = fecha;
+                pieza.kmInstalacion = kmSustitucion;
+
+                biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
+                window._sustituirModoPiezaRueda = false;
+                window._sustituirPiezaRuedaId = null;
+
+                guardarDatosUsuario();
+                cerrarModal('modal-sustituir');
+                cargarDespieceRueda();
+                mostrarNotificacion('Pieza sustituida ✅', 'exito');
+                return;
+            }
+
+            // MODO: Sustituir componente normal
             const kmViejo = componenteActual.kmInstalacion || 0;
             const durKm = kmSustitucion - kmViejo;
             const diasUso = componenteActual.fechaInstalacion ? Math.floor((new Date(fecha) - new Date(componenteActual.fechaInstalacion)) / 86400000) : 0;
             
             if (destinoViejo === 'cajon') {
-                // Enviar componente viejo al cajón
                 if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
                 biciActual.cajonPiezas.push({
                     id: Date.now().toString(),
@@ -4811,7 +4758,6 @@
                     diasUso: diasUso
                 });
             } else {
-                // Enviar al historial como siempre
                 if (!biciActual.historial) biciActual.historial = [];
                 biciActual.historial.unshift({
                     id: Date.now().toString(),
@@ -5343,7 +5289,7 @@
         // Conectar con Strava (inicia OAuth)
         function conectarStrava() {
             const scope = 'read,activity:read_all,profile:read_all';
-            const authUrl = `${STRAVA_AUTH_URL}?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(STRAVA_REDIRECT_URI)}&approval_prompt=force&scope=${scope}&state=strava_auth`;
+            const authUrl = `${STRAVA_AUTH_URL}?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${STRAVA_REDIRECT_URI}&approval_prompt=force&scope=${scope}&state=strava_auth`;
             window.location.href = authUrl;
         }
 
@@ -5622,7 +5568,9 @@
                         const option = document.createElement('option');
                         option.value = bici.id;
                         const km = Math.round(bici.distance / 1000);
-                        option.textContent = `${bici.name}${bici.brand_name ? ' - ' + bici.brand_name + ' ' + bici.model_name : ''} (${km} km)`;
+                        const nombreLimpio = `${bici.name}${bici.brand_name ? ' - ' + bici.brand_name + ' ' + bici.model_name : ''}`;
+                        option.textContent = `${nombreLimpio} (${km} km)`;
+                        option.dataset.nombre = nombreLimpio;
                         if (biciActual.stravaBiciId === bici.id) {
                             option.selected = true;
                         }
@@ -5658,7 +5606,7 @@
             if (stravaBiciId) {
                 const selectedOption = select.options[select.selectedIndex];
                 biciActual.stravaBiciId = stravaBiciId;
-                biciActual.stravaBiciNombre = selectedOption.textContent;
+                biciActual.stravaBiciNombre = selectedOption.dataset.nombre || selectedOption.textContent;
                 mostrarNotificacion('Bici vinculada con Strava', 'exito');
             } else {
                 delete biciActual.stravaBiciId;
