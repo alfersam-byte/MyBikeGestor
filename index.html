@@ -1250,6 +1250,30 @@
         </section>
 
         <!-- ========================================
+             SECCIÓN: DESGLOSE PESO
+        ======================================== -->
+        <section id="sec-desglose-peso" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <div class="topbar-title">⚖️ Desglose de Peso</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div id="contenido-desglose-peso" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: DESGLOSE INVERSIÓN
+        ======================================== -->
+        <section id="sec-desglose-inversion" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <div class="topbar-title">💰 Desglose de Inversión</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div id="contenido-desglose-inversion" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
              SECCIÓN: CAJÓN DE PIEZAS
         ======================================== -->
         <section id="sec-cajon-piezas" class="seccion">
@@ -1354,11 +1378,11 @@
                         <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Uso</div>
                         <div style="font-size: 1.6em; font-weight: 700; color: var(--primary);" id="taller-uso">0d</div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
+                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px; cursor:pointer;" onclick="navegar('sec-desglose-peso')">
                         <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Peso</div>
                         <div style="font-size: 1.6em; font-weight: 700; color: var(--secondary);" id="taller-peso">0</div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
+                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px; cursor:pointer;" onclick="navegar('sec-desglose-inversion')">
                         <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Inversión</div>
                         <div style="font-size: 1.6em; font-weight: 700; color: var(--warning);" id="taller-inversion">0€</div>
                     </div>
@@ -2658,6 +2682,10 @@
                 cargarBicisRetiradas();
             } else if (seccionId === 'sec-garaje-ruedas') {
                 cargarGarajeRuedas();
+            } else if (seccionId === 'sec-desglose-peso') {
+                cargarDesglosePeso();
+            } else if (seccionId === 'sec-desglose-inversion') {
+                cargarDesgloseInversion();
             } else if (seccionId === 'sec-detalle-juego-ruedas') {
                 cargarDetalleJuegoRuedas();
             } else if (seccionId === 'sec-despiece-rueda') {
@@ -4354,8 +4382,130 @@
         }
 
         // ========================================
-        // ABRIR SECCIÓN COMPONENTES (resto de secciones)
+        // DESGLOSE PESO E INVERSIÓN
         // ========================================
+        function _crearTarjetaDesglose(titulo, items, total, unidad, color) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.marginBottom = '12px';
+            const unidadTotal = unidad === 'g' ? `${(total/1000).toFixed(2)} kg` : `${parseFloat(total).toFixed(2)}€`;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="font-weight:700; font-size:1em;">${titulo}</div>
+                    <div style="font-weight:700; color:${color};">${unidadTotal}</div>
+                </div>
+                ${items.map(i => `
+                    <div style="display:flex; justify-content:space-between; font-size:0.85em; padding:5px 0; border-top:1px solid var(--border);">
+                        <span style="color:var(--text-dark);">${i.nombre}</span>
+                        <span style="color:${color}; font-weight:600;">${unidad === 'g' ? i.valor + 'g' : parseFloat(i.valor).toFixed(2) + '€'}</span>
+                    </div>`).join('')}
+            `;
+            return card;
+        }
+
+        function cargarDesglosePeso() {
+            const container = document.getElementById('contenido-desglose-peso');
+            container.innerHTML = '';
+            let totalGeneral = 0;
+            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+
+            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+                const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
+                const items = [];
+                comps.forEach(comp => {
+                    if (comp.peso) items.push({ nombre: `${comp.tipo} · ${comp.marca}`, valor: comp.peso });
+                    if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
+                        if (sub.peso) items.push({ nombre: `${sub.tipo} · ${sub.marca}`, valor: sub.peso });
+                    });
+                });
+                if (items.length === 0) return;
+                const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
+                totalGeneral += totalSeccion;
+                container.appendChild(_crearTarjetaDesglose(seccion, items, totalSeccion, 'g', 'var(--secondary)'));
+            });
+
+            // Ruedas — juego activo
+            const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
+            if (juegoActivo && juegoActivo.ruedas) {
+                const items = [];
+                Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
+                    if (rueda.peso) items.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.peso });
+                    (rueda.piezas || []).forEach(p => {
+                        if (p.peso) items.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.peso });
+                    });
+                });
+                if (items.length > 0) {
+                    const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
+                    totalGeneral += totalSeccion;
+                    container.appendChild(_crearTarjetaDesglose('Ruedas', items, totalSeccion, 'g', 'var(--secondary)'));
+                }
+            }
+
+            const totalDiv = document.createElement('div');
+            totalDiv.className = 'card';
+            totalDiv.style.cssText = 'margin-top:10px; background:var(--secondary); color:white;';
+            totalDiv.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:1.1em;">
+                <span>TOTAL</span><span>${(totalGeneral/1000).toFixed(2)} kg</span></div>`;
+            container.appendChild(totalDiv);
+        }
+
+        function cargarDesgloseInversion() {
+            const container = document.getElementById('contenido-desglose-inversion');
+            container.innerHTML = '';
+            let totalGeneral = 0;
+            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+
+            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+                const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
+                const items = [];
+                comps.forEach(comp => {
+                    if (comp.precio) items.push({ nombre: `${comp.tipo} · ${comp.marca}`, valor: comp.precio });
+                    if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
+                        if (sub.precio) items.push({ nombre: `${sub.tipo} · ${sub.marca}`, valor: sub.precio });
+                    });
+                });
+                if (items.length === 0) return;
+                const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
+                totalGeneral += totalSeccion;
+                container.appendChild(_crearTarjetaDesglose(seccion, items, totalSeccion, '€', 'var(--warning)'));
+            });
+
+            // Ruedas — juego activo
+            const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
+            if (juegoActivo && juegoActivo.ruedas) {
+                const items = [];
+                Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
+                    if (rueda.precio) items.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.precio });
+                    (rueda.piezas || []).forEach(p => {
+                        if (p.precio) items.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.precio });
+                    });
+                });
+                if (items.length > 0) {
+                    const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
+                    totalGeneral += totalSeccion;
+                    container.appendChild(_crearTarjetaDesglose('Ruedas', items, totalSeccion, '€', 'var(--warning)'));
+                }
+            }
+
+            // Historial — sustituciones y mantenimientos con coste
+            const historial = (biciActual.historial || []).filter(r => parseFloat(r.coste) > 0);
+            if (historial.length > 0) {
+                const items = historial.map(r => ({
+                    nombre: `${r.tipo} · ${r.componente || r.pieza || '-'} (${formatearFecha(r.fecha)})`,
+                    valor: parseFloat(r.coste)
+                }));
+                const totalHistorial = items.reduce((s, i) => s + i.valor, 0);
+                totalGeneral += totalHistorial;
+                container.appendChild(_crearTarjetaDesglose('Historial', items, totalHistorial, '€', 'var(--warning)'));
+            }
+
+            const totalDiv = document.createElement('div');
+            totalDiv.className = 'card';
+            totalDiv.style.cssText = 'margin-top:10px; background:var(--warning); color:white;';
+            totalDiv.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:1.1em;">
+                <span>TOTAL</span><span>${parseFloat(totalGeneral).toFixed(2)}€</span></div>`;
+            container.appendChild(totalDiv);
+        }
         function abrirSeccionComponentes(seccion) {
             seccionActual = seccion;
             document.getElementById('titulo-seccion-componentes').textContent = seccion;
@@ -5211,7 +5361,10 @@
                         <span class="badge" style="background: ${colorTipo}20; color: ${colorTipo}; font-weight: 600;">
                             ${reg.tipo}
                         </span>
-                        <span class="text-muted" style="font-weight: 600;">${formatearFecha(reg.fecha)}</span>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span class="text-muted" style="font-weight: 600;">${formatearFecha(reg.fecha)}</span>
+                            <button onclick="eliminarRegistroHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:1em; color:var(--danger); padding:0;" title="Eliminar">🗑️</button>
+                        </div>
                     </div>
                     <div class="card-title" style="font-size: 1em;">${reg.componente || reg.pieza || '-'}</div>
                     <div class="card-subtitle">${reg.descripcion}</div>
@@ -5222,6 +5375,26 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function eliminarRegistroHistorial(id) {
+            confirmar('¿Eliminar registro?', 'Esta acción no se puede deshacer.',
+                async () => {
+                    const reg = biciActual.historial.find(r => r.id === id);
+                    if (reg) {
+                        // Restar el coste de la inversión
+                        const coste = parseFloat(reg.coste) || 0;
+                        if (coste > 0) {
+                            biciActual.inversion = Math.max(0, parseFloat(biciActual.inversion || 0) - coste).toFixed(2);
+                        }
+                        biciActual.historial = biciActual.historial.filter(r => r.id !== id);
+                    }
+                    await guardarDatosUsuario();
+                    cargarHistorial();
+                    cargarTaller();
+                    mostrarNotificacion('Registro eliminado', 'info');
+                }
+            );
         }
 
         function abrirModalNuevoMantenimiento() {
