@@ -1250,6 +1250,18 @@
         </section>
 
         <!-- ========================================
+             SECCIÓN: ALERTAS DE SUSTITUCIÓN
+        ======================================== -->
+        <section id="sec-alertas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <div class="topbar-title">🔔 Alertas de sustitución</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div id="contenido-alertas" class="mt-20"></div>
+        </section>
+
+        <!-- ========================================
              SECCIÓN: DESGLOSE PESO
         ======================================== -->
         <section id="sec-desglose-peso" class="seccion">
@@ -1346,7 +1358,12 @@
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
                 <div class="topbar-title" id="taller-nombre-bici">Taller</div>
-                <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button id="btn-alertas-sustitucion" onclick="navegar('sec-alertas')" style="display:none; background:none; border:none; cursor:pointer; position:relative; padding:4px;" title="Alertas de sustitución">
+                        <span style="display:inline-block; width:14px; height:14px; background:#FF6B00; border-radius:50%; box-shadow: 0 0 6px #FF6B0099;"></span>
+                    </button>
+                    <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
+                </div>
             </div>
 
             <!-- Resumen de la bici -->
@@ -2682,6 +2699,8 @@
                 cargarBicisRetiradas();
             } else if (seccionId === 'sec-garaje-ruedas') {
                 cargarGarajeRuedas();
+            } else if (seccionId === 'sec-alertas') {
+                cargarAlertas();
             } else if (seccionId === 'sec-desglose-peso') {
                 cargarDesglosePeso();
             } else if (seccionId === 'sec-desglose-inversion') {
@@ -3277,6 +3296,9 @@
             document.getElementById('taller-modelo').textContent = `${biciActual.marca} ${biciActual.modelo}`;
             document.getElementById('taller-disciplina').textContent = biciActual.disciplina;
             document.getElementById('taller-km').textContent = `${biciActual.kmTotales || 0} km`;
+            
+            // Actualizar punto de alertas
+            actualizarPuntoAlertas();
             
             // Calcular peso total — excluir sección 'Ruedas' antigua
             let pesoTotal = 0;
@@ -4382,8 +4404,165 @@
         }
 
         // ========================================
-        // DESGLOSE PESO E INVERSIÓN
+        // SISTEMA DE ALERTAS DE SUSTITUCIÓN
         // ========================================
+
+        // Componentes de desgaste — únicos que generan alertas
+        const COMPONENTES_DESGASTE = ['Cadena', 'Cassette', 'Pastillas', 'Cubierta', 'Plato Grande', 'Plato Pequeño', 'Monoplato'];
+
+        // Calcula la vida media en km de un tipo de componente basándose en el historial
+        function calcularVidaMedia(tipo, nombreCompleto = null) {
+            const busqueda = (nombreCompleto || tipo).toLowerCase();
+            const sustituciones = (biciActual.historial || []).filter(r =>
+                r.tipo === 'Sustitución' &&
+                (r.componente || r.pieza || '').toLowerCase().includes(busqueda) &&
+                r.duracionKm > 0
+            );
+            if (sustituciones.length === 0) return null;
+            const total = sustituciones.reduce((s, r) => s + r.duracionKm, 0);
+            return Math.round(total / sustituciones.length);
+        }
+
+        // Devuelve lista de componentes con alerta
+        function calcularAlertas(umbral = 0.9) {
+            const alertas = [];
+            const kmActuales = biciActual.kmTotales || 0;
+            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+
+            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+                const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
+                comps.forEach(comp => {
+                    // Comprobar el componente principal si es de desgaste
+                    if (COMPONENTES_DESGASTE.includes(comp.tipo)) {
+                        const vidaMedia = calcularVidaMedia(comp.tipo);
+                        if (vidaMedia) {
+                            const kmComp = kmActuales - (comp.kmInstalacion || 0);
+                            const porcentaje = kmComp / vidaMedia;
+                            if (porcentaje >= umbral) {
+                                alertas.push({
+                                    nombre: comp.tipo,
+                                    marca: comp.marca,
+                                    kmActuales: kmComp,
+                                    vidaMedia,
+                                    porcentaje: Math.min(porcentaje, 1),
+                                    seccion
+                                });
+                            }
+                        }
+                    }
+                    // Subpiezas de desgaste — siempre comprobar independientemente del padre
+                    if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
+                        if (!COMPONENTES_DESGASTE.includes(sub.tipo)) return;
+                        const nombreCompleto = `${comp.tipo} - ${sub.tipo}`;
+                        const vidaSub = calcularVidaMedia(sub.tipo, nombreCompleto);
+                        if (!vidaSub) return;
+                        const kmSub = kmActuales - (sub.kmInstalacion || comp.kmInstalacion || 0);
+                        const pctSub = kmSub / vidaSub;
+                        if (pctSub >= umbral) {
+                            alertas.push({
+                                nombre: `${sub.tipo} (${comp.tipo})`,
+                                marca: sub.marca || comp.marca,
+                                kmActuales: kmSub,
+                                vidaMedia: vidaSub,
+                                porcentaje: Math.min(pctSub, 1),
+                                seccion
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Ruedas — piezas de desgaste del juego activo (cubiertas)
+            const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
+            if (juegoActivo && juegoActivo.ruedas) {
+                Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
+                    (rueda.piezas || []).forEach(pieza => {
+                        if (!COMPONENTES_DESGASTE.includes(pieza.tipo)) return;
+                        const vidaPieza = calcularVidaMedia(pieza.tipo);
+                        if (!vidaPieza) return;
+                        const kmPieza = kmActuales - (pieza.kmInstalacion || rueda.kmInstalacion || 0);
+                        const pctPieza = kmPieza / vidaPieza;
+                        if (pctPieza >= umbral) {
+                            alertas.push({
+                                nombre: `${pieza.tipo} (${lado})`,
+                                marca: pieza.marca || rueda.marca,
+                                kmActuales: kmPieza,
+                                vidaMedia: vidaPieza,
+                                porcentaje: Math.min(pctPieza, 1),
+                                seccion: 'Ruedas'
+                            });
+                        }
+                    });
+                });
+            }
+
+            // Ordenar: más urgentes primero
+            return alertas.sort((a, b) => b.porcentaje - a.porcentaje);
+        }
+
+        function cargarAlertas() {
+            const umbral = parseFloat(biciActual.umbralAlertas || 0.9);
+            const alertas = calcularAlertas(umbral);
+            const container = document.getElementById('contenido-alertas');
+            container.innerHTML = '';
+
+            // Config umbral
+            const configDiv = document.createElement('div');
+            configDiv.className = 'card';
+            configDiv.style.marginBottom = '16px';
+            configDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight:600;">Umbral de alerta</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="range" min="50" max="100" value="${Math.round(umbral*100)}" step="5"
+                            oninput="this.nextElementSibling.textContent=this.value+'%'; biciActual.umbralAlertas=this.value/100; guardarDatosUsuario(); cargarAlertas();"
+                            style="width:120px;">
+                        <span style="font-weight:700; color:var(--warning); min-width:38px;">${Math.round(umbral*100)}%</span>
+                    </div>
+                </div>
+                <div style="font-size:0.8em; color:var(--text); margin-top:6px;">Basado en la vida media de tus sustituciones anteriores</div>
+            `;
+            container.appendChild(configDiv);
+
+            if (alertas.length === 0) {
+                container.innerHTML += `<div class="card"><div class="lista-vacia"><div class="lista-vacia-icon">✅</div><p>Todo en orden, ningún componente cerca del límite</p></div></div>`;
+                return;
+            }
+
+            alertas.forEach(a => {
+                const kmRestantes = Math.round(a.vidaMedia - a.kmActuales);
+                const color = a.porcentaje >= 1 ? 'var(--danger)' : 'var(--warning)';
+                const estado = a.porcentaje >= 1 ? '⚠️ Revisar' : '🔔 Próxima sustitución';
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderLeft = `4px solid ${color}`;
+                card.style.marginBottom = '12px';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <div>
+                            <div style="font-weight:700;">${a.nombre}</div>
+                            <div style="font-size:0.8em; color:var(--text);">${a.marca} · ${a.seccion}</div>
+                        </div>
+                        <span style="font-size:0.8em; font-weight:600; color:${color};">${estado}</span>
+                    </div>
+                    <div style="background:var(--light-gray); border-radius:6px; height:8px; overflow:hidden; margin-bottom:8px;">
+                        <div style="height:100%; width:${Math.round(a.porcentaje*100)}%; background:${color}; border-radius:6px; transition:width 0.3s;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8em; color:var(--text);">
+                        <span>${a.kmActuales} km usados de ~${a.vidaMedia} km estimados</span>
+                        <span style="color:${color}; font-weight:600;">${kmRestantes > 0 ? `~${kmRestantes} km restantes` : `+${Math.abs(kmRestantes)} km sobre estimado`}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Actualiza visibilidad del punto naranja en el taller
+        function actualizarPuntoAlertas() {
+            const alertas = calcularAlertas(parseFloat(biciActual.umbralAlertas || 0.9));
+            const btn = document.getElementById('btn-alertas-sustitucion');
+            if (btn) btn.style.display = alertas.length > 0 ? 'inline-block' : 'none';
+        }
         function _crearTarjetaDesglose(titulo, items, total, unidad, color) {
             const card = document.createElement('div');
             card.className = 'card';
