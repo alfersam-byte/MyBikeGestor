@@ -4453,39 +4453,6 @@
             const container = document.getElementById('contenido-desglose-inversion');
             container.innerHTML = '';
             let totalGeneral = 0;
-            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
-
-            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
-                const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
-                const items = [];
-                comps.forEach(comp => {
-                    if (comp.precio) items.push({ nombre: `${comp.tipo} · ${comp.marca}`, valor: comp.precio });
-                    if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
-                        if (sub.precio) items.push({ nombre: `${sub.tipo} · ${sub.marca}`, valor: sub.precio });
-                    });
-                });
-                if (items.length === 0) return;
-                const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
-                totalGeneral += totalSeccion;
-                container.appendChild(_crearTarjetaDesglose(seccion, items, totalSeccion, '€', 'var(--warning)'));
-            });
-
-            // Ruedas — juego activo
-            const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
-            if (juegoActivo && juegoActivo.ruedas) {
-                const items = [];
-                Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
-                    if (rueda.precio) items.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.precio });
-                    (rueda.piezas || []).forEach(p => {
-                        if (p.precio) items.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.precio });
-                    });
-                });
-                if (items.length > 0) {
-                    const totalSeccion = items.reduce((s, i) => s + i.valor, 0);
-                    totalGeneral += totalSeccion;
-                    container.appendChild(_crearTarjetaDesglose('Ruedas', items, totalSeccion, '€', 'var(--warning)'));
-                }
-            }
 
             // Historial — sustituciones y mantenimientos con coste
             const historial = (biciActual.historial || []).filter(r => parseFloat(r.coste) > 0);
@@ -4496,7 +4463,48 @@
                 }));
                 const totalHistorial = items.reduce((s, i) => s + i.valor, 0);
                 totalGeneral += totalHistorial;
-                container.appendChild(_crearTarjetaDesglose('Historial', items, totalHistorial, '€', 'var(--warning)'));
+                container.appendChild(_crearTarjetaDesglose('Historial de cambios', items, totalHistorial, '€', 'var(--warning)'));
+            }
+
+            // Componentes actuales que NO han sido sustituidos (no aparecen en historial como sustitución)
+            const sustitucionesHistorial = (biciActual.historial || [])
+                .filter(r => r.tipo === 'Sustitución')
+                .map(r => (r.componente || r.pieza || '').toLowerCase());
+
+            const yaFueEustituido = (tipo) => sustitucionesHistorial.some(h => h.includes(tipo.toLowerCase()));
+
+            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const itemsIniciales = [];
+
+            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+                const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
+                comps.forEach(comp => {
+                    if (comp.precio && !yaFueEustituido(comp.tipo)) {
+                        itemsIniciales.push({ nombre: `${comp.tipo} · ${comp.marca}`, valor: comp.precio });
+                    }
+                    if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
+                        if (sub.precio && !yaFueEustituido(sub.tipo)) {
+                            itemsIniciales.push({ nombre: `${sub.tipo} · ${sub.marca}`, valor: sub.precio });
+                        }
+                    });
+                });
+            });
+
+            // Ruedas — juego activo (nunca duplican con historial)
+            const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
+            if (juegoActivo && juegoActivo.ruedas) {
+                Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
+                    if (rueda.precio) itemsIniciales.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.precio });
+                    (rueda.piezas || []).forEach(p => {
+                        if (p.precio) itemsIniciales.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.precio });
+                    });
+                });
+            }
+
+            if (itemsIniciales.length > 0) {
+                const totalIniciales = itemsIniciales.reduce((s, i) => s + i.valor, 0);
+                totalGeneral += totalIniciales;
+                container.appendChild(_crearTarjetaDesglose('Componentes sin sustituir', itemsIniciales, totalIniciales, '€', 'var(--warning)'));
             }
 
             const totalDiv = document.createElement('div');
@@ -4506,6 +4514,7 @@
                 <span>TOTAL</span><span>${parseFloat(totalGeneral).toFixed(2)}€</span></div>`;
             container.appendChild(totalDiv);
         }
+
         function abrirSeccionComponentes(seccion) {
             seccionActual = seccion;
             document.getElementById('titulo-seccion-componentes').textContent = seccion;
@@ -5340,7 +5349,11 @@
             }
 
             container.innerHTML = '';
-            biciActual.historial.forEach(reg => {
+            
+            // Ordenar por fecha descendente (más reciente primero)
+            const historialOrdenado = [...biciActual.historial].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            historialOrdenado.forEach(reg => {
                 const colorTipo = reg.tipo === 'Sustitución' ? 'var(--danger)' : 
                                  reg.tipo === 'Reparación' ? 'var(--primary)' : 'var(--secondary)';
                 
