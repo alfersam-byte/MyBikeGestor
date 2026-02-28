@@ -88,6 +88,11 @@
             display: flex;
         }
 
+        @keyframes pulseAlert {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.75; transform: scale(1.06); }
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -948,7 +953,7 @@
                     <div class="btn-grid-item-icon">👤</div>
                     <div class="btn-grid-item-text">Mi Perfil</div>
                 </button>
-                <button class="btn-grid-item" onclick="mostrarNotificacion('Próximamente: Configuración', 'info')">
+                <button class="btn-grid-item" onclick="navegar('sec-ajustes')">
                     <div class="btn-grid-item-icon">⚙️</div>
                     <div class="btn-grid-item-text">Ajustes</div>
                 </button>
@@ -957,6 +962,54 @@
                     <div class="btn-grid-item-text">Panel Admin</div>
                 </button>
             </div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: AJUSTES
+        ======================================== -->
+        <section id="sec-ajustes" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <div class="topbar-title">⚙️ Ajustes</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div class="mt-20">
+                <div class="card" onclick="navegar('sec-ajuste-alertas')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.6em;">🔔</span>
+                        <div>
+                            <div style="font-weight:700;">Alertas de sustitución</div>
+                            <div style="font-size:0.82em; color:var(--text);">Umbral global de aviso por desgaste</div>
+                        </div>
+                    </div>
+                    <span style="color:var(--text); font-size:1.2em;">›</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: AJUSTE — ALERTAS
+        ======================================== -->
+        <section id="sec-ajuste-alertas" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar('sec-ajustes')">←</button>
+                <div class="topbar-title">🔔 Alertas de sustitución</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div class="card mt-20">
+                <p style="font-size:0.9em; color:var(--text); margin-bottom:20px;">Umbral global de aviso para todas las bicis, basado en la vida media de cada componente según tu historial.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="font-weight:600;">Avisar al</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="range" id="ajuste-umbral-alertas" min="50" max="100" step="5" value="90"
+                            oninput="document.getElementById('ajuste-umbral-valor').textContent=this.value+'%';"
+                            style="width:140px;">
+                        <span id="ajuste-umbral-valor" style="font-weight:700; color:var(--warning); min-width:38px;">90%</span>
+                    </div>
+                </div>
+                <p style="font-size:0.8em; color:var(--text);">Componentes vigilados: Cadena, Cassette, Pastillas, Cubiertas, Platos</p>
+            </div>
+            <button class="btn btn-primary mt-20" onclick="guardarAjusteAlertas()">Guardar</button>
         </section>
 
         <!-- ========================================
@@ -1358,12 +1411,7 @@
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
                 <div class="topbar-title" id="taller-nombre-bici">Taller</div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <button id="btn-alertas-sustitucion" onclick="navegar('sec-alertas')" style="display:none; background:none; border:none; cursor:pointer; position:relative; padding:4px;" title="Alertas de sustitución">
-                        <span style="display:inline-block; width:14px; height:14px; background:#FF6B00; border-radius:50%; box-shadow: 0 0 6px #FF6B0099;"></span>
-                    </button>
-                    <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
-                </div>
+                <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
             </div>
 
             <!-- Resumen de la bici -->
@@ -2150,6 +2198,7 @@
                     <option value="">-- Selecciona --</option>
                     <option value="Bontrager">Bontrager</option>
                     <option value="Campagnolo">Campagnolo</option>
+                    <option value="Canyon">Canyon</option>
                     <option value="Corima">Corima</option>
                     <option value="DT Swiss">DT Swiss</option>
                     <option value="Enve">Enve</option>
@@ -2160,6 +2209,8 @@
                     <option value="Miche">Miche</option>
                     <option value="Reynolds">Reynolds</option>
                     <option value="Roval">Roval</option>
+                    <option value="Shimano">Shimano</option>
+                    <option value="Specialized">Specialized</option>
                     <option value="Vision">Vision</option>
                     <option value="Zipp">Zipp</option>
                     <option value="Otra">Otra</option>
@@ -2174,10 +2225,12 @@
                 <label>Material</label>
                 <select id="rueda-material">
                     <option value="">-- Selecciona --</option>
+                    <option value="Acero">Acero</option>
                     <option value="Aluminio">Aluminio</option>
                     <option value="Carbono">Carbono</option>
                     <option value="Carbono/Aluminio">Carbono/Aluminio</option>
-                    <option value="Acero">Acero</option>
+                    <option value="Cromo">Cromo</option>
+                    <option value="Plástico">Plástico</option>
                     <option value="Otro">Otro</option>
                 </select>
             </div>
@@ -2221,8 +2274,11 @@
                 <select id="pieza-rueda-marca-select">
                     <option value="">-- Selecciona --</option>
                     <option value="Bontrager">Bontrager</option>
+                    <option value="Campagnolo">Campagnolo</option>
+                    <option value="Canyon">Canyon</option>
                     <option value="Continental">Continental</option>
                     <option value="DT Swiss">DT Swiss</option>
+                    <option value="Garmin">Garmin</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Mavic">Mavic</option>
                     <option value="Michelin">Michelin</option>
@@ -2230,6 +2286,7 @@
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Shimano">Shimano</option>
                     <option value="Specialized">Specialized</option>
+                    <option value="Sram">Sram</option>
                     <option value="Zipp">Zipp</option>
                     <option value="Otra">Otra</option>
                 </select>
@@ -2242,12 +2299,15 @@
                 <label>Material</label>
                 <select id="pieza-rueda-material">
                     <option value="">-- Selecciona --</option>
+                    <option value="Acero">Acero</option>
                     <option value="Aluminio">Aluminio</option>
                     <option value="Carbono">Carbono</option>
                     <option value="Caucho">Caucho</option>
-                    <option value="Acero">Acero</option>
-                    <option value="Titanio">Titanio</option>
+                    <option value="Cromo">Cromo</option>
                     <option value="Latón">Latón</option>
+                    <option value="Plástico">Plástico</option>
+                    <option value="TPU">TPU</option>
+                    <option value="Titanio">Titanio</option>
                     <option value="Otro">Otro</option>
                 </select>
             </div>
@@ -2699,6 +2759,10 @@
                 cargarBicisRetiradas();
             } else if (seccionId === 'sec-garaje-ruedas') {
                 cargarGarajeRuedas();
+            } else if (seccionId === 'sec-ajuste-alertas') {
+                const umbral = Math.round((datosUsuario.umbralAlertas || 0.9) * 100);
+                document.getElementById('ajuste-umbral-alertas').value = umbral;
+                document.getElementById('ajuste-umbral-valor').textContent = umbral + '%';
             } else if (seccionId === 'sec-alertas') {
                 cargarAlertas();
             } else if (seccionId === 'sec-desglose-peso') {
@@ -2757,6 +2821,13 @@
         // ========================================
         // PERFIL DE USUARIO
         // ========================================
+        async function guardarAjusteAlertas() {
+            datosUsuario.umbralAlertas = parseFloat(document.getElementById('ajuste-umbral-alertas').value) / 100;
+            await guardarDatosUsuario();
+            mostrarNotificacion('Ajuste guardado', 'exito');
+            navegar('sec-ajustes');
+        }
+
         function cargarPerfil() {
             if (!usuarioActual || !datosUsuario) return;
 
@@ -3085,6 +3156,40 @@
 
             container.innerHTML = '';
             bicisActivas.forEach(bici => {
+                // Calcular alertas para esta bici
+                const umbral = parseFloat((datosUsuario && datosUsuario.umbralAlertas) || 0.9);
+                const biciTemp = bici; // referencia temporal
+                const hayAlertas = (() => {
+                    const kmActuales = bici.kmTotales || 0;
+                    const secciones = SECCIONES_COMPONENTES[bici.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+                    for (const seccion of secciones.filter(s => s !== 'Ruedas')) {
+                        const comps = (bici.componentesV2 && bici.componentesV2[seccion]) || [];
+                        for (const comp of comps) {
+                            const check = (tipo, nombreCompleto, kmInst) => {
+                                const sust = (bici.historial || []).filter(r =>
+                                    r.tipo === 'Sustitución' &&
+                                    (r.componente || r.pieza || '').toLowerCase().includes((nombreCompleto || tipo).toLowerCase()) &&
+                                    r.duracionKm > 0
+                                );
+                                if (!sust.length) return false;
+                                const media = sust.reduce((s, r) => s + r.duracionKm, 0) / sust.length;
+                                return (kmActuales - (kmInst || 0)) / media >= umbral;
+                            };
+                            if (COMPONENTES_DESGASTE.includes(comp.tipo) && check(comp.tipo, null, comp.kmInstalacion)) return true;
+                            if (comp.subpiezas) for (const sub of Object.values(comp.subpiezas)) {
+                                if (COMPONENTES_DESGASTE.includes(sub.tipo) && check(sub.tipo, `${comp.tipo} - ${sub.tipo}`, sub.kmInstalacion || comp.kmInstalacion)) return true;
+                            }
+                        }
+                    }
+                    return false;
+                })();
+
+                const badgeStyle = hayAlertas
+                    ? `background:#FF6B00; color:white; animation: pulseAlert 1.5s infinite;`
+                    : `background:#27ae60; color:white;`;
+                const badgeTitle = hayAlertas ? 'Hay alertas de sustitución' : 'Sin alertas de sustitución';
+                const badgeClick = hayAlertas ? `onclick="abrirTaller('${bici.id}', true)"` : `title="${badgeTitle}"`;
+
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
@@ -3093,7 +3198,7 @@
                             <div class="card-title">${bici.alias}</div>
                             <div class="card-subtitle">${bici.marca} ${bici.modelo}</div>
                         </div>
-                        <span class="badge badge-primary">${bici.disciplina}</span>
+                        <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 15px; align-items: center;">
                         <div class="text-muted">
@@ -3103,7 +3208,6 @@
                             Abrir
                         </button>
                     </div>
-
                 `;
                 container.appendChild(card);
             });
@@ -3279,13 +3383,18 @@
             navegar('sec-garaje');
         }
 
-        function abrirTaller(biciId) {
+        function abrirTaller(biciId, irAlertas = false) {
             biciActual = datosUsuario.garaje.find(b => b.id === biciId);
             if (!biciActual) {
                 mostrarNotificacion('Error: No se encontró la bici', 'error');
                 return;
             }
-            navegar('sec-taller');
+            if (irAlertas) {
+                navegar('sec-taller');
+                setTimeout(() => navegar('sec-alertas'), 50);
+            } else {
+                navegar('sec-taller');
+            }
         }
 
         function cargarTaller() {
@@ -3296,9 +3405,6 @@
             document.getElementById('taller-modelo').textContent = `${biciActual.marca} ${biciActual.modelo}`;
             document.getElementById('taller-disciplina').textContent = biciActual.disciplina;
             document.getElementById('taller-km').textContent = `${biciActual.kmTotales || 0} km`;
-            
-            // Actualizar punto de alertas
-            actualizarPuntoAlertas();
             
             // Calcular peso total — excluir sección 'Ruedas' antigua
             let pesoTotal = 0;
@@ -4501,7 +4607,7 @@
         }
 
         function cargarAlertas() {
-            const umbral = parseFloat(biciActual.umbralAlertas || 0.9);
+            const umbral = parseFloat(datosUsuario.umbralAlertas || biciActual.umbralAlertas || 0.9);
             const alertas = calcularAlertas(umbral);
             const container = document.getElementById('contenido-alertas');
             container.innerHTML = '';
@@ -4559,7 +4665,8 @@
 
         // Actualiza visibilidad del punto naranja en el taller
         function actualizarPuntoAlertas() {
-            const alertas = calcularAlertas(parseFloat(biciActual.umbralAlertas || 0.9));
+            const umbral = parseFloat((datosUsuario && datosUsuario.umbralAlertas) || (biciActual && biciActual.umbralAlertas) || 0.9);
+            const alertas = calcularAlertas(umbral);
             const btn = document.getElementById('btn-alertas-sustitucion');
             if (btn) btn.style.display = alertas.length > 0 ? 'inline-block' : 'none';
         }
