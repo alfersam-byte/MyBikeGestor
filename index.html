@@ -1755,9 +1755,12 @@
     ======================================== -->
     <div id="modal-reparar" class="modal">
         <div class="modal-contenido">
-            <div class="modal-header">
-                <h2 class="modal-title">Reparar Componente</h2>
-                <p style="color: var(--text); font-size: 0.9em; margin-top: 10px;" id="reparar-componente-nombre">-</p>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-reparar')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <div>
+                    <h2 class="modal-title" style="margin:0;">Reparar Componente</h2>
+                    <p style="color: var(--text); font-size: 0.9em; margin-top: 4px;" id="reparar-componente-nombre">-</p>
+                </div>
             </div>
             <div class="form-group">
                 <label>Descripción de la reparación</label>
@@ -3685,15 +3688,30 @@
             }
         };
         
-        // Componentes con subpiezas
-        const SUBPIEZAS = {
+        // Componentes con subpiezas (base, sin manetas)
+        const SUBPIEZAS_BASE = {
             'Cambio Trasero': ['Roldanas'],
             'Bielas': ['Plato Grande', 'Plato Pequeño', 'Monoplato'],
-            'Maneta Izquierda': ['Pila', 'Escalador'],
-            'Maneta Derecha': ['Pila', 'Escalador'],
             'Pinza Delantera': ['Pastillas'],
             'Pinza Trasera': ['Pastillas']
         };
+
+        // Subpiezas dinámicas según disciplina de la bici activa
+        function getSubpiezas() {
+            const subpiezas = Object.assign({}, SUBPIEZAS_BASE);
+            const disciplina = biciActual ? biciActual.disciplina : '';
+            if (disciplina === 'Carretera' || disciplina === 'Gravel') {
+                subpiezas['Maneta Izquierda'] = ['Pila', 'Escalador'];
+                subpiezas['Maneta Derecha'] = ['Pila', 'Escalador'];
+            }
+            return subpiezas;
+        }
+
+        // Proxy para mantener compatibilidad con código existente que usa SUBPIEZAS directamente
+        const SUBPIEZAS = new Proxy({}, {
+            get(_, prop) { return getSubpiezas()[prop]; },
+            has(_, prop) { return prop in getSubpiezas(); }
+        });
         
         // Cargar grid de secciones
         function cargarSeccionesComponentes() {
@@ -5007,6 +5025,7 @@
             cargarListaComponentesSeccion();
             cargarTaller();
             cerrarModal('modal-componente');
+            if (modoEdicion) abrirDetalleComponente(comp);
             mostrarNotificacion(modoEdicion ? 'Actualizado' : 'Añadido', 'exito');
         }
         
@@ -5103,6 +5122,7 @@
             
             guardarDatosUsuario();
             cerrarModal('modal-reparar');
+            if (!window._repararModoPiezaRueda && !window._repararModoRueda && componenteActual) abrirDetalleComponente(componenteActual);
             mostrarNotificacion('Reparación registrada', 'exito');
         }
         
