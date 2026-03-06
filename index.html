@@ -1719,6 +1719,11 @@
                 <input type="text" id="comp-material-otro" placeholder="Nombre del material">
             </div>
 
+            <!-- Campos extra según tipo de componente (ej: configuración de platos en Bielas) -->
+            <div id="comp-campos-extra">
+                <!-- Se generan dinámicamente -->
+            </div>
+
             <div class="form-group">
                 <label>Peso (gramos)</label>
                 <input type="number" id="comp-peso" placeholder="0" step="1">
@@ -1737,11 +1742,6 @@
             <div class="form-group">
                 <label>Km en instalación</label>
                 <input type="number" id="comp-km-instalacion" placeholder="0" step="1">
-            </div>
-
-            <!-- Campos extra según tipo de componente -->
-            <div id="comp-campos-extra">
-                <!-- Se generan dinámicamente -->
             </div>
 
             <div class="modal-buttons">
@@ -3691,26 +3691,33 @@
         // Componentes con subpiezas (base, sin manetas)
         const SUBPIEZAS_BASE = {
             'Cambio Trasero': ['Roldanas'],
-            'Bielas': ['Plato Grande', 'Plato Pequeño', 'Monoplato'],
             'Pinza Delantera': ['Pastillas'],
             'Pinza Trasera': ['Pastillas']
         };
 
-        // Subpiezas dinámicas según disciplina de la bici activa
-        function getSubpiezas() {
+        function getSubpiezasBielas(comp) {
+            const config = comp ? comp.configPlatos : '';
+            if (config === '1') return ['Monoplato'];
+            // Sin config o doble plato: mostrar plato grande y pequeño
+            return ['Plato Grande', 'Plato Pequeño'];
+        }
+
+        // Subpiezas dinámicas según disciplina y configuración del componente
+        function getSubpiezas(comp) {
             const subpiezas = Object.assign({}, SUBPIEZAS_BASE);
             const disciplina = biciActual ? biciActual.disciplina : '';
             if (disciplina === 'Carretera' || disciplina === 'Gravel') {
                 subpiezas['Maneta Izquierda'] = ['Pila', 'Escalador'];
                 subpiezas['Maneta Derecha'] = ['Pila', 'Escalador'];
             }
+            subpiezas['Bielas'] = getSubpiezasBielas(comp);
             return subpiezas;
         }
 
         // Proxy para mantener compatibilidad con código existente que usa SUBPIEZAS directamente
         const SUBPIEZAS = new Proxy({}, {
-            get(_, prop) { return getSubpiezas()[prop]; },
-            has(_, prop) { return prop in getSubpiezas(); }
+            get(_, prop) { return getSubpiezas(componenteActual)[prop]; },
+            has(_, prop) { return prop in getSubpiezas(componenteActual); }
         });
         
         // Cargar grid de secciones
@@ -4974,11 +4981,20 @@
         }
         
         // Campos extra
-        function actualizarCamposExtra() {
+        function actualizarCamposExtra(configPlatosActual) {
             const tipo = document.getElementById('comp-tipo').value;
             const container = document.getElementById('comp-campos-extra');
-            container.innerHTML = ''; // Sin campos extra por ahora
+            container.innerHTML = '';
+            if (tipo === 'Bielas') {
+                container.innerHTML = `<div class="form-group"><label>Configuración de platos</label><select id="comp-config-platos"><option value="">-- Selecciona --</option><option value="1">Monoplato (1 plato)</option><option value="2">Doble plato (2 platos)</option></select></div>`;
+                if (configPlatosActual) document.getElementById('comp-config-platos').value = configPlatosActual;
+            }
         }
+
+
+
+
+
         
         // Guardar componente
         function guardarComponente() {
@@ -5003,7 +5019,10 @@
                 kmInstalacion: km
             };
             
-            // Sin campos extra en componentes principales
+            if (tipo === 'Bielas') {
+                const selPlatos = document.getElementById('comp-config-platos');
+                if (selPlatos) comp.configPlatos = selPlatos.value || '';
+            }
             
             if (SUBPIEZAS[tipo]) comp.subpiezas = {};
             
@@ -5051,7 +5070,7 @@
             document.getElementById('comp-km-instalacion').value = componenteActual.kmInstalacion || '';
             
             select.onchange = () => actualizarCamposExtra();
-            actualizarCamposExtra();
+            actualizarCamposExtra(componenteActual.configPlatos);
             
             abrirModal('modal-componente');
         }
