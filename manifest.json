@@ -9,15 +9,98 @@
   "theme_color": "#2ecc71",
   "orientation": "portrait",
   "lang": "es",
-  "categories": ["sports", "health", "lifestyle"],
+  "categories": [
+    "sports",
+    "health",
+    "lifestyle"
+  ],
   "icons": [
-    { "src": "./icons/icon-72.png",   "sizes": "72x72",   "type": "image/png" },
-    { "src": "./icons/icon-96.png",   "sizes": "96x96",   "type": "image/png" },
-    { "src": "./icons/icon-128.png",  "sizes": "128x128", "type": "image/png" },
-    { "src": "./icons/icon-144.png",  "sizes": "144x144", "type": "image/png" },
-    { "src": "./icons/icon-152.png",  "sizes": "152x152", "type": "image/png" },
-    { "src": "./icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "./icons/icon-384.png",  "sizes": "384x384", "type": "image/png" },
-    { "src": "./icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "./icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "com.alfersam.mybikegestor",
+  "screenshots": [
+    {
+      "src": "./screenshots/login.png",
+      "sizes": "1080x2361",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pantalla de inicio de sesión"
+    },
+    {
+      "src": "./screenshots/garaje.png",
+      "sizes": "1080x2345",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mi Garaje - lista de bicicletas"
+    },
+    {
+      "src": "./screenshots/bici-detalle.png",
+      "sizes": "1080x2350",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Detalle de bicicleta"
+    },
+    {
+      "src": "./screenshots/componentes.png",
+      "sizes": "1080x2366",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Gestión de componentes"
+    },
+    {
+      "src": "./screenshots/transmision.png",
+      "sizes": "1080x2389",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Lista de componentes - Transmisión"
+    },
+    {
+      "src": "./screenshots/bielas-detalle.png",
+      "sizes": "1080x2350",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Detalle de componente con subpiezas"
+    }
   ]
 }
