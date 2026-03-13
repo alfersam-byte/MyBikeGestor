@@ -4780,12 +4780,30 @@
                 container.appendChild(_crearTarjetaDesglose('Historial de cambios', items, totalHistorial, '€', 'var(--warning)'));
             }
 
-            // Componentes actuales que NO han sido sustituidos (no aparecen en historial como sustitución)
-            const sustitucionesHistorial = (biciActual.historial || [])
-                .filter(r => r.tipo === 'Sustitución')
-                .map(r => (r.componente || r.pieza || '').toLowerCase());
+            // Componentes en uso — excluir los que ya aparecen en el historial de sustituciones
+            // El historial guarda el coste del componente NUEVO instalado, así que los componentes
+            // que han sido sustituidos al menos una vez ya están contados en el historial.
+            const tiposSustituidos = new Set(
+                (biciActual.historial || [])
+                    .filter(r => r.tipo === 'Sustitución')
+                    .map(r => (r.componente || r.pieza || '').toLowerCase().trim())
+            );
 
-            const yaFueEustituido = (tipo) => sustitucionesHistorial.some(h => h.includes(tipo.toLowerCase()));
+            // Normaliza "Cubierta (delantera)" → "cubierta (delantera)"
+            // y compara con el tipo del componente + lado
+            const fueSustituido = (tipo, lado, parentTipo) => {
+                const t = tipo.toLowerCase().trim();
+                const tLado = lado ? `${t} (${lado.toLowerCase().trim()})` : null;
+                // Coincidencia exacta
+                if (tiposSustituidos.has(t)) return true;
+                if (tLado && tiposSustituidos.has(tLado)) return true;
+                // Subpieza: buscar "pinza delantera - pastillas" cuando tipo="pastillas" y parent="pinza delantera"
+                if (parentTipo) {
+                    const compuesto = `${parentTipo.toLowerCase().trim()} - ${t}`;
+                    if (tiposSustituidos.has(compuesto)) return true;
+                }
+                return false;
+            };
 
             const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
             const itemsIniciales = [];
@@ -4793,24 +4811,28 @@
             secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
                 const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
                 comps.forEach(comp => {
-                    if (comp.precio && !yaFueEustituido(comp.tipo)) {
+                    if (comp.precio && !fueSustituido(comp.tipo)) {
                         itemsIniciales.push({ nombre: `${comp.tipo} · ${comp.marca}`, valor: comp.precio });
                     }
                     if (comp.subpiezas) Object.values(comp.subpiezas).forEach(sub => {
-                        if (sub.precio && !yaFueEustituido(sub.tipo)) {
+                        if (sub.precio && !fueSustituido(sub.tipo, null, comp.tipo)) {
                             itemsIniciales.push({ nombre: `${sub.tipo} · ${sub.marca}`, valor: sub.precio });
                         }
                     });
                 });
             });
 
-            // Ruedas — juego activo (nunca duplican con historial)
+            // Ruedas — juego activo
             const juegoActivo = (biciActual.juegosRuedas || []).find(j => j.activo && !j.retirado);
             if (juegoActivo && juegoActivo.ruedas) {
                 Object.entries(juegoActivo.ruedas).forEach(([lado, rueda]) => {
-                    if (rueda.precio) itemsIniciales.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.precio });
+                    if (rueda.precio && !fueSustituido(`Rueda ${lado}`)) {
+                        itemsIniciales.push({ nombre: `Rueda ${lado} · ${rueda.marca}`, valor: rueda.precio });
+                    }
                     (rueda.piezas || []).forEach(p => {
-                        if (p.precio) itemsIniciales.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.precio });
+                        if (p.precio && !fueSustituido(p.tipo, lado)) {
+                            itemsIniciales.push({ nombre: `${p.tipo} ${lado} · ${p.marca}`, valor: p.precio });
+                        }
                     });
                 });
             }
@@ -4818,7 +4840,7 @@
             if (itemsIniciales.length > 0) {
                 const totalIniciales = itemsIniciales.reduce((s, i) => s + i.valor, 0);
                 totalGeneral += totalIniciales;
-                container.appendChild(_crearTarjetaDesglose('Componentes sin sustituir', itemsIniciales, totalIniciales, '€', 'var(--warning)'));
+                container.appendChild(_crearTarjetaDesglose('Componentes en uso', itemsIniciales, totalIniciales, '€', 'var(--warning)'));
             }
 
             const totalDiv = document.createElement('div');
