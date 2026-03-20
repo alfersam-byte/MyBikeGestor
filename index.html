@@ -1067,15 +1067,23 @@
             <div class="card mt-20">
                 <div class="card-title" style="margin-bottom: 20px;">💪 Datos Físicos</div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label>Peso (kg)</label>
-                        <input type="number" id="perfil-peso" placeholder="70" step="0.1">
+                <div class="form-group">
+                    <label>Peso (kg) — <span id="perfil-peso-valor" style="color: var(--primary); font-weight: 700;">70</span> kg</label>
+                    <input type="range" id="perfil-peso" min="30" max="200" step="0.1" value="70"
+                        oninput="document.getElementById('perfil-peso-valor').textContent = parseFloat(this.value).toFixed(1); calcularIMC();"
+                        style="width:100%; accent-color: var(--primary);">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text);">
+                        <span>30 kg</span><span>200 kg</span>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label>Altura (cm)</label>
-                        <input type="number" id="perfil-altura" placeholder="175">
+                <div class="form-group">
+                    <label>Altura (cm) — <span id="perfil-altura-valor" style="color: var(--primary); font-weight: 700;">175</span> cm</label>
+                    <input type="range" id="perfil-altura" min="100" max="220" step="1" value="175"
+                        oninput="document.getElementById('perfil-altura-valor').textContent = this.value; calcularIMC();"
+                        style="width:100%; accent-color: var(--primary);">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text);">
+                        <span>100 cm</span><span>220 cm</span>
                     </div>
                 </div>
 
@@ -1183,7 +1191,7 @@
 
             <div class="form-group">
                 <label>Marca</label>
-                <select id="nueva-marca">
+                <select id="nueva-marca" onchange="document.getElementById('nueva-marca-otra-container').style.display = this.value === 'Otra' ? 'block' : 'none'">
                     <option value="">Selecciona una marca</option>
                     <option value="Basso">Basso</option>
                     <option value="BH">BH</option>
@@ -1199,6 +1207,7 @@
                     <option value="Giant">Giant</option>
                     <option value="Kona">Kona</option>
                     <option value="Lifefitness">Lifefitness</option>
+                    <option value="Megamo">Megamo</option>
                     <option value="Merida">Merida</option>
                     <option value="Orbea">Orbea</option>
                     <option value="Pinarello">Pinarello</option>
@@ -1211,6 +1220,9 @@
                     <option value="Yeti">Yeti</option>
                     <option value="Otra">Otra</option>
                 </select>
+                <div id="nueva-marca-otra-container" style="display:none; margin-top:10px;">
+                    <input type="text" id="nueva-marca-otra" placeholder="Nombre de la marca">
+                </div>
             </div>
 
             <div class="form-group">
@@ -1673,6 +1685,7 @@
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
+                    <option value="Megamo">Megamo</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
@@ -1845,6 +1858,7 @@
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
+                    <option value="Megamo">Megamo</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
@@ -1979,6 +1993,7 @@
                     <option value="Look">Look</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
+                    <option value="Megamo">Megamo</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
                     <option value="Pro">Pro</option>
@@ -2854,8 +2869,12 @@
             document.getElementById('perfil-password').value = '';
 
             // Datos físicos
-            document.getElementById('perfil-peso').value = datosUsuario.peso || '';
-            document.getElementById('perfil-altura').value = datosUsuario.altura || '';
+            const pesoVal = datosUsuario.peso || 70;
+            const alturaVal = datosUsuario.altura || 175;
+            document.getElementById('perfil-peso').value = pesoVal;
+            document.getElementById('perfil-peso-valor').textContent = parseFloat(pesoVal).toFixed(1);
+            document.getElementById('perfil-altura').value = alturaVal;
+            document.getElementById('perfil-altura-valor').textContent = alturaVal;
             document.getElementById('perfil-ftp').value = datosUsuario.ftp || '';
             document.getElementById('perfil-fc-max').value = datosUsuario.fcMax || '';
             document.getElementById('perfil-vo2max').value = datosUsuario.vo2max || '';
@@ -3352,7 +3371,8 @@
 
         function crearBicicleta() {
             const alias = document.getElementById('nueva-alias').value.trim();
-            const marca = document.getElementById('nueva-marca').value;
+            let marca = document.getElementById('nueva-marca').value;
+            if (marca === 'Otra') marca = document.getElementById('nueva-marca-otra').value.trim() || 'Otra';
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
             const fechaCompra = document.getElementById('nueva-fecha').value;
@@ -3388,6 +3408,8 @@
             // Limpiar formulario
             document.getElementById('nueva-alias').value = '';
             document.getElementById('nueva-marca').value = '';
+            document.getElementById('nueva-marca-otra').value = '';
+            document.getElementById('nueva-marca-otra-container').style.display = 'none';
             document.getElementById('nueva-modelo').value = '';
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
@@ -3526,7 +3548,20 @@
 
             // Rellenar formulario con datos actuales
             document.getElementById('nueva-alias').value = biciActual.alias || '';
-            document.getElementById('nueva-marca').value = biciActual.marca || '';
+            const marcaSelect = document.getElementById('nueva-marca');
+            const marcaOtraContainer = document.getElementById('nueva-marca-otra-container');
+            const marcaOtraInput = document.getElementById('nueva-marca-otra');
+            // Comprobar si la marca existe en el select
+            const opcionExiste = Array.from(marcaSelect.options).some(o => o.value === biciActual.marca);
+            if (opcionExiste) {
+                marcaSelect.value = biciActual.marca || '';
+                marcaOtraContainer.style.display = 'none';
+                marcaOtraInput.value = '';
+            } else {
+                marcaSelect.value = 'Otra';
+                marcaOtraContainer.style.display = 'block';
+                marcaOtraInput.value = biciActual.marca || '';
+            }
             document.getElementById('nueva-modelo').value = biciActual.modelo || '';
             document.getElementById('nueva-disciplina').value = biciActual.disciplina || 'Carretera';
             document.getElementById('nueva-fecha').value = biciActual.fechaCompra || '';
@@ -3557,6 +3592,8 @@
             // Limpiar campos
             document.getElementById('nueva-alias').value = '';
             document.getElementById('nueva-marca').value = '';
+            document.getElementById('nueva-marca-otra').value = '';
+            document.getElementById('nueva-marca-otra-container').style.display = 'none';
             document.getElementById('nueva-modelo').value = '';
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
@@ -3574,7 +3611,8 @@
 
         async function guardarEdicionBici() {
             const alias = document.getElementById('nueva-alias').value.trim();
-            const marca = document.getElementById('nueva-marca').value;
+            let marca = document.getElementById('nueva-marca').value;
+            if (marca === 'Otra') marca = document.getElementById('nueva-marca-otra').value.trim() || 'Otra';
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
             const fechaCompra = document.getElementById('nueva-fecha').value;
