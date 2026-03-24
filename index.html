@@ -4679,9 +4679,52 @@
             return alertas.sort((a, b) => b.porcentaje - a.porcentaje);
         }
 
+        function posponerAlerta(nombreAlerta, semanas) {
+            if (!biciActual.alertasPospuestas) biciActual.alertasPospuestas = {};
+            const hasta = new Date();
+            hasta.setDate(hasta.getDate() + semanas * 7);
+            biciActual.alertasPospuestas[nombreAlerta] = hasta.toISOString();
+            guardarDatosUsuario();
+            cargarAlertas();
+            mostrarNotificacion(`⏸️ Alerta pospuesta ${semanas} semanas`, 'info');
+        }
+
+        function mostrarPanelPosponer(nombreAlerta, btnEl) {
+            // Cerrar cualquier panel abierto
+            document.querySelectorAll('.panel-posponer').forEach(p => p.remove());
+
+            const panel = document.createElement('div');
+            panel.className = 'panel-posponer';
+            panel.style.cssText = 'background:var(--light-gray); border-radius:10px; padding:12px; margin-top:10px;';
+            panel.innerHTML = `
+                <div style="font-size:0.85em; font-weight:600; margin-bottom:8px; color:var(--dark);">⏸️ Posponer alerta</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button onclick="posponerAlerta('${nombreAlerta}', 2)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">2 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 4)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">4 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 8)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">8 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 12)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">12 sem</button>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="number" id="posponer-semanas-manual" placeholder="Semanas" min="1" max="52" style="width:100px; padding:6px 10px; border-radius:8px; border:1px solid var(--light-gray); font-size:0.85em;">
+                    <button onclick="const s=parseInt(document.getElementById('posponer-semanas-manual').value); if(s>0) posponerAlerta('${nombreAlerta}', s);" style="padding:6px 14px; border-radius:8px; border:none; background:var(--primary); color:white; font-size:0.8em; cursor:pointer;">Posponer</button>
+                </div>
+            `;
+            btnEl.closest('.card').appendChild(panel);
+        }
+
         function cargarAlertas() {
             const umbral = parseFloat(datosUsuario.umbralAlertas || biciActual.umbralAlertas || 0.9);
-            const alertas = calcularAlertas(umbral);
+            const ahora = new Date();
+            const pospuestas = biciActual.alertasPospuestas || {};
+            const alertas = calcularAlertas(umbral).filter(a => {
+                const hasta = pospuestas[a.nombre];
+                return !hasta || new Date(hasta) <= ahora;
+            });
+            const alertasPospuestas = calcularAlertas(umbral).filter(a => {
+                const hasta = pospuestas[a.nombre];
+                return hasta && new Date(hasta) > ahora;
+            });
+
             const container = document.getElementById('contenido-alertas');
             container.innerHTML = '';
 
@@ -4703,11 +4746,11 @@
             `;
             container.appendChild(configDiv);
 
-            if (alertas.length === 0) {
+            if (alertas.length === 0 && alertasPospuestas.length === 0) {
                 container.innerHTML += `<div class="card"><div class="lista-vacia"><div class="lista-vacia-icon">✅</div><p>Todo en orden, ningún componente cerca del límite</p></div></div>`;
-                return;
             }
 
+            // Alertas activas
             alertas.forEach(a => {
                 const kmRestantes = Math.round(a.vidaMedia - a.kmActuales);
                 const color = a.porcentaje >= 1 ? 'var(--danger)' : 'var(--warning)';
@@ -4727,13 +4770,44 @@
                     <div style="background:var(--light-gray); border-radius:6px; height:8px; overflow:hidden; margin-bottom:8px;">
                         <div style="height:100%; width:${Math.round(a.porcentaje*100)}%; background:${color}; border-radius:6px; transition:width 0.3s;"></div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8em; color:var(--text);">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8em; color:var(--text); margin-bottom:10px;">
                         <span>${a.kmActuales} km usados de ~${a.vidaMedia} km estimados</span>
                         <span style="color:${color}; font-weight:600;">${kmRestantes > 0 ? `~${kmRestantes} km restantes` : `+${Math.abs(kmRestantes)} km sobre estimado`}</span>
                     </div>
+                    <button onclick="mostrarPanelPosponer('${a.nombre}', this)" style="padding:6px 14px; border-radius:8px; border:1px solid var(--secondary); background:white; color:var(--secondary); font-size:0.8em; cursor:pointer; font-weight:600;">⏸️ Posponer</button>
                 `;
                 container.appendChild(card);
             });
+
+            // Alertas pospuestas
+            if (alertasPospuestas.length > 0) {
+                const titulo = document.createElement('div');
+                titulo.style.cssText = 'font-size:0.85em; font-weight:600; color:var(--text); margin:16px 0 8px;';
+                titulo.textContent = '⏸️ Alertas pospuestas';
+                container.appendChild(titulo);
+
+                alertasPospuestas.forEach(a => {
+                    const hasta = new Date(pospuestas[a.nombre]);
+                    const fechaStr = hasta.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.cssText = 'border-left:4px solid var(--text); opacity:0.7; margin-bottom:12px;';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">${a.nombre}</div>
+                                <div style="font-size:0.8em; color:var(--text);">${a.marca} · ${a.seccion}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:0.75em; color:var(--text);">Activa el</div>
+                                <div style="font-size:0.8em; font-weight:600; color:var(--dark);">${fechaStr}</div>
+                            </div>
+                        </div>
+                        <button onclick="delete biciActual.alertasPospuestas['${a.nombre}']; guardarDatosUsuario(); cargarAlertas();" style="margin-top:8px; padding:5px 12px; border-radius:8px; border:1px solid var(--danger); background:white; color:var(--danger); font-size:0.75em; cursor:pointer;">✕ Cancelar posposición</button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
         }
 
         function _crearTarjetaDesglose(titulo, items, total, unidad, color) {
@@ -4880,6 +4954,38 @@
                 totalGeneral += totalIniciales;
                 container.appendChild(_crearTarjetaDesglose('Componentes en uso', itemsIniciales, totalIniciales, '€', 'var(--warning)'));
             }
+
+            // Componentes en el cajón
+            const cajon = (biciActual.cajonPiezas || []).filter(p => parseFloat(p.precio) > 0);
+            if (cajon.length > 0) {
+                const itemsCajon = cajon.map(p => ({
+                    nombre: `${p.tipo} · ${p.marca || '-'}`,
+                    valor: parseFloat(p.precio)
+                }));
+                const totalCajon = itemsCajon.reduce((s, i) => s + i.valor, 0);
+                totalGeneral += totalCajon;
+                container.appendChild(_crearTarjetaDesglose('📦 Componentes en el cajón', itemsCajon, totalCajon, '€', 'var(--warning)'));
+            }
+
+            // Juegos de ruedas no activos (disponibles o retirados) con precio
+            const juegosNoActivos = (biciActual.juegosRuedas || []).filter(j => !j.activo);
+            juegosNoActivos.forEach(juego => {
+                const itemsJuego = [];
+                if (juego.ruedas) {
+                    Object.entries(juego.ruedas).forEach(([lado, rueda]) => {
+                        if (rueda.precio) itemsJuego.push({ nombre: `Rueda ${lado} · ${rueda.marca || '-'}`, valor: parseFloat(rueda.precio) });
+                        (rueda.piezas || []).forEach(p => {
+                            if (p.precio) itemsJuego.push({ nombre: `${p.tipo} ${lado} · ${p.marca || '-'}`, valor: parseFloat(p.precio) });
+                        });
+                    });
+                }
+                if (itemsJuego.length > 0) {
+                    const totalJuego = itemsJuego.reduce((s, i) => s + i.valor, 0);
+                    totalGeneral += totalJuego;
+                    const estado = juego.retirado ? '🗄️ Retirado' : '⚪ Disponible';
+                    container.appendChild(_crearTarjetaDesglose(`${estado} · ${juego.marca || 'Juego'} ${juego.modelo || ''}`.trim(), itemsJuego, totalJuego, '€', 'var(--warning)'));
+                }
+            });
 
             const totalDiv = document.createElement('div');
             totalDiv.className = 'card';
