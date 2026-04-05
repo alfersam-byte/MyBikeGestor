@@ -1355,13 +1355,14 @@
         ======================================== -->
         <section id="sec-cajon-piezas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-componentes')">←</button>
+                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
                 <div class="topbar-title">📦 Cajón de Piezas</div>
                 <div style="width: 40px;"></div>
             </div>
             <div class="text-muted text-center mb-20" style="margin-top:15px;">
                 <p>Piezas guardadas · Puedes reinstalarlas cuando quieras</p>
             </div>
+            <button class="btn btn-primary" style="margin-bottom:16px;" onclick="abrirModalAnadirCajon()">➕ Añadir pieza al cajón</button>
             <div id="lista-cajon-piezas" class="mt-20"></div>
         </section>
 
@@ -1484,9 +1485,9 @@
                     <div class="btn-grid-item-icon" id="btn-vincular-strava-icon">🚴</div>
                     <div class="btn-grid-item-text" id="btn-vincular-strava-texto">Vincular Strava</div>
                 </button>
-                <button class="btn-grid-item" onclick="mostrarNotificacion('Próximamente: Estadísticas', 'info')">
-                    <div class="btn-grid-item-icon">📊</div>
-                    <div class="btn-grid-item-text">Estadísticas</div>
+                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')">
+                    <div class="btn-grid-item-icon">📦</div>
+                    <div class="btn-grid-item-text">Cajón (<span id="cajon-count-taller">0</span>)</div>
                 </button>
             </div>
         </section>
@@ -2121,6 +2122,95 @@
             </div>
             <div class="modal-buttons">
                 <button class="btn btn-primary" onclick="enviarEmailRecuperacion()">Enviar enlace</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: AÑADIR PIEZA AL CAJÓN
+    ======================================== -->
+    <div id="modal-anadir-cajon" class="modal">
+        <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h2 class="modal-title">➕ Añadir pieza al cajón</h2>
+            </div>
+            <div class="form-group">
+                <label>Tipo de componente</label>
+                <select id="cajon-nuevo-tipo">
+                    <option value="">-- Selecciona --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="cajon-nuevo-marca" onchange="document.getElementById('cajon-nuevo-marca-otra-container').style.display = this.value === 'Otra' ? 'block' : 'none'">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Bontrager">Bontrager</option>
+                    <option value="Campagnolo">Campagnolo</option>
+                    <option value="Canyon">Canyon</option>
+                    <option value="Continental">Continental</option>
+                    <option value="DT Swiss">DT Swiss</option>
+                    <option value="Fizik">Fizik</option>
+                    <option value="Fox">Fox</option>
+                    <option value="Garmin">Garmin</option>
+                    <option value="Giant">Giant</option>
+                    <option value="Kodak">Kodak</option>
+                    <option value="Lifefitness">Lifefitness</option>
+                    <option value="Look">Look</option>
+                    <option value="Magura">Magura</option>
+                    <option value="Maxxis">Maxxis</option>
+                    <option value="Megamo">Megamo</option>
+                    <option value="Michelin">Michelin</option>
+                    <option value="Pirelli">Pirelli</option>
+                    <option value="Pro">Pro</option>
+                    <option value="Prólogo">Prólogo</option>
+                    <option value="RockShox">RockShox</option>
+                    <option value="Schwalbe">Schwalbe</option>
+                    <option value="Selle Italia">Selle Italia</option>
+                    <option value="Shimano">Shimano</option>
+                    <option value="Specialized">Specialized</option>
+                    <option value="Sram">Sram</option>
+                    <option value="Varta">Varta</option>
+                    <option value="Zipp">Zipp</option>
+                    <option value="Otra">Otra</option>
+                </select>
+                <div id="cajon-nuevo-marca-otra-container" style="display:none; margin-top:8px;">
+                    <input type="text" id="cajon-nuevo-marca-otra" placeholder="Nombre de la marca">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="cajon-nuevo-modelo" placeholder="Ej: Ultegra R8100">
+            </div>
+            <div class="form-group">
+                <label>Material</label>
+                <select id="cajon-nuevo-material">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Acero">Acero</option>
+                    <option value="Aluminio">Aluminio</option>
+                    <option value="Carbono">Carbono</option>
+                    <option value="Caucho">Caucho</option>
+                    <option value="Cromo">Cromo</option>
+                    <option value="Plástico">Plástico</option>
+                    <option value="TPU">TPU</option>
+                    <option value="Titanio">Titanio</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Peso (gramos)</label>
+                <input type="number" id="cajon-nuevo-peso" placeholder="0" step="1">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="cajon-nuevo-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Notas (opcional)</label>
+                <input type="text" id="cajon-nuevo-notas" placeholder="Ej: Nueva, comprada en oferta...">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="cerrarModal('modal-anadir-cajon')">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarPiezaCajon()">Guardar</button>
             </div>
         </div>
     </div>
@@ -5534,10 +5624,140 @@
             const cajon = biciActual.cajonPiezas || [];
             const btn = document.getElementById('btn-ver-cajon');
             const count = document.getElementById('cajon-count');
+            const countTaller = document.getElementById('cajon-count-taller');
             if (btn) {
                 btn.style.display = cajon.length > 0 ? 'block' : 'none';
                 if (count) count.textContent = cajon.length;
             }
+            if (countTaller) countTaller.textContent = cajon.length;
+        }
+
+        function abrirModalAnadirCajon() {
+            if (!biciActual) return;
+            const disciplina = biciActual.disciplina || 'Carretera';
+            const secciones = SECCIONES_COMPONENTES[disciplina] || SECCIONES_COMPONENTES['Carretera'];
+
+            const sel = document.getElementById('cajon-nuevo-tipo');
+            sel.innerHTML = '<option value="">-- Selecciona --</option>';
+            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+                const seccionData = COMPONENTES_POR_SECCION[seccion];
+                if (!seccionData) return;
+                const tipos = seccionData[disciplina] || seccionData['todos'] || [];
+                if (tipos.length === 0) return;
+                const group = document.createElement('optgroup');
+                group.label = seccion;
+                tipos.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    group.appendChild(opt);
+                });
+                sel.appendChild(group);
+            });
+
+            // Limpiar campos
+            document.getElementById('cajon-nuevo-marca').value = '';
+            document.getElementById('cajon-nuevo-marca-otra').value = '';
+            document.getElementById('cajon-nuevo-marca-otra-container').style.display = 'none';
+            document.getElementById('cajon-nuevo-modelo').value = '';
+            document.getElementById('cajon-nuevo-material').value = '';
+            document.getElementById('cajon-nuevo-peso').value = '';
+            document.getElementById('cajon-nuevo-precio').value = '';
+            document.getElementById('cajon-nuevo-notas').value = '';
+            abrirModal('modal-anadir-cajon');
+        }
+
+        async function guardarPiezaCajon() {
+            const tipo = document.getElementById('cajon-nuevo-tipo').value;
+            let marca = document.getElementById('cajon-nuevo-marca').value;
+            if (marca === 'Otra') marca = document.getElementById('cajon-nuevo-marca-otra').value.trim() || 'Otra';
+            const modelo = document.getElementById('cajon-nuevo-modelo').value.trim();
+            const material = document.getElementById('cajon-nuevo-material').value;
+            const peso = parseFloat(document.getElementById('cajon-nuevo-peso').value) || 0;
+            const precio = parseFloat(document.getElementById('cajon-nuevo-precio').value) || 0;
+            const notas = document.getElementById('cajon-nuevo-notas').value.trim();
+
+            if (!tipo || !marca) {
+                mostrarNotificacion('Indica el tipo y la marca', 'error');
+                return;
+            }
+
+            if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+            biciActual.cajonPiezas.push({
+                id: Date.now().toString(),
+                tipo, marca, modelo, material, peso, precio, notas,
+                manual: true,
+                fechaEntrada: new Date().toISOString()
+            });
+
+            await guardarDatosUsuario();
+            actualizarBotonCajon();
+            cerrarModal('modal-anadir-cajon');
+            cargarCajonPiezas();
+            mostrarNotificacion('Pieza añadida al cajón 📦', 'exito');
+        }
+
+        function editarPiezaCajon(piezaId) {
+            if (!biciActual) return;
+            const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
+            if (!pieza) return;
+
+            // Reutilizar modal de añadir pero en modo edición
+            abrirModalAnadirCajon();
+            document.querySelector('#modal-anadir-cajon .modal-title').textContent = '✏️ Editar pieza';
+            document.querySelector('#modal-anadir-cajon .btn-primary').onclick = () => guardarEdicionPiezaCajon(piezaId);
+
+            // Rellenar con datos existentes
+            const sel = document.getElementById('cajon-nuevo-tipo');
+            // Añadir el tipo actual si no está en la lista
+            if (![...sel.options].some(o => o.value === pieza.tipo)) {
+                const opt = document.createElement('option');
+                opt.value = pieza.tipo;
+                opt.textContent = pieza.tipo;
+                sel.appendChild(opt);
+            }
+            sel.value = pieza.tipo;
+
+            const marcaSel = document.getElementById('cajon-nuevo-marca');
+            const marcaExiste = [...marcaSel.options].some(o => o.value === pieza.marca);
+            if (marcaExiste) {
+                marcaSel.value = pieza.marca;
+            } else {
+                marcaSel.value = 'Otra';
+                document.getElementById('cajon-nuevo-marca-otra-container').style.display = 'block';
+                document.getElementById('cajon-nuevo-marca-otra').value = pieza.marca;
+            }
+            document.getElementById('cajon-nuevo-modelo').value = pieza.modelo || '';
+            document.getElementById('cajon-nuevo-material').value = pieza.material || '';
+            document.getElementById('cajon-nuevo-peso').value = pieza.peso || '';
+            document.getElementById('cajon-nuevo-precio').value = pieza.precio || '';
+            document.getElementById('cajon-nuevo-notas').value = pieza.notas || '';
+        }
+
+        async function guardarEdicionPiezaCajon(piezaId) {
+            const tipo = document.getElementById('cajon-nuevo-tipo').value;
+            let marca = document.getElementById('cajon-nuevo-marca').value;
+            if (marca === 'Otra') marca = document.getElementById('cajon-nuevo-marca-otra').value.trim() || 'Otra';
+            const modelo = document.getElementById('cajon-nuevo-modelo').value.trim();
+            const material = document.getElementById('cajon-nuevo-material').value;
+            const peso = parseFloat(document.getElementById('cajon-nuevo-peso').value) || 0;
+            const precio = parseFloat(document.getElementById('cajon-nuevo-precio').value) || 0;
+            const notas = document.getElementById('cajon-nuevo-notas').value.trim();
+
+            if (!tipo || !marca) {
+                mostrarNotificacion('Indica el tipo y la marca', 'error');
+                return;
+            }
+
+            const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
+            if (pieza) {
+                Object.assign(pieza, { tipo, marca, modelo, material, peso, precio, notas });
+            }
+
+            await guardarDatosUsuario();
+            cerrarModal('modal-anadir-cajon');
+            cargarCajonPiezas();
+            mostrarNotificacion('Pieza actualizada ✅', 'exito');
         }
 
         function cargarCajonPiezas() {
@@ -5573,8 +5793,8 @@
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-top:12px;">
-                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Reinstalar este componente" onclick="reinstalarPieza('${pieza.id}')">⚡ Reinstalar</button>
-                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarPiezaCajon('${pieza.id}')">🗑️ Eliminar</button>
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" onclick="editarPiezaCajon('${pieza.id}')">✏️ Editar</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" onclick="eliminarPiezaCajon('${pieza.id}')">🗑️ Eliminar</button>
                     </div>
                 `;
                 container.appendChild(card);

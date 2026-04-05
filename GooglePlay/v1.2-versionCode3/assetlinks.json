@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.alfersam_byte.twa",
+        "sha256_cert_fingerprints": ["9F:EC:98:61:AC:03:35:FB:A8:DB:24:2D:01:33:F2:F1:A8:1C:F4:1E:D1:6F:95:8C:6C:C1:B1:5E:2F:B1:48:67"]
+      }
+    }]
