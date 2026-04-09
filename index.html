@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyBikeGestor v3.0</title>
-
+    
     <!-- PWA -->
     <meta name="theme-color" content="#4CAF50">
     <meta name="mobile-web-app-capable" content="yes">
@@ -2129,6 +2129,29 @@
     <!-- ========================================
          MODAL: AÑADIR PIEZA AL CAJÓN
     ======================================== -->
+    <!-- ========================================
+         MODAL: EDITAR COSTE HISTORIAL
+    ======================================== -->
+    <div id="modal-editar-coste" class="modal">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Editar coste</h2>
+            </div>
+            <div id="editar-coste-info" style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px; font-size:0.85em; color:var(--dark);"></div>
+            <div class="form-group">
+                <label>Nuevo coste (€)</label>
+                <input type="number" id="editar-coste-input" placeholder="0" step="0.01" min="0">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="cerrarModal('modal-editar-coste')">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarEdicionCoste()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: AÑADIR PIEZA AL CAJÓN
+    ======================================== -->
     <div id="modal-anadir-cajon" class="modal">
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
             <div class="modal-header">
@@ -3337,7 +3360,7 @@
             });
         }
 
-        function retirarBici(biciId) {
+        async function retirarBici(biciId) {
             const bici = datosUsuario.garaje.find(b => b.id === biciId);
             if (!bici) return;
 
@@ -3422,7 +3445,7 @@
             });
         }
 
-        function reactivarBici(biciId) {
+        async function reactivarBici(biciId) {
             const bici = datosUsuario.garaje.find(b => b.id === biciId);
             if (!bici) return;
 
@@ -3751,7 +3774,7 @@
             abrirModal('modal-km');
         }
 
-        function guardarKm() {
+        async function guardarKm() {
             const km = parseFloat(document.getElementById('input-km').value);
             
             if (!km || km <= 0) {
@@ -4110,7 +4133,7 @@
             abrirModal('modal-juego-ruedas');
         }
 
-        function activarJuegoRuedas(juegoId) {
+        async function activarJuegoRuedas(juegoId) {
             const juego = biciActual.juegosRuedas.find(j => j.id === juegoId && !j.retirado);
             if (!juego) return;
             const juegoActivo = biciActual.juegosRuedas.find(j => j.activo);
@@ -4145,7 +4168,7 @@
             }
         }
 
-        function retirarJuegoRuedas(juegoId) {
+        async function retirarJuegoRuedas(juegoId) {
             const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
             if (!juego) return;
             confirmar(
@@ -4180,7 +4203,7 @@
             );
         }
 
-        function eliminarJuegoRuedas(juegoId) {
+        async function eliminarJuegoRuedas(juegoId) {
             const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
             if (!juego) return;
             confirmar(
@@ -4251,7 +4274,7 @@
             });
         }
 
-        function reactivarJuegoRuedas(juegoId) {
+        async function reactivarJuegoRuedas(juegoId) {
             const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
             if (!juego) return;
             confirmar(
@@ -4268,7 +4291,7 @@
             );
         }
 
-        function eliminarJuegoRetirado(juegoId) {
+        async function eliminarJuegoRetirado(juegoId) {
             const juego = biciActual.juegosRuedas.find(j => j.id === juegoId);
             if (!juego) return;
             confirmar(
@@ -4401,7 +4424,7 @@
             else { inp.style.display = 'none'; inp.value = sel.value; }
         }
 
-        function guardarRueda() {
+        async function guardarRueda() {
             const lado = window._ladoRuedaActual;
             const sel = document.getElementById('rueda-marca-select');
             const inp = document.getElementById('rueda-marca-input');
@@ -4431,7 +4454,7 @@
             mostrarNotificacion(`Rueda ${lado} guardada ✅`, 'exito');
         }
 
-        function eliminarRueda(lado) {
+        async function eliminarRueda(lado) {
             const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
             if (!rueda) return;
             confirmar(
@@ -4583,7 +4606,7 @@
             abrirModal('modal-pieza-rueda');
         }
 
-        function guardarPiezaRueda() {
+        async function guardarPiezaRueda() {
             const lado = window._ladoRuedaActual;
             const tipo = document.getElementById('pieza-rueda-tipo').value;
             const marca = document.getElementById('pieza-rueda-marca-select').value;
@@ -4659,7 +4682,7 @@
             abrirModal('modal-sustituir');
         }
 
-        function eliminarPiezaRueda(piezaId) {
+        async function eliminarPiezaRueda(piezaId) {
             confirmar('¿Eliminar pieza?', 'Esta acción no se puede deshacer.',
                 async () => {
                     const rueda = juegosRuedasActual.ruedas[window._ladoRuedaActual];
@@ -5253,7 +5276,7 @@
 
         
         // Guardar componente
-        function guardarComponente() {
+        async function guardarComponente() {
             const tipo = document.getElementById('comp-tipo').value.trim();
             let marca = document.getElementById('comp-marca').value;
             const modelo = document.getElementById('comp-modelo').value.trim();
@@ -5346,7 +5369,7 @@
         }
         
         // Guardar reparación
-        function guardarReparacion() {
+        async function guardarReparacion() {
             const desc = document.getElementById('reparar-descripcion').value.trim();
             const lugar = document.getElementById('reparar-lugar').value;
             const fecha = document.getElementById('reparar-fecha').value;
@@ -5602,7 +5625,7 @@
         }
         
         // Eliminar componente actual
-        function eliminarComponenteActual() {
+        async function eliminarComponenteActual() {
             if (!componenteActual) return;
             confirmar(
                 '¿Eliminar componente?',
@@ -5801,7 +5824,7 @@
             });
         }
 
-        function reinstalarPieza(piezaId) {
+        async function reinstalarPieza(piezaId) {
             if (!biciActual.cajonPiezas) return;
             const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
             if (!pieza) return;
@@ -5858,7 +5881,7 @@
             );
         }
 
-        function eliminarPiezaCajon(piezaId) {
+        async function eliminarPiezaCajon(piezaId) {
             confirmar(
                 '¿Eliminar definitivamente?',
                 '¿Estás seguro? Esta acción no se puede deshacer.',
@@ -5980,7 +6003,7 @@
         }
         
         // Guardar subpieza
-        function guardarSubpieza() {
+        async function guardarSubpieza() {
             if (!componenteActual || !subpiezaTipo) return;
             
             let marca = document.getElementById('subpieza-marca').value;
@@ -6140,32 +6163,47 @@
             });
         }
 
-        function editarCosteHistorial(id) {
+        async function editarCosteHistorial(id) {
             const reg = biciActual.historial.find(r => r.id === id);
             if (!reg) return;
 
             const costeActual = parseFloat(reg.coste) || 0;
-            const nuevoCosteStr = prompt(`Editar coste de "${reg.componente || reg.pieza}":\nCoste actual: ${costeActual}€\n\nNuevo coste (€):`, costeActual);
-            if (nuevoCosteStr === null) return; // cancelado
+            window._editandoCosteId = id;
 
-            const nuevoCoste = parseFloat(nuevoCosteStr);
+            document.getElementById('editar-coste-info').innerHTML = 
+                `<strong>${reg.componente || reg.pieza || '-'}</strong><br>
+                 <span style="color:var(--text);">${reg.descripcion || ''}</span><br>
+                 <span style="color:var(--warning);">Coste actual: <strong>${costeActual}€</strong></span>`;
+            document.getElementById('editar-coste-input').value = costeActual;
+            abrirModal('modal-editar-coste');
+            setTimeout(() => document.getElementById('editar-coste-input').focus(), 100);
+        }
+
+        async function confirmarEdicionCoste() {
+            const id = window._editandoCosteId;
+            if (!id) return;
+            const reg = biciActual.historial.find(r => r.id === id);
+            if (!reg) return;
+
+            const nuevoCoste = parseFloat(document.getElementById('editar-coste-input').value);
             if (isNaN(nuevoCoste) || nuevoCoste < 0) {
                 mostrarNotificacion('Coste no válido', 'error');
                 return;
             }
 
-            // Actualizar inversión: restar el viejo y sumar el nuevo
-            const diferencia = nuevoCoste - costeActual;
+            const diferencia = nuevoCoste - (parseFloat(reg.coste) || 0);
             biciActual.inversion = Math.max(0, parseFloat(biciActual.inversion || 0) + diferencia).toFixed(2);
             reg.coste = nuevoCoste;
+            window._editandoCosteId = null;
 
             await guardarDatosUsuario();
+            cerrarModal('modal-editar-coste');
             cargarHistorial();
             cargarTaller();
             mostrarNotificacion('Coste actualizado ✅', 'exito');
         }
 
-        function eliminarRegistroHistorial(id) {
+        async function eliminarRegistroHistorial(id) {
             confirmar('¿Eliminar registro?', 'Esta acción no se puede deshacer.',
                 async () => {
                     const reg = biciActual.historial.find(r => r.id === id);
@@ -6192,7 +6230,7 @@
             abrirModal('modal-mantenimiento');
         }
 
-        function guardarMantenimiento() {
+        async function guardarMantenimiento() {
             const tipo = document.getElementById('mant-tipo').value;
             const pieza = document.getElementById('mant-pieza').value.trim();
             const descripcion = document.getElementById('mant-descripcion').value.trim();
