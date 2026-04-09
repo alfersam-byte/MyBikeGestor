@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyBikeGestor v3.0</title>
-    
+
     <!-- PWA -->
     <meta name="theme-color" content="#4CAF50">
     <meta name="mobile-web-app-capable" content="yes">
@@ -3760,7 +3760,7 @@
             }
 
             biciActual.kmTotales = (biciActual.kmTotales || 0) + km;
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cargarTaller();
             cerrarModal('modal-km');
             mostrarNotificacion(`¡${km} km añadidos correctamente!`, 'exito');
@@ -4425,7 +4425,7 @@
                 piezas: ruedaExistente ? (ruedaExistente.piezas || []) : []
             };
 
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cerrarModal('modal-rueda');
             cargarDetalleJuegoRuedas();
             mostrarNotificacion(`Rueda ${lado} guardada ✅`, 'exito');
@@ -4608,7 +4608,7 @@
                 rueda.piezas.push({ id: Date.now().toString(), tipo, marca, modelo, material, peso, numRadios, precio, fechaInstalacion: fecha, kmInstalacion: km });
             }
 
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cerrarModal('modal-pieza-rueda');
             cargarDespieceRueda();
             cargarDetalleJuegoRuedas();
@@ -5296,7 +5296,7 @@
                 biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
             }
             
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cargarListaComponentesSeccion();
             cargarTaller();
             cerrarModal('modal-componente');
@@ -5395,7 +5395,7 @@
                 });
             }
             
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cerrarModal('modal-reparar');
             if (!window._repararModoPiezaRueda && !window._repararModoRueda && componenteActual) abrirDetalleComponente(componenteActual);
             mostrarNotificacion('Reparación registrada', 'exito');
@@ -5469,7 +5469,7 @@
         }
         
         // Guardar sustitución
-        function guardarSustitucion(destinoViejo) {
+        async function guardarSustitucion(destinoViejo) {
             const piezaCajonId = document.getElementById('sustituir-cajon-select') ? document.getElementById('sustituir-cajon-select').value : '';
             const desdeСajon = !!piezaCajonId;
 
@@ -5528,7 +5528,7 @@
                 window._sustituirModoPiezaRueda = false;
                 window._sustituirPiezaRuedaId = null;
 
-                guardarDatosUsuario();
+                await guardarDatosUsuario();
                 cerrarModal('modal-sustituir');
                 cargarDespieceRueda();
                 mostrarNotificacion('Pieza sustituida ✅', 'exito');
@@ -5594,7 +5594,7 @@
             
             biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
             
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cerrarModal('modal-sustituir');
             actualizarBotonCajon();
             abrirDetalleComponente(componenteActual);
@@ -6039,7 +6039,7 @@
             
             componenteActual.subpiezas[subpiezaTipo] = subpieza;
             
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cerrarModal('modal-subpieza');
             abrirDetalleComponente(componenteActual);
             mostrarNotificacion(modoSubpieza === 'sustituir' ? 'Sustituida' : modoSubpieza === 'editar' ? 'Actualizada' : 'Añadida', 'exito');
@@ -6128,13 +6128,41 @@
                     </div>
                     <div class="card-title" style="font-size: 1em;">${reg.componente || reg.pieza || '-'}</div>
                     <div class="card-subtitle">${reg.descripcion}</div>
-                    <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+                    <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items:center;">
                         ${detalleExtra}
-                        <div class="text-muted">Coste: <strong style="color: var(--warning);">${reg.coste || 0}€</strong></div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="text-muted">Coste: <strong style="color: var(--warning);">${reg.coste || 0}€</strong></div>
+                            <button onclick="editarCosteHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:0.9em; color:var(--secondary); padding:0;" title="Editar coste">✏️</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function editarCosteHistorial(id) {
+            const reg = biciActual.historial.find(r => r.id === id);
+            if (!reg) return;
+
+            const costeActual = parseFloat(reg.coste) || 0;
+            const nuevoCosteStr = prompt(`Editar coste de "${reg.componente || reg.pieza}":\nCoste actual: ${costeActual}€\n\nNuevo coste (€):`, costeActual);
+            if (nuevoCosteStr === null) return; // cancelado
+
+            const nuevoCoste = parseFloat(nuevoCosteStr);
+            if (isNaN(nuevoCoste) || nuevoCoste < 0) {
+                mostrarNotificacion('Coste no válido', 'error');
+                return;
+            }
+
+            // Actualizar inversión: restar el viejo y sumar el nuevo
+            const diferencia = nuevoCoste - costeActual;
+            biciActual.inversion = Math.max(0, parseFloat(biciActual.inversion || 0) + diferencia).toFixed(2);
+            reg.coste = nuevoCoste;
+
+            await guardarDatosUsuario();
+            cargarHistorial();
+            cargarTaller();
+            mostrarNotificacion('Coste actualizado ✅', 'exito');
         }
 
         function eliminarRegistroHistorial(id) {
@@ -6188,7 +6216,7 @@
             biciActual.historial.unshift(nuevoRegistro);
             biciActual.inversion = (parseFloat(biciActual.inversion) + coste).toFixed(2);
             
-            guardarDatosUsuario();
+            await guardarDatosUsuario();
             cargarHistorial();
             cargarTaller();
             cerrarModal('modal-mantenimiento');
