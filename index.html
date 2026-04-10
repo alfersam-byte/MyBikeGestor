@@ -1069,20 +1069,28 @@
                 
                 <div class="form-group">
                     <label>Peso (kg) — <span id="perfil-peso-valor" style="color: var(--primary); font-weight: 700;">70</span> kg</label>
-                    <input type="range" id="perfil-peso" min="30" max="200" step="0.1" value="70"
-                        oninput="document.getElementById('perfil-peso-valor').textContent = parseFloat(this.value).toFixed(1); calcularIMC();"
-                        style="width:100%; accent-color: var(--primary);">
-                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button type="button" onclick="ajustarPeso(-0.1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:white; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
+                        <input type="range" id="perfil-peso" min="30" max="200" step="0.1" value="70"
+                            oninput="document.getElementById('perfil-peso-valor').textContent = parseFloat(this.value).toFixed(1); calcularIMC();"
+                            style="flex:1; accent-color: var(--primary);">
+                        <button type="button" onclick="ajustarPeso(0.1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:var(--primary); color:white; font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">+</button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text); margin-top:4px;">
                         <span>30 kg</span><span>200 kg</span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Altura (cm) — <span id="perfil-altura-valor" style="color: var(--primary); font-weight: 700;">175</span> cm</label>
-                    <input type="range" id="perfil-altura" min="100" max="220" step="1" value="175"
-                        oninput="document.getElementById('perfil-altura-valor').textContent = this.value; calcularIMC();"
-                        style="width:100%; accent-color: var(--primary);">
-                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button type="button" onclick="ajustarAltura(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:white; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
+                        <input type="range" id="perfil-altura" min="100" max="220" step="1" value="175"
+                            oninput="document.getElementById('perfil-altura-valor').textContent = this.value; calcularIMC();"
+                            style="flex:1; accent-color: var(--primary);">
+                        <button type="button" onclick="ajustarAltura(1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:var(--primary); color:white; font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">+</button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text); margin-top:4px;">
                         <span>100 cm</span><span>220 cm</span>
                     </div>
                 </div>
@@ -1107,6 +1115,34 @@
                 <div class="form-group">
                     <label>VO2 Max (ml/kg/min)</label>
                     <input type="number" id="perfil-vo2max" placeholder="50" step="0.1">
+                </div>
+            </div>
+
+            <!-- CICLOCOMPUTADOR GPS -->
+            <div class="card mt-20">
+                <div class="card-title" style="margin-bottom: 20px;">🖥️ Ciclocomputador GPS</div>
+                <p style="color:var(--text); font-size:0.85em; margin-bottom:15px;">Registra tu ciclocomputador aquí y sus km se acumularán automáticamente con los de todas tus bicis.</p>
+
+                <div id="ciclo-sin-datos" style="display:none;">
+                    <button class="btn btn-primary" onclick="abrirModalCiclocomputador()">➕ Añadir ciclocomputador</button>
+                </div>
+
+                <div id="ciclo-con-datos" style="display:none;">
+                    <div style="background:var(--light-gray); border-radius:10px; padding:15px; margin-bottom:15px;">
+                        <div style="font-weight:700; font-size:1em;" id="ciclo-nombre-display">-</div>
+                        <div style="font-size:0.85em; color:var(--text); margin-top:4px;" id="ciclo-fecha-display">-</div>
+                        <div style="margin-top:12px;">
+                            <div style="text-align:center; background:white; border-radius:8px; padding:10px;">
+                                <div style="font-size:0.75em; color:var(--text); font-weight:600;">KM TOTALES</div>
+                                <div style="font-size:1.6em; font-weight:700; color:var(--primary);" id="ciclo-km-totales-display">0</div>
+                            </div>
+                            <div style="display:none;" id="ciclo-km-historicos-display">0</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalCiclocomputador()">✏️ Editar</button>
+                        <button class="btn btn-danger" style="flex:1;" onclick="eliminarCiclocomputador()">🗑️ Eliminar</button>
+                    </div>
                 </div>
             </div>
 
@@ -2130,6 +2166,56 @@
          MODAL: AÑADIR PIEZA AL CAJÓN
     ======================================== -->
     <!-- ========================================
+         MODAL: CICLOCOMPUTADOR GPS
+    ======================================== -->
+    <div id="modal-ciclocomputador" class="modal">
+        <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h2 class="modal-title">🖥️ Ciclocomputador GPS</h2>
+            </div>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="ciclo-marca-select" onchange="cicloMarcaSelectChange(this.value)" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; transition:border-color 0.2s; font-family:inherit;">
+                    <option value="">-- Selecciona una marca --</option>
+                    <option value="Garmin">Garmin</option>
+                    <option value="Wahoo">Wahoo</option>
+                    <option value="Sigma">Sigma</option>
+                    <option value="Bryton">Bryton</option>
+                    <option value="Polar">Polar</option>
+                    <option value="Lezyne">Lezyne</option>
+                    <option value="Hammerhead">Hammerhead</option>
+                    <option value="Cateye">Cateye</option>
+                    <option value="iGPSport">iGPSport</option>
+                    <option value="Beeline">Beeline</option>
+                    <option value="otra">Otra...</option>
+                </select>
+                <input type="text" id="ciclo-marca" placeholder="Escribe la marca" style="margin-top:8px; display:none;">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="ciclo-modelo" placeholder="Ej: Edge 540, ELEMNT Bolt...">
+            </div>
+            <div class="form-group">
+                <label>Fecha de compra (aproximada)</label>
+                <input type="date" id="ciclo-fecha">
+            </div>
+            <div class="form-group">
+                <label>Km históricos</label>
+                <p style="font-size:0.8em; color:var(--text); margin-bottom:8px;">Km que ya llevaba antes de tenerlo registrado en tus bicis actuales</p>
+                <input type="number" id="ciclo-km-historicos" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="ciclo-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="cerrarModal('modal-ciclocomputador')">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarCiclocomputador()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
          MODAL: EDITAR COSTE HISTORIAL
     ======================================== -->
     <div id="modal-editar-coste" class="modal">
@@ -3006,6 +3092,9 @@
             
             // Actualizar estado de Strava
             actualizarEstadoStrava();
+
+            // Cargar ciclocomputador
+            actualizarDisplayCiclocomputador();
         }
 
         function actualizarNombreCompleto() {
@@ -3831,7 +3920,7 @@
                 'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo', 'Cámaras/Válvulas/Tubeless']
             },
             'Periféricos': {
-                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS'],
+                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS'],
                 'Indoor': ['Consola', 'Manillar', 'Tija Sillín', 'Sillín', 'Portabidones', 'Acople GPS/Ciclocomputador', 'Soporte Tablet/Móvil', 'Ventilador', 'Alfombrilla Protectora', 'Protector Anticorrosión/Sudor']
             },
             'Suspensiones': {
@@ -3843,14 +3932,21 @@
         const SUBPIEZAS_BASE = {
             'Cambio Trasero': ['Roldanas'],
             'Pinza Delantera': ['Pastillas'],
-            'Pinza Trasera': ['Pastillas']
+            'Pinza Trasera': ['Pastillas'],
+            'Ciclocomputador GPS': ['Pila']
         };
 
         function getSubpiezasBielas(comp) {
             const config = comp ? comp.configPlatos : '';
-            if (config === '1') return ['Monoplato'];
-            // Sin config o doble plato: mostrar plato grande y pequeño
-            return ['Plato Grande', 'Plato Pequeño'];
+            const subpiezas = [];
+            if (config === '1') {
+                subpiezas.push('Monoplato');
+            } else {
+                subpiezas.push('Plato Grande', 'Plato Pequeño');
+            }
+            // Añadir Medidor de Potencia si el componente lo tiene configurado
+            if (comp && comp.conMedidorPotencia) subpiezas.push('Medidor de Potencia');
+            return subpiezas;
         }
 
         // Subpiezas dinámicas según disciplina y configuración del componente
@@ -3862,6 +3958,7 @@
                 subpiezas['Maneta Derecha'] = ['Pila', 'Escalador'];
             }
             subpiezas['Bielas'] = getSubpiezasBielas(comp);
+            subpiezas['Medidor de Potencia'] = ['Pila'];
             return subpiezas;
         }
 
@@ -5124,7 +5221,23 @@
             if (!biciActual.componentesV2) biciActual.componentesV2 = {};
             if (!biciActual.componentesV2[seccionActual]) biciActual.componentesV2[seccionActual] = [];
             
-            const componentes = biciActual.componentesV2[seccionActual];
+            const componentes = [...biciActual.componentesV2[seccionActual]];
+
+            // Añadir ciclocomputador virtual en Periféricos
+            if (seccionActual === 'Periféricos' && datosUsuario.ciclocomputador && biciActual.disciplina !== 'Indoor') {
+                const ciclo = datosUsuario.ciclocomputador;
+                componentes.push({
+                    id: '__ciclocomputador__',
+                    tipo: 'Ciclocomputador GPS',
+                    marca: ciclo.marca,
+                    modelo: ciclo.modelo,
+                    precio: ciclo.precio || 0,
+                    kmInstalacion: 0,
+                    fechaInstalacion: ciclo.fecha,
+                    _virtual: true,
+                    _kmTotales: calcularKmTotalesCiclo()
+                });
+            }
             
             if (componentes.length === 0) {
                 container.innerHTML = '<div class="lista-vacia"><div class="lista-vacia-icon">🔧</div><p>No hay componentes</p></div>';
@@ -5136,23 +5249,40 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style.cursor = 'pointer';
-                card.onclick = () => abrirDetalleComponente(comp);
-                
-                const kmUso = (biciActual.kmTotales || 0) - (comp.kmInstalacion || 0);
-                const diasUso = comp.fechaInstalacion ? Math.floor((new Date() - new Date(comp.fechaInstalacion)) / (1000*60*60*24)) : 0;
-                
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${comp.tipo}</div>
-                            <div class="card-subtitle">${comp.marca || '-'} ${comp.modelo || '-'}</div>
+
+                if (comp._virtual) {
+                    // Tarjeta especial para ciclocomputador
+                    card.style.borderLeft = '4px solid var(--primary)';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${comp.tipo}</div>
+                                <div class="card-subtitle">${comp.marca} ${comp.modelo}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="badge badge-primary">${comp._kmTotales} km</div>
+                                <div style="font-size:0.75em; color:var(--text); margin-top:5px;">Total acumulado</div>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div class="badge badge-primary">${kmUso} km</div>
-                            <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${formatearDuracion(diasUso)}</div>
+                    `;
+                    card.onclick = () => mostrarNotificacion('Edita el ciclocomputador desde tu Perfil', 'info');
+                } else {
+                    card.onclick = () => abrirDetalleComponente(comp);
+                    const kmUso = (biciActual.kmTotales || 0) - (comp.kmInstalacion || 0);
+                    const diasUso = comp.fechaInstalacion ? Math.floor((new Date() - new Date(comp.fechaInstalacion)) / (1000*60*60*24)) : 0;
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${comp.tipo}</div>
+                                <div class="card-subtitle">${comp.marca || '-'} ${comp.modelo || '-'}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="badge badge-primary">${kmUso} km</div>
+                                <div style="font-size: 0.75em; color: var(--text); margin-top: 5px;">${formatearDuracion(diasUso)}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
                 container.appendChild(card);
             });
         }
@@ -5195,17 +5325,28 @@
             
             container.innerHTML = '';
             tipos.forEach(tipo => {
+                // El Medidor de Potencia solo aparece en la lista si está activado en la edición
+                if (tipo === 'Medidor de Potencia' && !componenteActual.conMedidorPotencia) return;
+
                 const sub = componenteActual.subpiezas[tipo];
                 const div = document.createElement('div');
                 div.style.cssText = 'padding:10px;background:var(--light-gray);border-radius:8px;margin-bottom:10px;';
                 
                 if (sub) {
                     const kmUso = (biciActual.kmTotales || 0) - (sub.kmInstalacion || 0);
+                    let extraInfo = '';
+                    if (tipo === 'Medidor de Potencia' && sub.pila && sub.pila.tipo) {
+                        const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
+                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
+                    } else if (tipo === 'Pila' && sub.tipoPila) {
+                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.tipoPila}</div>`;
+                    }
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
                                 <div style="font-weight:bold;">${tipo}</div>
                                 <div style="font-size:0.85em;color:var(--text);">${sub.marca} ${sub.modelo} - ${kmUso} km</div>
+                                ${extraInfo}
                             </div>
                             <div style="display:flex;gap:10px;">
                                 <button class="btn btn-secondary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">✏️</button>
@@ -5260,13 +5401,61 @@
         }
         
         // Campos extra
-        function actualizarCamposExtra(configPlatosActual) {
+        function actualizarCamposExtra(configPlatosActual, conMedidorActual) {
             const tipo = document.getElementById('comp-tipo').value;
             const container = document.getElementById('comp-campos-extra');
             container.innerHTML = '';
             if (tipo === 'Bielas') {
-                container.innerHTML = `<div class="form-group"><label>Configuración de platos</label><select id="comp-config-platos"><option value="">-- Selecciona --</option><option value="1">Monoplato (1 plato)</option><option value="2">Doble plato (2 platos)</option></select></div>`;
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Configuración de platos</label>
+                    <div class="form-group">
+                        <select id="comp-config-platos">
+                            <option value="">-- Selecciona --</option>
+                            <option value="1">Monoplato (1 plato)</option>
+                            <option value="2">Doble plato (2 platos)</option>
+                        </select>
+                    </div>
+                    <div style="background:var(--light-gray); border-radius:12px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                        <div>
+                            <div style="font-weight:700; font-size:0.95em;">⚡ Medidor de Potencia</div>
+                            <div style="font-size:0.8em; color:var(--text); margin-top:2px;">Incluye potenciómetro en bielas</div>
+                        </div>
+                        <label style="position:relative; display:inline-block; width:48px; height:26px; flex-shrink:0; cursor:pointer;">
+                            <input type="checkbox" id="comp-con-medidor-potencia" style="opacity:0; width:0; height:0; position:absolute;">
+                            <span id="medidor-switch-track" style="
+                                position:absolute; inset:0; border-radius:26px;
+                                background:#ccc; transition:background 0.2s;
+                            "></span>
+                            <span id="medidor-switch-thumb" style="
+                                position:absolute; top:3px; left:3px;
+                                width:20px; height:20px; border-radius:50%;
+                                background:white; transition:transform 0.2s;
+                                box-shadow:0 1px 3px rgba(0,0,0,0.3);
+                            "></span>
+                        </label>
+                    </div>`;
+                // JS para animar el switch
+                setTimeout(() => {
+                    const chk = document.getElementById('comp-con-medidor-potencia');
+                    const track = document.getElementById('medidor-switch-track');
+                    const thumb = document.getElementById('medidor-switch-thumb');
+                    if (!chk) return;
+                    const updateSwitch = () => {
+                        track.style.background = chk.checked ? 'var(--primary)' : '#ccc';
+                        thumb.style.transform = chk.checked ? 'translateX(22px)' : 'translateX(0)';
+                    };
+                    chk.addEventListener('change', updateSwitch);
+                    updateSwitch();
+                }, 0);
                 if (configPlatosActual) document.getElementById('comp-config-platos').value = configPlatosActual;
+                if (conMedidorActual) {
+                    // Esperar al setTimeout del switch
+                    setTimeout(() => {
+                        const chk = document.getElementById('comp-con-medidor-potencia');
+                        if (chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
+                    }, 10);
+                }
             }
         }
 
@@ -5301,6 +5490,13 @@
             if (tipo === 'Bielas') {
                 const selPlatos = document.getElementById('comp-config-platos');
                 if (selPlatos) comp.configPlatos = selPlatos.value || '';
+                const chkMedidor = document.getElementById('comp-con-medidor-potencia');
+                const teniaMedidor = modoEdicion && componenteActual.conMedidorPotencia;
+                comp.conMedidorPotencia = chkMedidor ? chkMedidor.checked : false;
+                // Si se desactiva el medidor, eliminar su subpieza
+                if (teniaMedidor && !comp.conMedidorPotencia) {
+                    // se limpiará al restaurar subpiezas abajo
+                }
             }
             
             if (SUBPIEZAS[tipo]) comp.subpiezas = {};
@@ -5311,7 +5507,12 @@
             if (modoEdicion) {
                 const idx = biciActual.componentesV2[seccionActual].findIndex(c => c.id === componenteActual.id);
                 if (idx !== -1) {
-                    comp.subpiezas = biciActual.componentesV2[seccionActual][idx].subpiezas || {};
+                    const subpiezasOriginales = biciActual.componentesV2[seccionActual][idx].subpiezas || {};
+                    // Si se desactiva el medidor de potencia, eliminar su subpieza
+                    if (tipo === 'Bielas' && !comp.conMedidorPotencia) {
+                        delete subpiezasOriginales['Medidor de Potencia'];
+                    }
+                    comp.subpiezas = subpiezasOriginales;
                     biciActual.componentesV2[seccionActual][idx] = comp;
                 }
             } else {
@@ -5349,7 +5550,7 @@
             document.getElementById('comp-km-instalacion').value = componenteActual.kmInstalacion || '';
             
             select.onchange = () => actualizarCamposExtra();
-            actualizarCamposExtra(componenteActual.configPlatos);
+            actualizarCamposExtra(componenteActual.configPlatos, componenteActual.conMedidorPotencia);
             
             abrirModal('modal-componente');
         }
@@ -5903,6 +6104,24 @@
         // Subpiezas (placeholder)
         // Variables para subpiezas
         let subpiezaTipo = null;
+        // Toggle medidor de potencia desde la vista de subpiezas
+        async function toggleMedidorPotencia() {
+            if (!componenteActual || componenteActual.tipo !== 'Bielas') return;
+            const tenia = !!componenteActual.conMedidorPotencia;
+            componenteActual.conMedidorPotencia = !tenia;
+            if (tenia && componenteActual.subpiezas) {
+                delete componenteActual.subpiezas['Medidor de Potencia'];
+            }
+            // Actualizar en el array de la bici
+            if (biciActual.componentesV2 && biciActual.componentesV2[seccionActual]) {
+                const idx = biciActual.componentesV2[seccionActual].findIndex(c => c.id === componenteActual.id);
+                if (idx !== -1) biciActual.componentesV2[seccionActual][idx] = componenteActual;
+            }
+            await guardarDatosUsuario();
+            cargarSubpiezas();
+            mostrarNotificacion(componenteActual.conMedidorPotencia ? 'Medidor de Potencia activado ⚡' : 'Medidor de Potencia desactivado', 'info');
+        }
+
         let modoSubpieza = 'añadir'; // 'añadir', 'editar', 'sustituir'
         
         // Editar/Añadir subpieza
@@ -5933,6 +6152,15 @@
                 document.getElementById('subpieza-precio').value = sub.precio || '';
                 document.getElementById('subpieza-fecha').value = sub.fechaInstalacion || '';
                 document.getElementById('subpieza-km').value = sub.kmInstalacion || '';
+            } else if (tipo === 'Medidor de Potencia') {
+                // Medidor de potencia: no hereda marca/modelo de las bielas
+                document.getElementById('subpieza-marca').value = '';
+                document.getElementById('subpieza-modelo').value = '';
+                document.getElementById('subpieza-material').value = '';
+                document.getElementById('subpieza-peso').value = '';
+                document.getElementById('subpieza-precio').value = '';
+                document.getElementById('subpieza-fecha').value = componenteActual.fechaInstalacion || '';
+                document.getElementById('subpieza-km').value = componenteActual.kmInstalacion || '';
             } else {
                 // Heredar del padre
                 document.getElementById('subpieza-marca').value = componenteActual.marca;
@@ -5980,6 +6208,14 @@
             
             actualizarCamposEspecificosSubpieza(tipo, true);
             
+            // Si es Medidor de Potencia al sustituir, resetear pila con km actuales
+            if (tipo === 'Medidor de Potencia') {
+                const pilaKmEl = document.getElementById('subpieza-pila-km');
+                const pilaFechaEl = document.getElementById('subpieza-pila-fecha');
+                if (pilaKmEl) pilaKmEl.value = biciActual.kmTotales || 0;
+                if (pilaFechaEl) pilaFechaEl.value = new Date().toISOString().split('T')[0];
+            }
+            
             abrirModal('modal-subpieza');
         }
         
@@ -5998,6 +6234,53 @@
                 const sub = existente && componenteActual.subpiezas[tipo];
                 container.innerHTML = `
                     <div class="form-group"><label>Número de Dientes</label><input type="number" id="subpieza-num-dientes" value="${sub?.numDientes || 50}" step="1"></div>
+                `;
+            } else if (tipo === 'Medidor de Potencia') {
+                const sub = existente && componenteActual.subpiezas[tipo];
+                const pila = sub?.pila || {};
+                const pilaKmDefault = pila.km !== undefined ? pila.km : (sub ? (sub.kmInstalacion || 0) : (biciActual.kmTotales || 0));
+                container.innerHTML = `
+                    <div style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px;">
+                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Pila / Batería</div>
+                        <div class="form-group">
+                            <label>Tipo de pila</label>
+                            <select id="subpieza-pila-tipo" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="CR2032" ${pila.tipo === 'CR2032' ? 'selected' : ''}>CR2032</option>
+                                <option value="CR2025" ${pila.tipo === 'CR2025' ? 'selected' : ''}>CR2025</option>
+                                <option value="CR2016" ${pila.tipo === 'CR2016' ? 'selected' : ''}>CR2016</option>
+                                <option value="AAA" ${pila.tipo === 'AAA' ? 'selected' : ''}>AAA</option>
+                                <option value="AA" ${pila.tipo === 'AA' ? 'selected' : ''}>AA</option>
+                                <option value="Recargable" ${pila.tipo === 'Recargable' ? 'selected' : ''}>Recargable (integrada)</option>
+                                <option value="Otra" ${pila.tipo === 'Otra' ? 'selected' : ''}>Otra</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de instalación de la pila</label>
+                            <input type="date" id="subpieza-pila-fecha" value="${pila.fecha || new Date().toISOString().split('T')[0]}">
+                        </div>
+                        <div class="form-group">
+                            <label>Km al instalar la pila</label>
+                            <input type="number" id="subpieza-pila-km" value="${pilaKmDefault}" placeholder="0" min="0">
+                        </div>
+                    </div>
+                `;
+            } else if (tipo === 'Pila') {
+                const sub = existente && componenteActual.subpiezas[tipo];
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Tipo de pila</label>
+                        <select id="subpieza-pila-tipo" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                            <option value="">-- Selecciona --</option>
+                            <option value="CR2032" ${sub?.tipoPila === 'CR2032' ? 'selected' : ''}>CR2032</option>
+                            <option value="CR2025" ${sub?.tipoPila === 'CR2025' ? 'selected' : ''}>CR2025</option>
+                            <option value="CR2016" ${sub?.tipoPila === 'CR2016' ? 'selected' : ''}>CR2016</option>
+                            <option value="AAA" ${sub?.tipoPila === 'AAA' ? 'selected' : ''}>AAA</option>
+                            <option value="AA" ${sub?.tipoPila === 'AA' ? 'selected' : ''}>AA</option>
+                            <option value="Recargable" ${sub?.tipoPila === 'Recargable' ? 'selected' : ''}>Recargable (integrada)</option>
+                            <option value="Otra" ${sub?.tipoPila === 'Otra' ? 'selected' : ''}>Otra</option>
+                        </select>
+                    </div>
                 `;
             }
         }
@@ -6033,6 +6316,18 @@
             } else if (subpiezaTipo.includes('Plato')) {
                 const dientes = document.getElementById('subpieza-num-dientes');
                 if (dientes) subpieza.numDientes = parseFloat(dientes.value) || 0;
+            } else if (subpiezaTipo === 'Medidor de Potencia') {
+                const pilaTipo = document.getElementById('subpieza-pila-tipo');
+                const pilaFecha = document.getElementById('subpieza-pila-fecha');
+                const pilaKm = document.getElementById('subpieza-pila-km');
+                if (pilaTipo) subpieza.pila = {
+                    tipo: pilaTipo.value,
+                    fecha: pilaFecha ? pilaFecha.value : '',
+                    km: pilaKm ? parseFloat(pilaKm.value) || 0 : 0
+                };
+            } else if (subpiezaTipo === 'Pila') {
+                const pilaTipo = document.getElementById('subpieza-pila-tipo');
+                if (pilaTipo) subpieza.tipoPila = pilaTipo.value;
             }
             
             if (!componenteActual.subpiezas) componenteActual.subpiezas = {};
@@ -6559,6 +6854,122 @@
         }
 
         // Actualizar visualización de estado de Strava en perfil
+        // ========================================
+        // CICLOCOMPUTADOR GPS
+        // ========================================
+
+        function ajustarPeso(delta) {
+            const slider = document.getElementById('perfil-peso');
+            const nuevoValor = Math.min(200, Math.max(30, parseFloat(slider.value) + delta));
+            slider.value = nuevoValor.toFixed(1);
+            document.getElementById('perfil-peso-valor').textContent = nuevoValor.toFixed(1);
+            calcularIMC();
+        }
+
+        function ajustarAltura(delta) {
+            const slider = document.getElementById('perfil-altura');
+            const nuevoValor = Math.min(220, Math.max(100, parseInt(slider.value) + delta));
+            slider.value = nuevoValor;
+            document.getElementById('perfil-altura-valor').textContent = nuevoValor;
+            calcularIMC();
+        }
+
+        function cicloMarcaSelectChange(val) {
+            const input = document.getElementById('ciclo-marca');
+            if (val === 'otra') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+                input.value = val;
+            }
+        }
+
+        function actualizarDisplayCiclocomputador() {
+            const ciclo = datosUsuario.ciclocomputador;
+            const sinDatos = document.getElementById('ciclo-sin-datos');
+            const conDatos = document.getElementById('ciclo-con-datos');
+            if (!ciclo) {
+                sinDatos.style.display = 'block';
+                conDatos.style.display = 'none';
+                return;
+            }
+            sinDatos.style.display = 'none';
+            conDatos.style.display = 'block';
+            document.getElementById('ciclo-nombre-display').textContent = `${ciclo.marca} ${ciclo.modelo}`;
+            document.getElementById('ciclo-fecha-display').textContent = ciclo.fecha ? `Comprado: ${formatearFecha(ciclo.fecha)}` : 'Fecha desconocida';
+            document.getElementById('ciclo-km-historicos-display').textContent = `${ciclo.kmHistoricos || 0} km`;
+            document.getElementById('ciclo-km-totales-display').textContent = `${calcularKmTotalesCiclo()} km`;
+        }
+
+        function calcularKmTotalesCiclo() {
+            if (!datosUsuario.ciclocomputador) return 0;
+            const kmHistoricos = parseFloat(datosUsuario.ciclocomputador.kmHistoricos) || 0;
+            let kmBicis = 0;
+            (datosUsuario.garaje || []).filter(b => b.activa !== false).forEach(bici => {
+                if (bici.disciplina !== 'Indoor') kmBicis += parseFloat(bici.kmTotales) || 0;
+            });
+            return Math.round(kmHistoricos + kmBicis);
+        }
+
+        function abrirModalCiclocomputador() {
+            const ciclo = datosUsuario.ciclocomputador;
+            const marcaGuardada = ciclo ? ciclo.marca : '';
+            const select = document.getElementById('ciclo-marca-select');
+            const input = document.getElementById('ciclo-marca');
+            // Comprobar si la marca está en las opciones del select
+            const opcionExiste = Array.from(select.options).some(o => o.value === marcaGuardada && o.value !== '' && o.value !== 'otra');
+            if (marcaGuardada && opcionExiste) {
+                select.value = marcaGuardada;
+                input.style.display = 'none';
+                input.value = marcaGuardada;
+            } else if (marcaGuardada) {
+                select.value = 'otra';
+                input.style.display = 'block';
+                input.value = marcaGuardada;
+            } else {
+                select.value = '';
+                input.style.display = 'none';
+                input.value = '';
+            }
+            document.getElementById('ciclo-modelo').value = ciclo ? ciclo.modelo : '';
+            document.getElementById('ciclo-fecha').value = ciclo ? ciclo.fecha : '';
+            document.getElementById('ciclo-km-historicos').value = ciclo ? ciclo.kmHistoricos : '';
+            document.getElementById('ciclo-precio').value = ciclo ? ciclo.precio : '';
+            abrirModal('modal-ciclocomputador');
+        }
+
+        async function guardarCiclocomputador() {
+            const marca = document.getElementById('ciclo-marca').value.trim();
+            const modelo = document.getElementById('ciclo-modelo').value.trim();
+            const fecha = document.getElementById('ciclo-fecha').value;
+            const kmHistoricos = parseFloat(document.getElementById('ciclo-km-historicos').value) || 0;
+            const precio = parseFloat(document.getElementById('ciclo-precio').value) || 0;
+
+            if (!marca || !modelo) {
+                mostrarNotificacion('Indica marca y modelo', 'error');
+                return;
+            }
+
+            datosUsuario.ciclocomputador = { marca, modelo, fecha, kmHistoricos, precio };
+            await guardarDatosUsuario();
+            cerrarModal('modal-ciclocomputador');
+            actualizarDisplayCiclocomputador();
+            mostrarNotificacion('Ciclocomputador guardado ✅', 'exito');
+        }
+
+        async function eliminarCiclocomputador() {
+            confirmar('¿Eliminar ciclocomputador?', 'Se eliminarán todos sus datos.',
+                async () => {
+                    delete datosUsuario.ciclocomputador;
+                    await guardarDatosUsuario();
+                    actualizarDisplayCiclocomputador();
+                    mostrarNotificacion('Ciclocomputador eliminado', 'info');
+                }
+            );
+        }
+
         function actualizarEstadoStrava() {
             const conectado = datosUsuario && datosUsuario.stravaAccessToken;
             
