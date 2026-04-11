@@ -1139,10 +1139,11 @@
                             <div style="display:none;" id="ciclo-km-historicos-display">0</div>
                         </div>
                     </div>
-                    <div style="display:flex; gap:10px;">
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
                         <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalCiclocomputador()">✏️ Editar</button>
-                        <button class="btn btn-danger" style="flex:1;" onclick="eliminarCiclocomputador()">🗑️ Eliminar</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="abrirModalSustituirCiclocomputador()">🔄 Sustituir</button>
                     </div>
+                    <button class="btn btn-danger" style="width:100%;" onclick="eliminarCiclocomputador()">🗑️ Eliminar</button>
                 </div>
             </div>
 
@@ -2170,8 +2171,9 @@
     ======================================== -->
     <div id="modal-ciclocomputador" class="modal">
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
-            <div class="modal-header">
-                <h2 class="modal-title">🖥️ Ciclocomputador GPS</h2>
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-ciclocomputador')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;">🖥️ Ciclocomputador GPS</h2>
             </div>
             <div class="form-group">
                 <label>Marca</label>
@@ -2205,12 +2207,75 @@
                 <input type="number" id="ciclo-km-historicos" placeholder="0" min="0">
             </div>
             <div class="form-group">
+                <label>Peso (gramos)</label>
+                <input type="number" id="ciclo-peso" placeholder="0" step="1" min="0">
+            </div>
+            <div class="form-group">
                 <label>Precio (€)</label>
                 <input type="number" id="ciclo-precio" placeholder="0" step="0.01">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-ciclocomputador')">Cancelar</button>
                 <button class="btn btn-primary" onclick="guardarCiclocomputador()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         MODAL: SUSTITUIR CICLOCOMPUTADOR GPS
+    ======================================== -->
+    <div id="modal-sustituir-ciclocomputador" class="modal">
+        <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
+            <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
+                <button onclick="cerrarModal('modal-sustituir-ciclocomputador')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;">🔄 Sustituir Ciclocomputador</h2>
+            </div>
+            <div class="card" style="background:var(--light-gray); margin-bottom:20px;">
+                <div style="font-size:0.85em; color:var(--text); margin-bottom:6px;">GPS actual</div>
+                <div style="font-weight:700;" id="ciclo-sust-actual-nombre">-</div>
+                <div style="font-size:0.85em; color:var(--text); margin-top:4px;" id="ciclo-sust-actual-km">-</div>
+            </div>
+            <div class="form-group">
+                <label>Fecha de sustitución</label>
+                <input type="date" id="ciclo-sust-fecha">
+            </div>
+            <p style="font-weight:700; font-size:0.95em; margin-bottom:16px;">Nuevo ciclocomputador</p>
+            <div class="form-group">
+                <label>Marca</label>
+                <select id="ciclo-sust-marca-select" onchange="cicloSustMarcaSelectChange(this.value)" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; transition:border-color 0.2s; font-family:inherit;">
+                    <option value="">-- Selecciona una marca --</option>
+                    <option value="Garmin">Garmin</option>
+                    <option value="Wahoo">Wahoo</option>
+                    <option value="Sigma">Sigma</option>
+                    <option value="Bryton">Bryton</option>
+                    <option value="Polar">Polar</option>
+                    <option value="Lezyne">Lezyne</option>
+                    <option value="Hammerhead">Hammerhead</option>
+                    <option value="Cateye">Cateye</option>
+                    <option value="iGPSport">iGPSport</option>
+                    <option value="Beeline">Beeline</option>
+                    <option value="otra">Otra...</option>
+                </select>
+                <input type="text" id="ciclo-sust-marca" placeholder="Escribe la marca" style="margin-top:8px; display:none;">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="ciclo-sust-modelo" placeholder="Ej: Edge 840, ELEMNT Roam...">
+            </div>
+            <div class="form-group">
+                <label>Km históricos del nuevo GPS</label>
+                <p style="font-size:0.8em; color:var(--text); margin-bottom:8px;">Km que ya llevaba antes de registrarlo</p>
+                <input type="number" id="ciclo-sust-km-historicos" placeholder="0" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label>Peso (gramos)</label>
+                <input type="number" id="ciclo-sust-peso" placeholder="0" step="1" min="0">
+            </div>
+            <div class="form-group">
+                <label>Precio (€)</label>
+                <input type="number" id="ciclo-sust-precio" placeholder="0" step="0.01">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="confirmarSustitucionCiclocomputador()">Sustituir</button>
             </div>
         </div>
     </div>
@@ -2687,14 +2752,17 @@
             return p.length >= 2 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : nombre.substring(0,2).toUpperCase();
         }
         async function removeProfilePhoto() {
-            if (!confirm('¿Eliminar foto de perfil?')) return;
             document.getElementById('photo-options').classList.remove('active');
-            try {
-                await storage.ref().child(`profile-photos/${usuarioActual.uid}`).delete().catch(()=>{});
-                await db.collection('usuarios').doc(usuarioActual.uid).update({ photoURL: firebase.firestore.FieldValue.delete() });
-                mostrarFotoPerfil(null);
-                mostrarNotificacion('Foto eliminada','exito');
-            } catch(e) { mostrarNotificacion('Error al eliminar','error'); }
+            confirmar('¿Eliminar foto de perfil?', 'Esta acción no se puede deshacer.',
+                async () => {
+                    try {
+                        await storage.ref().child(`profile-photos/${usuarioActual.uid}`).delete().catch(()=>{});
+                        await db.collection('usuarios').doc(usuarioActual.uid).update({ photoURL: firebase.firestore.FieldValue.delete() });
+                        mostrarFotoPerfil(null);
+                        mostrarNotificacion('Foto eliminada','exito');
+                    } catch(e) { mostrarNotificacion('Error al eliminar','error'); }
+                }
+            );
         }
 
         // Sincronizar KM de la bici actual desde Strava
@@ -3949,6 +4017,12 @@
             return subpiezas;
         }
 
+        function getSubpiezasPedales(comp) {
+            const subpiezas = [];
+            if (comp && comp.conMedidorPotencia) subpiezas.push('Medidor de Potencia Pedales');
+            return subpiezas;
+        }
+
         // Subpiezas dinámicas según disciplina y configuración del componente
         function getSubpiezas(comp) {
             const subpiezas = Object.assign({}, SUBPIEZAS_BASE);
@@ -3959,6 +4033,7 @@
             }
             subpiezas['Bielas'] = getSubpiezasBielas(comp);
             subpiezas['Medidor de Potencia'] = ['Pila'];
+            subpiezas['Pedales'] = getSubpiezasPedales(comp);
             return subpiezas;
         }
 
@@ -5325,8 +5400,9 @@
             
             container.innerHTML = '';
             tipos.forEach(tipo => {
-                // El Medidor de Potencia solo aparece en la lista si está activado en la edición
+                // El Medidor de Potencia solo aparece en la lista si está activado
                 if (tipo === 'Medidor de Potencia' && !componenteActual.conMedidorPotencia) return;
+                if (tipo === 'Medidor de Potencia Pedales' && !componenteActual.conMedidorPotencia) return;
 
                 const sub = componenteActual.subpiezas[tipo];
                 const div = document.createElement('div');
@@ -5338,15 +5414,29 @@
                     if (tipo === 'Medidor de Potencia' && sub.pila && sub.pila.tipo) {
                         const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
                         extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
+                    } else if (tipo === 'Medidor de Potencia Pedales') {
+                        const tipoStr = sub.tipoPedal ? sub.tipoPedal + ' · ' : '';
+                        if (sub.pila?.alimentacion === 'Recargable') {
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">⚡ ${tipoStr}Recargable USB</div>`;
+                        } else if (sub.pila?.alimentacion === 'Pila' && sub.pila?.tipo) {
+                            const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${tipoStr}${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
+                        } else {
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">⚡ ${tipoStr}Sin alimentación configurada</div>`;
+                        }
                     } else if (tipo === 'Pila' && sub.tipoPila) {
                         extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.tipoPila}</div>`;
                     }
+                    const subtituloCard = tipo === 'Pila'
+                        ? `${sub.marca || ''} ${sub.tipoPila || ''} · ${kmUso} km`.trim()
+                        : `${sub.marca} ${sub.modelo} - ${kmUso} km`;
+                    const extraInfoFinal = tipo === 'Pila' ? '' : extraInfo;
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
                                 <div style="font-weight:bold;">${tipo}</div>
-                                <div style="font-size:0.85em;color:var(--text);">${sub.marca} ${sub.modelo} - ${kmUso} km</div>
-                                ${extraInfo}
+                                <div style="font-size:0.85em;color:var(--text);">${subtituloCard}</div>
+                                ${extraInfoFinal}
                             </div>
                             <div style="display:flex;gap:10px;">
                                 <button class="btn btn-secondary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">✏️</button>
@@ -5401,10 +5491,16 @@
         }
         
         // Campos extra
-        function actualizarCamposExtra(configPlatosActual, conMedidorActual) {
+        function actualizarCamposExtra(configPlatosActual, conMedidorActual, tipoPedalActual) {
             const tipo = document.getElementById('comp-tipo').value;
             const container = document.getElementById('comp-campos-extra');
             container.innerHTML = '';
+            if (tipo === 'Pedales') {
+                const chkMedidor = document.getElementById('comp-con-medidor-potencia');
+                const teniaMedidor = modoEdicion && componenteActual.conMedidorPotencia;
+                comp.conMedidorPotencia = chkMedidor ? chkMedidor.checked : false;
+            }
+
             if (tipo === 'Bielas') {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5451,6 +5547,37 @@
                 if (configPlatosActual) document.getElementById('comp-config-platos').value = configPlatosActual;
                 if (conMedidorActual) {
                     // Esperar al setTimeout del switch
+                    setTimeout(() => {
+                        const chk = document.getElementById('comp-con-medidor-potencia');
+                        if (chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
+                    }, 10);
+                }
+            } else if (tipo === 'Pedales') {
+                container.innerHTML = `
+                    <div style="background:var(--light-gray); border-radius:12px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                        <div>
+                            <div style="font-weight:700; font-size:0.95em;">⚡ Medidor de Potencia</div>
+                            <div style="font-size:0.8em; color:var(--text); margin-top:2px;">Pedales con potenciómetro integrado</div>
+                        </div>
+                        <label style="position:relative; display:inline-block; width:48px; height:26px; flex-shrink:0; cursor:pointer;">
+                            <input type="checkbox" id="comp-con-medidor-potencia" style="opacity:0; width:0; height:0; position:absolute;">
+                            <span id="medidor-switch-track" style="position:absolute; inset:0; border-radius:26px; background:#ccc; transition:background 0.2s;"></span>
+                            <span id="medidor-switch-thumb" style="position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:white; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.3);"></span>
+                        </label>
+                    </div>`;
+                setTimeout(() => {
+                    const chk = document.getElementById('comp-con-medidor-potencia');
+                    const track = document.getElementById('medidor-switch-track');
+                    const thumb = document.getElementById('medidor-switch-thumb');
+                    if (!chk) return;
+                    const updateSwitch = () => {
+                        track.style.background = chk.checked ? 'var(--primary)' : '#ccc';
+                        thumb.style.transform = chk.checked ? 'translateX(22px)' : 'translateX(0)';
+                    };
+                    chk.addEventListener('change', updateSwitch);
+                    updateSwitch();
+                }, 0);
+                if (conMedidorActual) {
                     setTimeout(() => {
                         const chk = document.getElementById('comp-con-medidor-potencia');
                         if (chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
@@ -5509,7 +5636,8 @@
                 if (idx !== -1) {
                     const subpiezasOriginales = biciActual.componentesV2[seccionActual][idx].subpiezas || {};
                     // Si se desactiva el medidor de potencia, eliminar su subpieza
-                    if (tipo === 'Bielas' && !comp.conMedidorPotencia) {
+                    if ((tipo === 'Bielas' || tipo === 'Pedales') && !comp.conMedidorPotencia) {
+                        delete subpiezasOriginales['Medidor de Potencia Pedales'];
                         delete subpiezasOriginales['Medidor de Potencia'];
                     }
                     comp.subpiezas = subpiezasOriginales;
@@ -5550,7 +5678,7 @@
             document.getElementById('comp-km-instalacion').value = componenteActual.kmInstalacion || '';
             
             select.onchange = () => actualizarCamposExtra();
-            actualizarCamposExtra(componenteActual.configPlatos, componenteActual.conMedidorPotencia);
+            actualizarCamposExtra(componenteActual.configPlatos, componenteActual.conMedidorPotencia, componenteActual.tipoPedalMedidor);
             
             abrirModal('modal-componente');
         }
@@ -6125,8 +6253,18 @@
         let modoSubpieza = 'añadir'; // 'añadir', 'editar', 'sustituir'
         
         // Editar/Añadir subpieza
+        // Marcas genéricas para subpiezas
+        const MARCAS_SUBPIEZA_GENERICAS = ['Bontrager','Canyon','Campagnolo','Continental','Basso','DT Swiss','Fizik','Fox','Garmin','Giant','Kodak','Lifefitness','Look','Maxxis','Magura','Megamo','Michelin','Pirelli','Pro','Prólogo','RockShox','Schwalbe','Selle Italia','Shimano','Specialized','Sram','Varta','Zipp','Otra'];
+
         function editarSubpieza(tipo) {
             if (!componenteActual) return;
+
+            // Restaurar marcas genéricas por defecto (se sobreescribirán si es Medidor de Potencia)
+            const marcasSel = document.getElementById('subpieza-marca');
+            if (marcasSel && tipo !== 'Medidor de Potencia') {
+                marcasSel.innerHTML = '<option value="">-- Selecciona --</option>' +
+                    MARCAS_SUBPIEZA_GENERICAS.map(m => '<option value="' + m + '">' + m + '</option>').join('');
+            }
             
             subpiezaTipo = tipo;
             const subpiezaExiste = componenteActual.subpiezas && componenteActual.subpiezas[tipo];
@@ -6153,6 +6291,13 @@
                 document.getElementById('subpieza-fecha').value = sub.fechaInstalacion || '';
                 document.getElementById('subpieza-km').value = sub.kmInstalacion || '';
             } else if (tipo === 'Medidor de Potencia') {
+                // Marcas específicas de potenciómetros
+                const marcasSelect = document.getElementById('subpieza-marca');
+                if (marcasSelect) {
+                    marcasSelect.innerHTML = '<option value="">-- Selecciona --</option>' +
+                        ['Garmin','Wahoo','Favero','4iiii','Stages','Pioneer','SRM','Rotor','Quarq','Power2Max','Shimano','Sram','Otra']
+                        .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+                }
                 // Medidor de potencia: no hereda marca/modelo de las bielas
                 document.getElementById('subpieza-marca').value = '';
                 document.getElementById('subpieza-modelo').value = '';
@@ -6172,6 +6317,50 @@
                 document.getElementById('subpieza-km').value = componenteActual.kmInstalacion || '';
             }
             
+            // Para Pila: ocultar campos genéricos irrelevantes, usar modelo para tipo pila
+            const esPila = tipo === 'Pila';
+            const esMedidorPotencia = tipo === 'Medidor de Potencia' || tipo === 'Medidor de Potencia Pedales';
+            ['subpieza-material', 'subpieza-peso', 'subpieza-modelo'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.closest('.form-group').style.display = esPila ? 'none' : '';
+            });
+            document.getElementById('subpieza-material-otro-container').style.display = 'none';
+            // Ocultar también bloque heredados para Pila (no aporta)
+            document.getElementById('subpieza-datos-heredados').style.display = esPila ? 'none' : 'block';
+
+            // Para Pila: cambiar label de Modelo por "Tipo de pila" y poner marcas de pilas
+            const modeloLabel = document.querySelector('label[for="subpieza-modelo"], #modal-subpieza .form-group label');
+            const modeloGroup = document.getElementById('subpieza-modelo')?.closest('.form-group');
+            if (esPila) {
+                if (modeloGroup) modeloGroup.querySelector('label').textContent = 'Tipo de pila';
+                // Marcas de pilas
+                const marcasSel = document.getElementById('subpieza-marca');
+                if (marcasSel) {
+                    marcasSel.innerHTML = '<option value="">-- Selecciona --</option>' +
+                        ['Duracell','Energizer','Varta','Panasonic','GP','Sony','Kodak','Otra']
+                        .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+                    const sub = subpiezaExiste && componenteActual.subpiezas[tipo];
+                    if (sub?.marca) marcasSel.value = sub.marca;
+                }
+                // Usar modelo para guardar tipo pila — precargar si existe
+                const sub = subpiezaExiste && componenteActual.subpiezas[tipo];
+                document.getElementById('subpieza-modelo').value = sub?.tipoPila || sub?.modelo || '';
+            } else {
+                if (modeloGroup) modeloGroup.querySelector('label').textContent = 'Modelo';
+            }
+
+            // Para Medidor de Potencia: marcas específicas
+            if (esMedidorPotencia) {
+                const marcasSel = document.getElementById('subpieza-marca');
+                if (marcasSel) {
+                    marcasSel.innerHTML = '<option value="">-- Selecciona --</option>' +
+                        ['Garmin','Wahoo','Favero','4iiii','Stages','Pioneer','SRM','Rotor','Quarq','Power2Max','Shimano','Sram','Otra']
+                        .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+                    const sub = subpiezaExiste && componenteActual.subpiezas[tipo];
+                    if (sub?.marca) marcasSel.value = sub.marca;
+                }
+            }
+
             // Campos específicos
             actualizarCamposEspecificosSubpieza(tipo, subpiezaExiste);
             
@@ -6198,9 +6387,36 @@
             document.getElementById('subpieza-heredada-km').textContent = componenteActual.kmInstalacion || '0';
             
             // Pre-rellenar con datos de la subpieza actual
-            document.getElementById('subpieza-marca').value = subActual.marca;
-            document.getElementById('subpieza-modelo').value = subActual.modelo || '';
-            document.getElementById('subpieza-material').value = subActual.material;
+            const esPilaSust = tipo === 'Pila';
+            const esMedidorSust = tipo === 'Medidor de Potencia' || tipo === 'Medidor de Potencia Pedales';
+
+            // Ocultar/mostrar campos según tipo
+            ['subpieza-material', 'subpieza-peso', 'subpieza-modelo'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.closest('.form-group').style.display = esPilaSust ? 'none' : '';
+            });
+            document.getElementById('subpieza-material-otro-container').style.display = 'none';
+            document.getElementById('subpieza-datos-heredados').style.display = esPilaSust ? 'none' : 'block';
+
+            // Marcas según tipo
+            const marcasSel = document.getElementById('subpieza-marca');
+            if (esPilaSust && marcasSel) {
+                marcasSel.innerHTML = '<option value="">-- Selecciona --</option>' +
+                    ['Duracell','Energizer','Varta','Panasonic','GP','Sony','Kodak','Otra']
+                    .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+            } else if (esMedidorSust && marcasSel) {
+                marcasSel.innerHTML = '<option value="">-- Selecciona --</option>' +
+                    ['Garmin','Wahoo','Favero','4iiii','Stages','Pioneer','SRM','Rotor','Quarq','Power2Max','Shimano','Sram','Otra']
+                    .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+            }
+
+            // Label modelo
+            const modeloGroup = document.getElementById('subpieza-modelo')?.closest('.form-group');
+            if (modeloGroup) modeloGroup.querySelector('label').textContent = esPilaSust ? 'Tipo de pila' : 'Modelo';
+
+            document.getElementById('subpieza-marca').value = subActual.marca || '';
+            document.getElementById('subpieza-modelo').value = esPilaSust ? (subActual.tipoPila || subActual.modelo || '') : (subActual.modelo || '');
+            if (!esPilaSust) document.getElementById('subpieza-material').value = subActual.material || '';
             document.getElementById('subpieza-peso').value = subActual.peso || '';
             document.getElementById('subpieza-precio').value = '';
             document.getElementById('subpieza-fecha').value = new Date().toISOString().split('T')[0];
@@ -6219,6 +6435,24 @@
             abrirModal('modal-subpieza');
         }
         
+        // Helper unificado para selector de pila con opción "Otra" con campo libre
+        function htmlSelectorPila(opciones, valorActual, tipoOtraActual) {
+            const opts = opciones.map(o =>
+                `<option value="${o}" ${valorActual === o ? 'selected' : ''}>${o}</option>`
+            ).join('');
+            const mostrarOtra = valorActual === 'Otra' ? 'block' : 'none';
+            return `
+                <select id="subpieza-pila-tipo" onchange="document.getElementById('pila-otra-container').style.display=this.value==='Otra'?'block':'none'" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                    <option value="">-- Selecciona --</option>
+                    ${opts}
+                    <option value="Otra" ${valorActual === 'Otra' ? 'selected' : ''}>Otra</option>
+                </select>
+                <div id="pila-otra-container" style="display:${mostrarOtra}; margin-top:8px;">
+                    <input type="text" id="subpieza-pila-tipo-otra" placeholder="Escribe el tipo de pila" value="${tipoOtraActual || ''}">
+                </div>
+            `;
+        }
+
         // Actualizar campos específicos según tipo de subpieza
         function actualizarCamposEspecificosSubpieza(tipo, existente) {
             const container = document.getElementById('subpieza-campos-especificos');
@@ -6242,18 +6476,27 @@
                 container.innerHTML = `
                     <div style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px;">
                         <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Pila / Batería</div>
+                        
+                        <div class="form-group">
+                            <label>Marca de la pila</label>
+                            <select id="subpieza-medidor-marca-pila" onchange="document.getElementById('medidor-marca-otra-pila').style.display=this.value==='Otra'?'block':'none'" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Duracell" ${pila.marca === 'Duracell' ? 'selected' : ''}>Duracell</option>
+                                <option value="Energizer" ${pila.marca === 'Energizer' ? 'selected' : ''}>Energizer</option>
+                                <option value="Varta" ${pila.marca === 'Varta' ? 'selected' : ''}>Varta</option>
+                                <option value="Panasonic" ${pila.marca === 'Panasonic' ? 'selected' : ''}>Panasonic</option>
+                                <option value="GP" ${pila.marca === 'GP' ? 'selected' : ''}>GP</option>
+                                <option value="Sony" ${pila.marca === 'Sony' ? 'selected' : ''}>Sony</option>
+                                <option value="Kodak" ${pila.marca === 'Kodak' ? 'selected' : ''}>Kodak</option>
+                                <option value="Otra" ${pila.marca === 'Otra' ? 'selected' : ''}>Otra</option>
+                            </select>
+                            <div id="medidor-marca-otra-pila" style="display:${pila.marca === 'Otra' ? 'block' : 'none'}; margin-top:8px;">
+                                <input type="text" id="subpieza-medidor-marca-pila-otra" placeholder="Escribe la marca" value="${pila.marcaOtra || ''}">
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label>Tipo de pila</label>
-                            <select id="subpieza-pila-tipo" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
-                                <option value="">-- Selecciona --</option>
-                                <option value="CR2032" ${pila.tipo === 'CR2032' ? 'selected' : ''}>CR2032</option>
-                                <option value="CR2025" ${pila.tipo === 'CR2025' ? 'selected' : ''}>CR2025</option>
-                                <option value="CR2016" ${pila.tipo === 'CR2016' ? 'selected' : ''}>CR2016</option>
-                                <option value="AAA" ${pila.tipo === 'AAA' ? 'selected' : ''}>AAA</option>
-                                <option value="AA" ${pila.tipo === 'AA' ? 'selected' : ''}>AA</option>
-                                <option value="Recargable" ${pila.tipo === 'Recargable' ? 'selected' : ''}>Recargable (integrada)</option>
-                                <option value="Otra" ${pila.tipo === 'Otra' ? 'selected' : ''}>Otra</option>
-                            </select>
+                            ${htmlSelectorPila(['CR2032','CR2025','CR2016','AAA','AA','Recargable'], pila.tipo, pila.tipoOtra)}
                         </div>
                         <div class="form-group">
                             <label>Fecha de instalación de la pila</label>
@@ -6265,23 +6508,93 @@
                         </div>
                     </div>
                 `;
+            } else if (tipo === 'Medidor de Potencia Pedales') {
+                const sub = existente && componenteActual.subpiezas[tipo];
+                const pilaKmDefault = sub?.pila?.km !== undefined ? sub.pila.km : (biciActual.kmTotales || 0);
+                const pilaFechaDefault = sub?.pila?.fecha || new Date().toISOString().split('T')[0];
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="subpieza-pedal-tipo" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                            <option value="">-- Selecciona --</option>
+                            <option value="Single" ${sub?.tipoPedal === 'Single' ? 'selected' : ''}>Single (un pedal)</option>
+                            <option value="Dual" ${sub?.tipoPedal === 'Dual' ? 'selected' : ''}>Dual (dos pedales)</option>
+                        </select>
+                    </div>
+                    <div style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px;">
+                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Alimentación</div>
+                        
+                        <div class="form-group">
+                            <label>Marca de la pila</label>
+                            <select id="subpieza-medidor-marca-pila" onchange="document.getElementById('medidor-marca-otra-pila').style.display=this.value==='Otra'?'block':'none'" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Duracell" ${sub?.pila?.marca === 'Duracell' ? 'selected' : ''}>Duracell</option>
+                                <option value="Energizer" ${sub?.pila?.marca === 'Energizer' ? 'selected' : ''}>Energizer</option>
+                                <option value="Varta" ${sub?.pila?.marca === 'Varta' ? 'selected' : ''}>Varta</option>
+                                <option value="Panasonic" ${sub?.pila?.marca === 'Panasonic' ? 'selected' : ''}>Panasonic</option>
+                                <option value="GP" ${sub?.pila?.marca === 'GP' ? 'selected' : ''}>GP</option>
+                                <option value="Sony" ${sub?.pila?.marca === 'Sony' ? 'selected' : ''}>Sony</option>
+                                <option value="Kodak" ${sub?.pila?.marca === 'Kodak' ? 'selected' : ''}>Kodak</option>
+                                <option value="Otra" ${sub?.pila?.marca === 'Otra' ? 'selected' : ''}>Otra</option>
+                            </select>
+                            <div id="medidor-marca-otra-pila" style="display:${sub?.pila?.marca === 'Otra' ? 'block' : 'none'}; margin-top:8px;">
+                                <input type="text" id="subpieza-medidor-marca-pila-otra" placeholder="Escribe la marca" value="${sub?.pila?.marcaOtra || ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de alimentación</label>
+                            <select id="subpieza-pedal-alimentacion" onchange="togglePedalPila(this.value)" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Pila" ${sub?.pila?.alimentacion === 'Pila' ? 'selected' : ''}>Pila</option>
+                                <option value="Recargable" ${sub?.pila?.alimentacion === 'Recargable' ? 'selected' : ''}>Recargable USB</option>
+                            </select>
+                        </div>
+                        <div id="pedal-pila-campos" style="display:${sub?.pila?.alimentacion === 'Pila' ? 'block' : 'none'};">
+                            <div class="form-group">
+                                <label>Tipo de pila</label>
+                                ${htmlSelectorPila(['AAA','AA'], sub?.pila?.tipo, sub?.pila?.tipoOtra)}
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha último cambio de pila</label>
+                                <input type="date" id="subpieza-pila-fecha" value="${pilaFechaDefault}">
+                            </div>
+                            <div class="form-group">
+                                <label>Km al cambiar la pila</label>
+                                <input type="number" id="subpieza-pila-km" value="${pilaKmDefault}" placeholder="0" min="0">
+                            </div>
+                        </div>
+                        <div id="pedal-recargable-campos" style="display:${sub?.pila?.alimentacion === 'Recargable' ? 'block' : 'none'};">
+                            <div class="form-group">
+                                <label>Fecha última carga</label>
+                                <input type="date" id="subpieza-recarga-fecha" value="${pilaFechaDefault}">
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else if (tipo === 'Pila') {
                 const sub = existente && componenteActual.subpiezas[tipo];
+                const tipoPilaActual = sub?.tipoPila || sub?.modelo || '';
+                const tiposP = ['CR2032','CR2025','CR2016','AAA','AA','Recargable'];
+                const enLista = tiposP.includes(tipoPilaActual);
                 container.innerHTML = `
                     <div class="form-group">
                         <label>Tipo de pila</label>
-                        <select id="subpieza-pila-tipo" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                        <select id="pila-tipo-select" onchange="document.getElementById('pila-tipo-otra-container').style.display=this.value==='Otra'?'block':'none'; document.getElementById('subpieza-modelo').value=this.value!=='Otra'?this.value:document.getElementById('pila-tipo-otra-input').value;" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
                             <option value="">-- Selecciona --</option>
-                            <option value="CR2032" ${sub?.tipoPila === 'CR2032' ? 'selected' : ''}>CR2032</option>
-                            <option value="CR2025" ${sub?.tipoPila === 'CR2025' ? 'selected' : ''}>CR2025</option>
-                            <option value="CR2016" ${sub?.tipoPila === 'CR2016' ? 'selected' : ''}>CR2016</option>
-                            <option value="AAA" ${sub?.tipoPila === 'AAA' ? 'selected' : ''}>AAA</option>
-                            <option value="AA" ${sub?.tipoPila === 'AA' ? 'selected' : ''}>AA</option>
-                            <option value="Recargable" ${sub?.tipoPila === 'Recargable' ? 'selected' : ''}>Recargable (integrada)</option>
-                            <option value="Otra" ${sub?.tipoPila === 'Otra' ? 'selected' : ''}>Otra</option>
+                            ${tiposP.map(t => `<option value="${t}" ${tipoPilaActual === t ? 'selected' : ''}>${t}</option>`).join('')}
+                            <option value="Otra" ${!enLista && tipoPilaActual ? 'selected' : ''}>Otra</option>
                         </select>
+                        <div id="pila-tipo-otra-container" style="display:${!enLista && tipoPilaActual ? 'block' : 'none'}; margin-top:8px;">
+                            <input type="text" id="pila-tipo-otra-input" placeholder="Escribe el tipo" value="${!enLista ? tipoPilaActual : ''}"
+                                oninput="document.getElementById('subpieza-modelo').value=this.value;">
+                        </div>
                     </div>
                 `;
+                // Sincronizar el campo modelo oculto con el valor del select
+                setTimeout(() => {
+                    const sel = document.getElementById('pila-tipo-select');
+                    if (sel && sel.value && sel.value !== 'Otra') document.getElementById('subpieza-modelo').value = sel.value;
+                }, 0);
             }
         }
         
@@ -6317,17 +6630,49 @@
                 const dientes = document.getElementById('subpieza-num-dientes');
                 if (dientes) subpieza.numDientes = parseFloat(dientes.value) || 0;
             } else if (subpiezaTipo === 'Medidor de Potencia') {
+                const medidorMarcaSel = document.getElementById('subpieza-medidor-marca-pila');
+                const medidorMarcaOtra = document.getElementById('subpieza-medidor-marca-pila-otra');
+                const marcaMedidor = medidorMarcaSel ? (medidorMarcaSel.value === 'Otra' && medidorMarcaOtra?.value.trim() ? medidorMarcaOtra.value.trim() : medidorMarcaSel.value) : '';
+                const marcaMedidorOtra = medidorMarcaSel?.value === 'Otra' ? (medidorMarcaOtra?.value.trim() || '') : '';
                 const pilaTipo = document.getElementById('subpieza-pila-tipo');
                 const pilaFecha = document.getElementById('subpieza-pila-fecha');
                 const pilaKm = document.getElementById('subpieza-pila-km');
+                const pilaOtra = document.getElementById('subpieza-pila-tipo-otra');
                 if (pilaTipo) subpieza.pila = {
-                    tipo: pilaTipo.value,
+                    marca: marcaMedidor,
+                    marcaOtra: marcaMedidorOtra,
+                    tipo: (pilaTipo.value === 'Otra' && pilaOtra?.value.trim()) ? pilaOtra.value.trim() : pilaTipo.value,
+                    tipoOtra: pilaTipo.value === 'Otra' ? (pilaOtra?.value.trim() || '') : '',
                     fecha: pilaFecha ? pilaFecha.value : '',
                     km: pilaKm ? parseFloat(pilaKm.value) || 0 : 0
                 };
+            } else if (subpiezaTipo === 'Medidor de Potencia Pedales') {
+                const tipoPedal = document.getElementById('subpieza-pedal-tipo');
+                const alimentacion = document.getElementById('subpieza-pedal-alimentacion');
+                if (tipoPedal) subpieza.tipoPedal = tipoPedal.value;
+                if (alimentacion) {
+                    const alVal = alimentacion.value;
+                    const medidorMarcaSelP = document.getElementById('subpieza-medidor-marca-pila');
+                    const medidorMarcaOtraP = document.getElementById('subpieza-medidor-marca-pila-otra');
+                    const marcaMedidorP = medidorMarcaSelP ? (medidorMarcaSelP.value === 'Otra' && medidorMarcaOtraP?.value.trim() ? medidorMarcaOtraP.value.trim() : medidorMarcaSelP.value) : '';
+                    subpieza.pila = { alimentacion: alVal, marca: marcaMedidorP };
+                    if (alVal === 'Pila') {
+                        const pilaTipo = document.getElementById('subpieza-pila-tipo');
+                        const pilaFecha = document.getElementById('subpieza-pila-fecha');
+                        const pilaKm = document.getElementById('subpieza-pila-km');
+                        const pilaOtra = document.getElementById('subpieza-pila-tipo-otra');
+                        subpieza.pila.tipo = (pilaTipo?.value === 'Otra' && pilaOtra?.value.trim()) ? pilaOtra.value.trim() : (pilaTipo?.value || '');
+                        subpieza.pila.tipoOtra = pilaTipo?.value === 'Otra' ? (pilaOtra?.value.trim() || '') : '';
+                        subpieza.pila.fecha = pilaFecha ? pilaFecha.value : '';
+                        subpieza.pila.km = pilaKm ? parseFloat(pilaKm.value) || 0 : 0;
+                    } else if (alVal === 'Recargable') {
+                        const recargaFecha = document.getElementById('subpieza-recarga-fecha');
+                        subpieza.pila.fecha = recargaFecha ? recargaFecha.value : '';
+                    }
+                }
             } else if (subpiezaTipo === 'Pila') {
-                const pilaTipo = document.getElementById('subpieza-pila-tipo');
-                if (pilaTipo) subpieza.tipoPila = pilaTipo.value;
+                // El tipo de pila viene del campo modelo
+                subpieza.tipoPila = modelo;
             }
             
             if (!componenteActual.subpiezas) componenteActual.subpiezas = {};
@@ -6934,6 +7279,7 @@
                 input.value = '';
             }
             document.getElementById('ciclo-modelo').value = ciclo ? ciclo.modelo : '';
+            document.getElementById('ciclo-peso').value = ciclo ? ciclo.peso || '' : '';
             document.getElementById('ciclo-fecha').value = ciclo ? ciclo.fecha : '';
             document.getElementById('ciclo-km-historicos').value = ciclo ? ciclo.kmHistoricos : '';
             document.getElementById('ciclo-precio').value = ciclo ? ciclo.precio : '';
@@ -6945,6 +7291,7 @@
             const modelo = document.getElementById('ciclo-modelo').value.trim();
             const fecha = document.getElementById('ciclo-fecha').value;
             const kmHistoricos = parseFloat(document.getElementById('ciclo-km-historicos').value) || 0;
+            const peso = parseFloat(document.getElementById('ciclo-peso').value) || 0;
             const precio = parseFloat(document.getElementById('ciclo-precio').value) || 0;
 
             if (!marca || !modelo) {
@@ -6952,11 +7299,88 @@
                 return;
             }
 
-            datosUsuario.ciclocomputador = { marca, modelo, fecha, kmHistoricos, precio };
+            datosUsuario.ciclocomputador = { marca, modelo, fecha, kmHistoricos, peso, precio };
             await guardarDatosUsuario();
             cerrarModal('modal-ciclocomputador');
             actualizarDisplayCiclocomputador();
             mostrarNotificacion('Ciclocomputador guardado ✅', 'exito');
+        }
+
+
+        function togglePedalPila(val) {
+            const pilaCampos = document.getElementById('pedal-pila-campos');
+            const recargableCampos = document.getElementById('pedal-recargable-campos');
+            if (pilaCampos) pilaCampos.style.display = val === 'Pila' ? 'block' : 'none';
+            if (recargableCampos) recargableCampos.style.display = val === 'Recargable' ? 'block' : 'none';
+        }
+
+        function cicloSustMarcaSelectChange(val) {
+            const input = document.getElementById('ciclo-sust-marca');
+            if (val === 'otra') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+                input.value = val;
+            }
+        }
+
+        function abrirModalSustituirCiclocomputador() {
+            const ciclo = datosUsuario.ciclocomputador;
+            if (!ciclo) return;
+            document.getElementById('ciclo-sust-actual-nombre').textContent = ciclo.marca + ' ' + ciclo.modelo;
+            document.getElementById('ciclo-sust-actual-km').textContent = calcularKmTotalesCiclo() + ' km totales acumulados';
+            document.getElementById('ciclo-sust-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('ciclo-sust-marca-select').value = '';
+            document.getElementById('ciclo-sust-marca').value = '';
+            document.getElementById('ciclo-sust-marca').style.display = 'none';
+            document.getElementById('ciclo-sust-modelo').value = '';
+            document.getElementById('ciclo-sust-km-historicos').value = '0';
+            document.getElementById('ciclo-sust-peso').value = '';
+            document.getElementById('ciclo-sust-precio').value = '';
+            abrirModal('modal-sustituir-ciclocomputador');
+        }
+
+        async function confirmarSustitucionCiclocomputador() {
+            const fecha = document.getElementById('ciclo-sust-fecha').value;
+            const selectVal = document.getElementById('ciclo-sust-marca-select').value;
+            let marca = selectVal === 'otra' || selectVal === '' 
+                ? document.getElementById('ciclo-sust-marca').value.trim()
+                : selectVal;
+            const modelo = document.getElementById('ciclo-sust-modelo').value.trim();
+            const kmHistoricos = parseFloat(document.getElementById('ciclo-sust-km-historicos').value) || 0;
+            const peso = parseFloat(document.getElementById('ciclo-sust-peso').value) || 0;
+            const precio = parseFloat(document.getElementById('ciclo-sust-precio').value) || 0;
+
+            if (!marca || !modelo) {
+                mostrarNotificacion('Indica marca y modelo del nuevo GPS', 'error');
+                return;
+            }
+
+            const cicloViejo = datosUsuario.ciclocomputador;
+            const kmTotalesViejo = calcularKmTotalesCiclo();
+
+            // Registrar en historial del usuario
+            if (!datosUsuario.historialGPS) datosUsuario.historialGPS = [];
+            datosUsuario.historialGPS.unshift({
+                id: Date.now().toString(),
+                fecha,
+                tipo: 'Sustitución GPS',
+                descripcion: cicloViejo.marca + ' ' + cicloViejo.modelo + ' → ' + marca + ' ' + modelo,
+                kmAcumulados: kmTotalesViejo,
+                coste: precio,
+                fechaCreacion: new Date().toISOString()
+            });
+
+            // Guardar nuevo GPS — los km históricos del nuevo arrancan desde 0 de bicis,
+            // pero el nuevo puede traer km previos propios
+            datosUsuario.ciclocomputador = { marca, modelo, fecha, kmHistoricos, peso, precio };
+
+            await guardarDatosUsuario();
+            cerrarModal('modal-sustituir-ciclocomputador');
+            actualizarDisplayCiclocomputador();
+            mostrarNotificacion('GPS sustituido ✅', 'exito');
         }
 
         async function eliminarCiclocomputador() {
