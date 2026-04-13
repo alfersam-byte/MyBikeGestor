@@ -21,7 +21,7 @@
     "alias": "my-key-alias"
   },
   "appVersionName": "1.5",
-  "appVersionCode": 7,
+  "appVersionCode": 8,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://alfersam-byte.github.io/MyBikeGestor/manifest.json",
