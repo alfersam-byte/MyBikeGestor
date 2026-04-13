@@ -1,0 +1,8 @@
+cmdcd "C:\Users\Usuario"
+bubblewrap build --verbose
+Introducir la contraseña GsnaUtgUlm61 dos veces y listo. Todo lo demás ya está resuelto:
+
+SDK ✅
+JDK con enlace simbólico ✅
+Keystore en la ruta correcta ✅
+config.json configurado ✅

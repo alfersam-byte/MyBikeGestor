@@ -1103,18 +1103,36 @@
                 </div>
 
                 <div class="form-group">
-                    <label>FTP - Potencia Umbral (W)</label>
-                    <input type="number" id="perfil-ftp" placeholder="200">
+                    <label>FTP - Potencia Umbral (W) — <span id="perfil-ftp-valor" style="color: var(--primary); font-weight: 700;">200</span> W</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button type="button" onclick="ajustarFtp(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:white; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
+                        <input type="range" id="perfil-ftp" min="50" max="500" step="1" value="200"
+                            oninput="document.getElementById('perfil-ftp-valor').textContent = this.value;"
+                            style="flex:1; accent-color: var(--primary);">
+                        <button type="button" onclick="ajustarFtp(1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:var(--primary); color:white; font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">+</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>FC Máxima (ppm)</label>
-                    <input type="number" id="perfil-fc-max" placeholder="190">
+                    <label>FC Máxima (ppm) — <span id="perfil-fc-max-valor" style="color: var(--primary); font-weight: 700;">190</span> ppm</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button type="button" onclick="ajustarFcMax(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:white; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
+                        <input type="range" id="perfil-fc-max" min="100" max="230" step="1" value="190"
+                            oninput="document.getElementById('perfil-fc-max-valor').textContent = this.value;"
+                            style="flex:1; accent-color: var(--primary);">
+                        <button type="button" onclick="ajustarFcMax(1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:var(--primary); color:white; font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">+</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>VO2 Max (ml/kg/min)</label>
-                    <input type="number" id="perfil-vo2max" placeholder="50" step="0.1">
+                    <label>VO2 Max (ml/kg/min) — <span id="perfil-vo2max-valor" style="color: var(--primary); font-weight: 700;">50.0</span></label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button type="button" onclick="ajustarVo2(-0.5)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:white; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
+                        <input type="range" id="perfil-vo2max" min="20" max="90" step="0.5" value="50"
+                            oninput="document.getElementById('perfil-vo2max-valor').textContent = parseFloat(this.value).toFixed(1);"
+                            style="flex:1; accent-color: var(--primary);">
+                        <button type="button" onclick="ajustarVo2(0.5)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:var(--primary); color:white; font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">+</button>
+                    </div>
                 </div>
             </div>
 
@@ -1186,7 +1204,7 @@
             </div>
 
             <button class="btn btn-primary mt-20" onclick="guardarPerfil()">Guardar Cambios</button>
-            <button class="btn btn-secondary mt-20" onclick="navegar('sec-dashboard')">Volver</button>
+            <button class="btn-back mt-20" onclick="navegar('sec-dashboard')" style="align-self:flex-start;">←</button>
         </section>
 
         <!-- ========================================
@@ -1514,17 +1532,17 @@
                     <div class="btn-grid-item-icon">📋</div>
                     <div class="btn-grid-item-text">Historial</div>
                 </button>
-                <button class="btn-grid-item" onclick="abrirModalKm()">
-                    <div class="btn-grid-item-icon">📏</div>
-                    <div class="btn-grid-item-text">Añadir KM</div>
+                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')">
+                    <div class="btn-grid-item-icon">📦</div>
+                    <div class="btn-grid-item-text">Cajón (<span id="cajon-count-taller">0</span>)</div>
                 </button>
                 <button class="btn-grid-item" id="btn-vincular-strava" onclick="accionStravaBici()">
                     <div class="btn-grid-item-icon" id="btn-vincular-strava-icon">🚴</div>
                     <div class="btn-grid-item-text" id="btn-vincular-strava-texto">Vincular Strava</div>
                 </button>
-                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')">
-                    <div class="btn-grid-item-icon">📦</div>
-                    <div class="btn-grid-item-text">Cajón (<span id="cajon-count-taller">0</span>)</div>
+                <button class="btn-grid-item" onclick="abrirModalKm()">
+                    <div class="btn-grid-item-icon">📏</div>
+                    <div class="btn-grid-item-text">Añadir KM</div>
                 </button>
             </div>
         </section>
@@ -2306,6 +2324,7 @@
     <div id="modal-anadir-cajon" class="modal">
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
             <div class="modal-header">
+                <button onclick="cerrarModal('modal-anadir-cajon')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
                 <h2 class="modal-title">➕ Añadir pieza al cajón</h2>
             </div>
             <div class="form-group">
@@ -2383,8 +2402,7 @@
                 <input type="text" id="cajon-nuevo-notas" placeholder="Ej: Nueva, comprada en oferta...">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="cerrarModal('modal-anadir-cajon')">Cancelar</button>
-                <button class="btn btn-primary" onclick="guardarPiezaCajon()">Guardar</button>
+                <button class="btn btn-primary" style="width:100%;" onclick="guardarPiezaCajon()">Guardar</button>
             </div>
         </div>
     </div>
@@ -3142,9 +3160,15 @@
             document.getElementById('perfil-peso-valor').textContent = parseFloat(pesoVal).toFixed(1);
             document.getElementById('perfil-altura').value = alturaVal;
             document.getElementById('perfil-altura-valor').textContent = alturaVal;
-            document.getElementById('perfil-ftp').value = datosUsuario.ftp || '';
-            document.getElementById('perfil-fc-max').value = datosUsuario.fcMax || '';
-            document.getElementById('perfil-vo2max').value = datosUsuario.vo2max || '';
+            const ftpVal = datosUsuario.ftp || 200;
+            document.getElementById('perfil-ftp').value = ftpVal;
+            document.getElementById('perfil-ftp-valor').textContent = ftpVal;
+            const fcMaxVal = datosUsuario.fcMax || 190;
+            document.getElementById('perfil-fc-max').value = fcMaxVal;
+            document.getElementById('perfil-fc-max-valor').textContent = fcMaxVal;
+            const vo2Val = datosUsuario.vo2max || 50;
+            document.getElementById('perfil-vo2max').value = vo2Val;
+            document.getElementById('perfil-vo2max-valor').textContent = parseFloat(vo2Val).toFixed(1);
 
             // Calcular edad e IMC si hay datos
             calcularEdad();
@@ -7202,6 +7226,27 @@
         // ========================================
         // CICLOCOMPUTADOR GPS
         // ========================================
+
+        function ajustarFtp(delta) {
+            const slider = document.getElementById('perfil-ftp');
+            const nuevoValor = Math.min(500, Math.max(50, parseInt(slider.value) + delta));
+            slider.value = nuevoValor;
+            document.getElementById('perfil-ftp-valor').textContent = nuevoValor;
+        }
+
+        function ajustarFcMax(delta) {
+            const slider = document.getElementById('perfil-fc-max');
+            const nuevoValor = Math.min(230, Math.max(100, parseInt(slider.value) + delta));
+            slider.value = nuevoValor;
+            document.getElementById('perfil-fc-max-valor').textContent = nuevoValor;
+        }
+
+        function ajustarVo2(delta) {
+            const slider = document.getElementById('perfil-vo2max');
+            const nuevoValor = Math.min(90, Math.max(20, parseFloat(slider.value) + delta));
+            slider.value = nuevoValor.toFixed(1);
+            document.getElementById('perfil-vo2max-valor').textContent = nuevoValor.toFixed(1);
+        }
 
         function ajustarPeso(delta) {
             const slider = document.getElementById('perfil-peso');
