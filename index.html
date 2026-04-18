@@ -1739,6 +1739,7 @@
                     <option value="Kodak">Kodak</option>
                     <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
+                    <option value="Magene">Magene</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
                     <option value="Megamo">Megamo</option>
@@ -1912,6 +1913,7 @@
                     <option value="Kodak">Kodak</option>
                     <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
+                    <option value="Magene">Magene</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
                     <option value="Megamo">Megamo</option>
@@ -2047,6 +2049,7 @@
                     <option value="Kodak">Kodak</option>
                     <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
+                    <option value="Magene">Magene</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Magura">Magura</option>
                     <option value="Megamo">Megamo</option>
@@ -2206,6 +2209,7 @@
                     <option value="Hammerhead">Hammerhead</option>
                     <option value="Cateye">Cateye</option>
                     <option value="iGPSport">iGPSport</option>
+                    <option value="Magene">Magene</option>
                     <option value="Beeline">Beeline</option>
                     <option value="otra">Otra...</option>
                 </select>
@@ -2270,6 +2274,7 @@
                     <option value="Hammerhead">Hammerhead</option>
                     <option value="Cateye">Cateye</option>
                     <option value="iGPSport">iGPSport</option>
+                    <option value="Magene">Magene</option>
                     <option value="Beeline">Beeline</option>
                     <option value="otra">Otra...</option>
                 </select>
@@ -2349,6 +2354,7 @@
                     <option value="Kodak">Kodak</option>
                     <option value="Lifefitness">Lifefitness</option>
                     <option value="Look">Look</option>
+                    <option value="Magene">Magene</option>
                     <option value="Magura">Magura</option>
                     <option value="Maxxis">Maxxis</option>
                     <option value="Megamo">Megamo</option>
@@ -2923,6 +2929,23 @@
         // ========================================
         
         // Formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+        // Calcula los km reales de uso de un componente teniendo en cuenta
+        // si fue instalado antes de la fecha de compra de la bici (componente reutilizado)
+        function calcularKmComponente(kmInstalacion, fechaInstalacion, bici) {
+            const kmBici = bici.kmTotales || 0;
+            const kmInst = kmInstalacion || 0;
+            if (fechaInstalacion && bici.fechaCompra) {
+                const fechaInst = new Date(fechaInstalacion);
+                const fechaCompra = new Date(bici.fechaCompra);
+                if (fechaInst < fechaCompra) {
+                    // Componente reutilizado: km instalación son los previos + todos los de la bici
+                    return kmInst + kmBici;
+                }
+            }
+            // Comportamiento normal
+            return Math.max(0, kmBici - kmInst);
+        }
+
         function formatearFecha(fechaISO) {
             if (!fechaISO) return '-';
             const partes = fechaISO.split('T')[0].split('-');
@@ -3501,7 +3524,7 @@
                                 );
                                 if (!sust.length) return false;
                                 const media = sust.reduce((s, r) => s + r.duracionKm, 0) / sust.length;
-                                return (kmActuales - (kmInst || 0)) / media >= umbral;
+                                const kmComp = calcularKmComponente(kmInst, comp.fechaInstalacion, bici); return kmComp / media >= umbral;
                             };
                             if (COMPONENTES_DESGASTE.includes(comp.tipo) && check(comp.tipo, null, comp.kmInstalacion)) return true;
                             if (comp.subpiezas) for (const sub of Object.values(comp.subpiezas)) {
@@ -4012,7 +4035,7 @@
                 'todos': ['Llanta Delantera', 'Llanta Trasera', 'Buje Delantero', 'Buje Trasero', 'Cubierta Delantera', 'Cubierta Trasera', 'Cierre Delantero', 'Cierre Trasero', 'Núcleo', 'Cámaras/Válvulas/Tubeless']
             },
             'Periféricos': {
-                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS'],
+                'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS', 'Sensor de Cadencia', 'Sensor de Velocidad'],
                 'Indoor': ['Consola', 'Manillar', 'Tija Sillín', 'Sillín', 'Portabidones', 'Acople GPS/Ciclocomputador', 'Soporte Tablet/Móvil', 'Ventilador', 'Alfombrilla Protectora', 'Protector Anticorrosión/Sudor']
             },
             'Suspensiones': {
@@ -4023,8 +4046,8 @@
         // Componentes con subpiezas (base, sin manetas)
         const SUBPIEZAS_BASE = {
             'Cambio Trasero': ['Roldanas'],
-            'Pinza Delantera': ['Pastillas'],
-            'Pinza Trasera': ['Pastillas'],
+            'Pinza Delantera': ['Pastillas', 'Latiguillo'],
+            'Pinza Trasera': ['Pastillas', 'Latiguillo'],
             'Ciclocomputador GPS': ['Pila']
         };
 
@@ -4924,7 +4947,7 @@
                     if (COMPONENTES_DESGASTE.includes(comp.tipo)) {
                         const vidaMedia = calcularVidaMedia(comp.tipo);
                         if (vidaMedia) {
-                            const kmComp = kmActuales - (comp.kmInstalacion || 0);
+                            const kmComp = calcularKmComponente(comp.kmInstalacion, comp.fechaInstalacion, biciActual);
                             const porcentaje = kmComp / vidaMedia;
                             if (porcentaje >= umbral) {
                                 alertas.push({
@@ -4944,7 +4967,7 @@
                         const nombreCompleto = `${comp.tipo} - ${sub.tipo}`;
                         const vidaSub = calcularVidaMedia(sub.tipo, nombreCompleto);
                         if (!vidaSub) return;
-                        const kmSub = kmActuales - (sub.kmInstalacion || comp.kmInstalacion || 0);
+                        const kmSub = calcularKmComponente(sub.kmInstalacion || comp.kmInstalacion, sub.fechaInstalacion || comp.fechaInstalacion, biciActual);
                         const pctSub = kmSub / vidaSub;
                         if (pctSub >= umbral) {
                             alertas.push({
@@ -5367,7 +5390,7 @@
                     card.onclick = () => mostrarNotificacion('Edita el ciclocomputador desde tu Perfil', 'info');
                 } else {
                     card.onclick = () => abrirDetalleComponente(comp);
-                    const kmUso = (biciActual.kmTotales || 0) - (comp.kmInstalacion || 0);
+                    const kmUso = calcularKmComponente(comp.kmInstalacion, comp.fechaInstalacion, biciActual);
                     const diasUso = comp.fechaInstalacion ? Math.floor((new Date() - new Date(comp.fechaInstalacion)) / (1000*60*60*24)) : 0;
                     card.innerHTML = `
                         <div class="card-header">
@@ -5398,7 +5421,7 @@
             document.getElementById('detalle-comp-peso').textContent = comp.peso ? `${comp.peso}g` : '-';
             document.getElementById('detalle-comp-km').textContent = comp.kmInstalacion || '0';
             
-            const kmUso = (biciActual.kmTotales || 0) - (comp.kmInstalacion || 0);
+            const kmUso = calcularKmComponente(comp.kmInstalacion, comp.fechaInstalacion, biciActual);
             document.getElementById('detalle-comp-km-uso').textContent = `${kmUso} km`;
             
             document.getElementById('detalle-comp-fecha').textContent = formatearFecha(comp.fechaInstalacion);
@@ -5433,7 +5456,7 @@
                 div.style.cssText = 'padding:10px;background:var(--light-gray);border-radius:8px;margin-bottom:10px;';
                 
                 if (sub) {
-                    const kmUso = (biciActual.kmTotales || 0) - (sub.kmInstalacion || 0);
+                    const kmUso = calcularKmComponente(sub.kmInstalacion || comp.kmInstalacion, sub.fechaInstalacion || comp.fechaInstalacion, biciActual);
                     let extraInfo = '';
                     if (tipo === 'Medidor de Potencia' && sub.pila && sub.pila.tipo) {
                         const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
@@ -5519,6 +5542,26 @@
             const tipo = document.getElementById('comp-tipo').value;
             const container = document.getElementById('comp-campos-extra');
             container.innerHTML = '';
+
+            // Para sensores, sustituir el select de marcas por el de GPS
+            const marcasGPS = ['Garmin','Wahoo','Sigma','Bryton','Polar','Lezyne','Hammerhead','Cateye','iGPSport','Magene','Beeline'];
+            const selectMarca = document.getElementById('comp-marca');
+            const marcaOtraContainer = document.getElementById('comp-marca-otra-container');
+            if (tipo === 'Sensor de Cadencia' || tipo === 'Sensor de Velocidad') {
+                const valorActual = selectMarca.value;
+                selectMarca.innerHTML = '<option value="">-- Selecciona --</option>';
+                marcasGPS.forEach(m => selectMarca.add(new Option(m, m)));
+                selectMarca.add(new Option('Otra', 'Otra'));
+                if (valorActual) selectMarca.value = valorActual;
+            } else {
+                // Restaurar marcas generales si se cambia de tipo
+                const marcasGenerales = ['Bontrager','Canyon','Campagnolo','Continental','Basso','DT Swiss','Fizik','Fox','Garmin','Giant','Kodak','Lifefitness','Look','Magene','Maxxis','Magura','Megamo','Michelin','Pirelli','Pro','Prólogo','RockShox','Schwalbe','Selle Italia','Shimano','Specialized','Sram','Varta','Zipp','Otra'];
+                const valorActual = selectMarca.value;
+                selectMarca.innerHTML = '<option value="">-- Selecciona --</option>';
+                marcasGenerales.forEach(m => selectMarca.add(new Option(m, m)));
+                if (valorActual) selectMarca.value = valorActual;
+            }
+
             if (tipo === 'Pedales') {
                 const chkMedidor = document.getElementById('comp-con-medidor-potencia');
                 const teniaMedidor = modoEdicion && componenteActual.conMedidorPotencia;
@@ -6278,7 +6321,7 @@
         
         // Editar/Añadir subpieza
         // Marcas genéricas para subpiezas
-        const MARCAS_SUBPIEZA_GENERICAS = ['Bontrager','Canyon','Campagnolo','Continental','Basso','DT Swiss','Fizik','Fox','Garmin','Giant','Kodak','Lifefitness','Look','Maxxis','Magura','Megamo','Michelin','Pirelli','Pro','Prólogo','RockShox','Schwalbe','Selle Italia','Shimano','Specialized','Sram','Varta','Zipp','Otra'];
+        const MARCAS_SUBPIEZA_GENERICAS = ['Bontrager','Canyon','Campagnolo','Continental','Basso','DT Swiss','Fizik','Fox','Garmin','Giant','Kodak','Lifefitness','Look','Magene','Maxxis','Magura','Megamo','Michelin','Pirelli','Pro','Prólogo','RockShox','Schwalbe','Selle Italia','Shimano','Specialized','Sram','Varta','Zipp','Otra'];
 
         function editarSubpieza(tipo) {
             if (!componenteActual) return;
