@@ -5724,7 +5724,10 @@
                 div.style.cssText = 'padding:10px;background:var(--light-gray);border-radius:8px;margin-bottom:10px;';
                 
                 if (sub) {
-                    const kmUso = calcularKmComponente(sub.kmInstalacion || componenteActual.kmInstalacion, sub.fechaInstalacion || componenteActual.fechaInstalacion, biciActual);
+                    // Para Pila el cálculo es siempre simple (km bici - km instalación pila)
+                    const kmUso = tipo === 'Pila'
+                        ? Math.max(0, (biciActual.kmTotales || 0) - (sub.kmInstalacion || 0))
+                        : calcularKmComponente(sub.kmInstalacion || componenteActual.kmInstalacion, sub.fechaInstalacion || componenteActual.fechaInstalacion, biciActual);
                     let extraInfo = '';
                     if (tipo === 'Medidor de Potencia' && sub.pila && sub.pila.tipo) {
                         const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
