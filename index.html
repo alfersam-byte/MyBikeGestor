@@ -3267,6 +3267,18 @@
         }
 
         // Guardar datos del usuario en Firestore
+        function limpiarUndefined(obj) {
+            if (Array.isArray(obj)) return obj.filter(item => item !== undefined).map(limpiarUndefined);
+            if (obj !== null && typeof obj === 'object') {
+                return Object.fromEntries(
+                    Object.entries(obj)
+                        .filter(([_, v]) => v !== undefined)
+                        .map(([k, v]) => [k, limpiarUndefined(v)])
+                );
+            }
+            return obj;
+        }
+
         async function guardarDatosUsuario() {
             if (!datosUsuario || !datosUsuario.id) {
                 console.error('No hay datos de usuario o falta el ID');
@@ -3275,7 +3287,8 @@
             }
             
             try {
-                await db.collection('usuarios').doc(datosUsuario.id).set(datosUsuario);
+                const datosLimpios = limpiarUndefined(datosUsuario);
+                await db.collection('usuarios').doc(datosUsuario.id).set(datosLimpios);
                 console.log('Datos guardados en Firestore con ID:', datosUsuario.id);
             } catch (error) {
                 console.error('Error guardando datos:', error);
@@ -6119,7 +6132,7 @@
             if (cajon.length > 0) {
                 cajónContainer.style.display = 'block';
                 cajon.forEach(p => {
-                    const kmAcum = p.kmAlRetirar - (p.kmInstalacion || 0);
+                    const kmAcum = (p.kmAlRetirar != null && p.kmInstalacion != null) ? p.kmAlRetirar - p.kmInstalacion : (p.kmAlRetirar || 0);
                     const opt = document.createElement('option');
                     opt.value = p.id;
                     opt.textContent = `${p.marca} ${p.modelo || ''} · ${kmAcum} km acumulados`;
@@ -6226,67 +6239,92 @@
             }
 
             // MODO: Sustituir componente normal
-            const kmViejo = componenteActual.kmInstalacion || 0;
+            // Buscar referencia real en biciActual.componentesV2 para garantizar persistencia
+            const compIndex = (biciActual.componentesV2[seccionActual] || []).findIndex(c => c.id === componenteActual.id);
+            if (compIndex === -1) return;
+            const compRef = biciActual.componentesV2[seccionActual][compIndex];
+
+            const kmViejo = compRef.kmInstalacion || 0;
             const durKm = kmSustitucion - kmViejo;
-            const diasUso = componenteActual.fechaInstalacion ? Math.floor((new Date(fecha) - new Date(componenteActual.fechaInstalacion)) / 86400000) : 0;
-            
+            const diasUso = compRef.fechaInstalacion ? Math.floor((new Date(fecha) - new Date(compRef.fechaInstalacion)) / 86400000) : 0;
+
+            // Siempre añadir al historial
+            if (!biciActual.historial) biciActual.historial = [];
+            biciActual.historial.unshift({
+                id: Date.now().toString(),
+                fecha, tipo: 'Sustitución',
+                componente: compRef.tipo,
+                descripcion: `${compRef.marca} ${compRef.modelo || ''} → ${marca} ${modelo}`,
+                km: kmSustitucion, coste: precio,
+                duracionKm: durKm, duracionDias: diasUso,
+                fechaCreacion: new Date().toISOString()
+            });
+
             if (destinoViejo === 'cajon') {
                 if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
                 biciActual.cajonPiezas.push({
-                    id: Date.now().toString(),
-                    tipo: componenteActual.tipo,
-                    marca: componenteActual.marca,
-                    modelo: componenteActual.modelo || '',
-                    material: componenteActual.material,
-                    peso: componenteActual.peso,
-                    precio: componenteActual.precio,
-                    fechaInstalacion: componenteActual.fechaInstalacion,
-                    kmInstalacion: componenteActual.kmInstalacion,
-                    subpiezas: componenteActual.subpiezas,
-                    seccion: seccionActual,
+                    id: Date.now().toString() + '_old',
+                    tipo: compRef.tipo,
+                    marca: compRef.marca,
+                    modelo: compRef.modelo || '',
+                    material: compRef.material || '',
+                    peso: compRef.peso || 0,
+                    precio: compRef.precio || 0,
+                    fechaInstalacion: compRef.fechaInstalacion || '',
+                    kmInstalacion: compRef.kmInstalacion || 0,
+                    subpiezas: compRef.subpiezas || {},
+                    seccion: seccionActual || '',
                     fechaRetiro: new Date().toISOString(),
-                    kmAlRetirar: kmSustitucion,
-                    diasUso: diasUso
+                    kmAlRetirar: kmSustitucion || 0,
+                    diasUso: diasUso || 0
                 });
-            } else {
-                if (!biciActual.historial) biciActual.historial = [];
-                biciActual.historial.unshift({
-                    id: Date.now().toString(),
-                    fecha, tipo: 'Sustitución',
-                    componente: componenteActual.tipo,
-                    descripcion: `${componenteActual.marca} ${componenteActual.modelo} → ${marca} ${modelo}`,
-                    km: kmSustitucion, coste: precio,
-                    duracionKm: durKm, duracionDias: diasUso,
-                    fechaCreacion: new Date().toISOString()
-                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
-            
-            componenteActual.marca = marca;
-            componenteActual.modelo = modelo;
-            componenteActual.material = material;
-            componenteActual.peso = peso;
-            componenteActual.precio = precio;
-            componenteActual.fechaInstalacion = fecha;
-            componenteActual.kmInstalacion = kmSustitucion;
-            
+
+            // Actualizar compRef directamente (referencia al objeto en biciActual)
+            compRef.marca = marca;
+            compRef.modelo = modelo;
+            compRef.material = material;
+            compRef.peso = peso;
+            compRef.precio = precio;
+            compRef.fechaInstalacion = fecha;
+            compRef.kmInstalacion = kmSustitucion;
+
             // Si viene del cajón, guardar km previos acumulados y eliminarlo del cajón
             if (desdeСajon) {
                 const piezaCajon = (biciActual.cajonPiezas || []).find(p => p.id === piezaCajonId);
                 if (piezaCajon) {
-                    componenteActual.kmAcumuladosPrevios = (piezaCajon.kmAlRetirar || 0) - (piezaCajon.kmInstalacion || 0);
+                    compRef.kmAcumuladosPrevios = (piezaCajon.kmAlRetirar || 0) - (piezaCajon.kmInstalacion || 0);
                 }
                 biciActual.cajonPiezas = biciActual.cajonPiezas.filter(p => p.id !== piezaCajonId);
             } else {
-                componenteActual.kmAcumuladosPrevios = 0;
+                compRef.kmAcumuladosPrevios = 0;
             }
-            
-            if (SUBPIEZAS[componenteActual.tipo]) componenteActual.subpiezas = {};
-            
+
+            if (SUBPIEZAS[compRef.tipo]) compRef.subpiezas = {};
+
             biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
+            componenteActual = compRef;
             
             await guardarDatosUsuario();
             cerrarModal('modal-sustituir');
             actualizarBotonCajon();
+            cargarListaComponentesSeccion();
             abrirDetalleComponente(componenteActual);
             mostrarNotificacion(desdeСajon ? 'Instalado desde el cajón 📦✅' : destinoViejo === 'cajon' ? 'Pieza guardada en el cajón 📦' : 'Sustituido ✅', 'exito');
         }
