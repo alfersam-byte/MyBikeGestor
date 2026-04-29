@@ -3360,7 +3360,6 @@
         let seccionAnterior = 'sec-login';
 
         function navegar(seccionId) {
-            // Guardar sección anterior
             const secActiva = document.querySelector('.seccion.activa');
             if (secActiva) seccionAnterior = secActiva.id;
 
@@ -4107,6 +4106,8 @@
                 document.getElementById('btn-vincular-strava-icon').textContent = '🚴';
                 document.getElementById('btn-vincular-strava-texto').textContent = 'Vincular Strava';
             }
+
+            actualizarBotonCajon();
         }
 
         function volverATaller() {
