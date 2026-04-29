@@ -746,6 +746,13 @@
                 </label>
             </div>
 
+
+            <div class="form-group">
+                <label style="display: flex; align-items: flex-start; font-weight: normal; cursor: pointer;">
+                    <input type="checkbox" id="reg-comunicaciones" style="width: auto; margin-right: 10px; margin-top: 3px; cursor: pointer;">
+                    <span style="font-size: 0.85em; color: var(--text);">Acepto recibir comunicaciones sobre novedades y pruebas de MyBikeGestor <span style="color: var(--text-light);">(opcional)</span></span>
+                </label>
+            </div>
             <button class="btn btn-primary" onclick="registrarUsuario()">Crear cuenta</button>
             <button class="btn btn-link mt-20" onclick="navegar('sec-login')">Ya tengo cuenta</button>
         </section>
@@ -841,6 +848,7 @@
                     <li>Gestionar tu cuenta de usuario</li>
                     <li>Permitirte acceder y utilizar las funcionalidades de la aplicación</li>
                     <li>Guardar y sincronizar tus datos entre dispositivos</li>
+                    <li>Enviarte comunicaciones relacionadas con el servicio, como invitaciones a pruebas o novedades de la aplicación, siempre que hayas aceptado recibirlas</li>
                 </ul>
 
                 <h3 style="color: var(--dark); margin: 20px 0 10px 0; font-size: 1.1em;">4. Base legal</h3>
@@ -3648,6 +3656,7 @@
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
             const aceptaTerminos = document.getElementById('reg-terminos').checked;
+            const aceptaComunicaciones = document.getElementById('reg-comunicaciones').checked;
 
             if (!email || !password) {
                 mostrarNotificacion('Email y contraseña son obligatorios', 'error');
@@ -3676,7 +3685,9 @@
                     garaje: [],
                     fechaRegistro: new Date().toISOString(),
                     aceptoTerminos: true,
-                    fechaAceptacionTerminos: new Date().toISOString()
+                    fechaAceptacionTerminos: new Date().toISOString(),
+                    aceptoComunicaciones: aceptaComunicaciones,
+                    fechaAceptacionComunicaciones: aceptaComunicaciones ? new Date().toISOString() : ""
                 };
                 
                 await db.collection('usuarios').doc(user.uid).set(datosUsuario);
