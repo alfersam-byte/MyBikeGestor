@@ -762,7 +762,7 @@
         ======================================== -->
         <section id="sec-terminos" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="history.back()">←</button>
+                <button class="btn-back" onclick="navegar(seccionAnterior)">←</button>
                 <div class="topbar-title">Términos y Condiciones</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -806,7 +806,7 @@
                     Los cambios entrarán en vigor inmediatamente después de su publicación.
                 </p>
 
-                <button class="btn btn-primary mt-20" onclick="history.back()">Cerrar</button>
+                <button class="btn btn-primary mt-20" onclick="navegar(seccionAnterior)">Cerrar</button>
             </div>
         </section>
 
@@ -815,7 +815,7 @@
         ======================================== -->
         <section id="sec-privacidad" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="history.back()">←</button>
+                <button class="btn-back" onclick="navegar(seccionAnterior)">←</button>
                 <div class="topbar-title">Política de Privacidad</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -904,7 +904,7 @@
                     cambio significativo.
                 </p>
 
-                <button class="btn btn-primary mt-20" onclick="history.back()">Cerrar</button>
+                <button class="btn btn-primary mt-20" onclick="navegar(seccionAnterior)">Cerrar</button>
             </div>
         </section>
 
@@ -3357,7 +3357,13 @@
         // ========================================
         // SISTEMA DE NAVEGACIÓN
         // ========================================
+        let seccionAnterior = 'sec-login';
+
         function navegar(seccionId) {
+            // Guardar sección anterior
+            const secActiva = document.querySelector('.seccion.activa');
+            if (secActiva) seccionAnterior = secActiva.id;
+
             // Ocultar todas las secciones
             document.querySelectorAll('.seccion').forEach(sec => {
                 sec.classList.remove('activa');
