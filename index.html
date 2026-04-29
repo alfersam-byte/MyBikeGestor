@@ -5866,8 +5866,7 @@
 
             if (tipo === 'Pedales') {
                 const chkMedidor = document.getElementById('comp-con-medidor-potencia');
-                const teniaMedidor = modoEdicion && componenteActual.conMedidorPotencia;
-                comp.conMedidorPotencia = chkMedidor ? chkMedidor.checked : false;
+                if (chkMedidor && componenteActual) componenteActual.conMedidorPotencia = chkMedidor.checked;
             }
 
             if (tipo === 'Bielas') {
@@ -5993,6 +5992,11 @@
                 if (teniaMedidor && !comp.conMedidorPotencia) {
                     // se limpiará al restaurar subpiezas abajo
                 }
+            }
+
+            if (tipo === 'Pedales') {
+                const chkMedidor = document.getElementById('comp-con-medidor-potencia');
+                comp.conMedidorPotencia = chkMedidor ? chkMedidor.checked : false;
             }
             
             if (SUBPIEZAS[tipo]) comp.subpiezas = {};
@@ -6921,23 +6925,6 @@
                         <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Alimentación</div>
                         
                         <div class="form-group">
-                            <label>Marca de la pila</label>
-                            <select id="subpieza-medidor-marca-pila" onchange="document.getElementById('medidor-marca-otra-pila').style.display=this.value==='Otra'?'block':'none'" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
-                                <option value="">-- Selecciona --</option>
-                                <option value="Duracell" ${sub?.pila?.marca === 'Duracell' ? 'selected' : ''}>Duracell</option>
-                                <option value="Energizer" ${sub?.pila?.marca === 'Energizer' ? 'selected' : ''}>Energizer</option>
-                                <option value="Varta" ${sub?.pila?.marca === 'Varta' ? 'selected' : ''}>Varta</option>
-                                <option value="Panasonic" ${sub?.pila?.marca === 'Panasonic' ? 'selected' : ''}>Panasonic</option>
-                                <option value="GP" ${sub?.pila?.marca === 'GP' ? 'selected' : ''}>GP</option>
-                                <option value="Sony" ${sub?.pila?.marca === 'Sony' ? 'selected' : ''}>Sony</option>
-                                <option value="Kodak" ${sub?.pila?.marca === 'Kodak' ? 'selected' : ''}>Kodak</option>
-                                <option value="Otra" ${sub?.pila?.marca === 'Otra' ? 'selected' : ''}>Otra</option>
-                            </select>
-                            <div id="medidor-marca-otra-pila" style="display:${sub?.pila?.marca === 'Otra' ? 'block' : 'none'}; margin-top:8px;">
-                                <input type="text" id="subpieza-medidor-marca-pila-otra" placeholder="Escribe la marca" value="${sub?.pila?.marcaOtra || ''}">
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label>Tipo de alimentación</label>
                             <select id="subpieza-pedal-alimentacion" onchange="togglePedalPila(this.value)" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
                                 <option value="">-- Selecciona --</option>
@@ -6946,6 +6933,23 @@
                             </select>
                         </div>
                         <div id="pedal-pila-campos" style="display:${sub?.pila?.alimentacion === 'Pila' ? 'block' : 'none'};">
+                            <div class="form-group">
+                                <label>Marca de la pila</label>
+                                <select id="subpieza-medidor-marca-pila" onchange="document.getElementById('medidor-marca-otra-pila').style.display=this.value==='Otra'?'block':'none'" style="width:100%; padding:12px 15px; border:2px solid var(--light-gray); border-radius:12px; font-size:1em; outline:none; font-family:inherit;">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="Duracell" ${sub?.pila?.marca === 'Duracell' ? 'selected' : ''}>Duracell</option>
+                                    <option value="Energizer" ${sub?.pila?.marca === 'Energizer' ? 'selected' : ''}>Energizer</option>
+                                    <option value="Varta" ${sub?.pila?.marca === 'Varta' ? 'selected' : ''}>Varta</option>
+                                    <option value="Panasonic" ${sub?.pila?.marca === 'Panasonic' ? 'selected' : ''}>Panasonic</option>
+                                    <option value="GP" ${sub?.pila?.marca === 'GP' ? 'selected' : ''}>GP</option>
+                                    <option value="Sony" ${sub?.pila?.marca === 'Sony' ? 'selected' : ''}>Sony</option>
+                                    <option value="Kodak" ${sub?.pila?.marca === 'Kodak' ? 'selected' : ''}>Kodak</option>
+                                    <option value="Otra" ${sub?.pila?.marca === 'Otra' ? 'selected' : ''}>Otra</option>
+                                </select>
+                                <div id="medidor-marca-otra-pila" style="display:${sub?.pila?.marca === 'Otra' ? 'block' : 'none'}; margin-top:8px;">
+                                    <input type="text" id="subpieza-medidor-marca-pila-otra" placeholder="Escribe la marca" value="${sub?.pila?.marcaOtra || ''}">
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label>Tipo de pila</label>
                                 ${htmlSelectorPila(['AAA','AA'], sub?.pila?.tipo, sub?.pila?.tipoOtra)}
