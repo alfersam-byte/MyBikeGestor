@@ -5780,6 +5780,19 @@
                         ? `${sub.marca || ''} ${sub.tipoPila || ''} · ${kmUso} km`.trim()
                         : `${sub.marca} ${sub.modelo} - ${kmUso} km`;
                     const extraInfoFinal = tipo === 'Pila' ? '' : extraInfo;
+
+                    // Botón pila/recarga para medidores
+                    let btnPila = '';
+                    if (tipo === 'Medidor de Potencia' && sub.pila?.tipo) {
+                        btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')">🔋</button>`;
+                    } else if (tipo === 'Medidor de Potencia Pedales') {
+                        if (sub.pila?.alimentacion === 'Pila' && sub.pila?.tipo) {
+                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')">🔋</button>`;
+                        } else if (sub.pila?.alimentacion === 'Recargable') {
+                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#4caf50;color:white;border-radius:8px;" onclick="registrarRecargaMedidor('${tipo}')">⚡</button>`;
+                        }
+                    }
+
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
@@ -5787,7 +5800,8 @@
                                 <div style="font-size:0.85em;color:var(--text);">${subtituloCard}</div>
                                 ${extraInfoFinal}
                             </div>
-                            <div style="display:flex;gap:10px;">
+                            <div style="display:flex;gap:6px;">
+                                ${btnPila}
                                 <button class="btn btn-secondary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">✏️</button>
                                 <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="sustituirSubpieza('${tipo}')">🔄</button>
                             </div>
@@ -6656,6 +6670,201 @@
         const MATERIALES = ['Acero','Aluminio','Carbono','Caucho','Cromo','Goma','Latón','Plástico','TPU','Titanio','Varios','Otro'];
         const MARCAS_SUBPIEZA_GENERICAS = MARCAS;
 
+        function cambiarPilaMedidor(tipo) {
+            if (!componenteActual || !biciActual) return;
+            const sub = componenteActual.subpiezas?.[tipo];
+            if (!sub) return;
+
+            const modalId = 'modal-cambiar-pila-medidor';
+            const existente = document.getElementById(modalId);
+            if (existente) existente.remove();
+
+            const pilaVieja = sub.pila || {};
+            const fecha = new Date().toISOString().split('T')[0];
+            const km = biciActual.kmTotales || 0;
+
+            const modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'modal activo';
+            modal.innerHTML = `
+                <div class="modal-contenido" style="max-width:400px;">
+                    <h3 style="margin-bottom:16px;">🔋 Cambiar Pila</h3>
+                    <p style="font-size:0.85em;color:var(--text);margin-bottom:16px;">
+                        Pila actual: <strong>${pilaVieja.marca || '-'} ${pilaVieja.tipo || '-'}</strong> · 
+                        ${Math.max(0, km - (pilaVieja.km || 0))} km desde último cambio
+                    </p>
+                    <div class="form-group">
+                        <label>Marca nueva pila</label>
+                        <select id="pila-nueva-marca" style="width:100%;padding:12px;border:2px solid var(--light-gray);border-radius:12px;font-size:1em;">
+                            <option value="">-- Selecciona --</option>
+                            ${['Duracell','Energizer','Varta','Panasonic','GP','Sony','Kodak'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                            <option value="Otra">Otra</option>
+                        </select>
+                        <div id="pila-nueva-marca-otra" style="display:none;margin-top:8px;">
+                            <input type="text" id="pila-nueva-marca-otra-input" placeholder="Escribe la marca">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo nueva pila</label>
+                        <select id="pila-nueva-tipo" style="width:100%;padding:12px;border:2px solid var(--light-gray);border-radius:12px;font-size:1em;">
+                            <option value="">-- Selecciona --</option>
+                            ${(tipo === 'Medidor de Potencia' ? ['CR2032','CR2025','CR2016','AAA','AA'] : ['AAA','AA']).map(t => `<option value="${t}">${t}</option>`).join('')}
+                            <option value="Otra">Otra</option>
+                        </select>
+                        <div id="pila-nueva-tipo-otra" style="display:none;margin-top:8px;">
+                            <input type="text" id="pila-nueva-tipo-otra-input" placeholder="Escribe el tipo">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Coste (€)</label>
+                        <input type="number" id="pila-nueva-coste" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha cambio</label>
+                        <input type="date" id="pila-nueva-fecha" value="${fecha}">
+                    </div>
+                    <div class="form-group">
+                        <label>Km al cambiar</label>
+                        <input type="number" id="pila-nueva-km" value="${km}" min="0">
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('${modalId}').remove()">Cancelar</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="guardarCambioPilaMedidor('${tipo}')">Guardar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Listeners para "Otra"
+            document.getElementById('pila-nueva-marca').addEventListener('change', e => {
+                document.getElementById('pila-nueva-marca-otra').style.display = e.target.value === 'Otra' ? 'block' : 'none';
+            });
+            document.getElementById('pila-nueva-tipo').addEventListener('change', e => {
+                document.getElementById('pila-nueva-tipo-otra').style.display = e.target.value === 'Otra' ? 'block' : 'none';
+            });
+        }
+
+        async function guardarCambioPilaMedidor(tipo) {
+            if (!componenteActual || !biciActual) return;
+            const sub = componenteActual.subpiezas?.[tipo];
+            if (!sub) return;
+
+            const marcaSel = document.getElementById('pila-nueva-marca').value;
+            const marca = marcaSel === 'Otra' ? (document.getElementById('pila-nueva-marca-otra-input').value.trim() || 'Otra') : marcaSel;
+            const tipoSel = document.getElementById('pila-nueva-tipo').value;
+            const tipoPila = tipoSel === 'Otra' ? (document.getElementById('pila-nueva-tipo-otra-input').value.trim() || 'Otra') : tipoSel;
+            const coste = parseFloat(document.getElementById('pila-nueva-coste').value) || 0;
+            const fecha = document.getElementById('pila-nueva-fecha').value;
+            const km = parseFloat(document.getElementById('pila-nueva-km').value) || 0;
+
+            const pilaVieja = sub.pila || {};
+            const kmDuracion = Math.max(0, km - (pilaVieja.km || 0));
+            const diasDuracion = pilaVieja.fecha ? Math.floor((new Date(fecha) - new Date(pilaVieja.fecha)) / 86400000) : 0;
+
+            // Registrar en historial
+            if (!biciActual.historial) biciActual.historial = [];
+            biciActual.historial.unshift({
+                id: Date.now().toString(),
+                fecha,
+                tipo: 'Cambio de pila',
+                componente: `${componenteActual.tipo} - ${tipo}`,
+                descripcion: `${pilaVieja.marca || '-'} ${pilaVieja.tipo || '-'} → ${marca} ${tipoPila}`,
+                km,
+                coste,
+                duracionKm: kmDuracion,
+                duracionDias: diasDuracion,
+                fechaCreacion: new Date().toISOString()
+            });
+
+            // Actualizar pila en subpieza
+            if (tipo === 'Medidor de Potencia') {
+                sub.pila = { ...sub.pila, marca, tipo: tipoPila, km, fecha };
+            } else if (tipo === 'Medidor de Potencia Pedales') {
+                sub.pila = { ...sub.pila, marca, tipo: tipoPila, km, fecha };
+            }
+
+            if (coste > 0) biciActual.inversion = (parseFloat(biciActual.inversion || 0) + coste).toFixed(2);
+
+            await guardarDatosUsuario();
+            document.getElementById('modal-cambiar-pila-medidor').remove();
+            abrirDetalleComponente(componenteActual);
+            mostrarNotificacion('🔋 Pila cambiada correctamente', 'exito');
+        }
+
+        function registrarRecargaMedidor(tipo) {
+            if (!componenteActual || !biciActual) return;
+            const sub = componenteActual.subpiezas?.[tipo];
+            if (!sub) return;
+
+            const modalId = 'modal-registrar-recarga';
+            const existente = document.getElementById(modalId);
+            if (existente) existente.remove();
+
+            const fecha = new Date().toISOString().split('T')[0];
+            const km = biciActual.kmTotales || 0;
+            const kmDesdeUltima = Math.max(0, km - (sub.pila?.km || 0));
+
+            const modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'modal activo';
+            modal.innerHTML = `
+                <div class="modal-contenido" style="max-width:400px;">
+                    <h3 style="margin-bottom:16px;">⚡ Registrar Carga</h3>
+                    <p style="font-size:0.85em;color:var(--text);margin-bottom:16px;">
+                        Última carga: <strong>${sub.pila?.fecha || '-'}</strong> · ${kmDesdeUltima} km desde entonces
+                    </p>
+                    <div class="form-group">
+                        <label>Fecha de carga</label>
+                        <input type="date" id="recarga-fecha" value="${fecha}">
+                    </div>
+                    <div class="form-group">
+                        <label>Km al cargar</label>
+                        <input type="number" id="recarga-km" value="${km}" min="0">
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('${modalId}').remove()">Cancelar</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="guardarRecargaMedidor('${tipo}')">Guardar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function guardarRecargaMedidor(tipo) {
+            if (!componenteActual || !biciActual) return;
+            const sub = componenteActual.subpiezas?.[tipo];
+            if (!sub) return;
+
+            const fecha = document.getElementById('recarga-fecha').value;
+            const km = parseFloat(document.getElementById('recarga-km').value) || 0;
+
+            const kmDesdeUltima = Math.max(0, km - (sub.pila?.km || 0));
+            const diasDesdeUltima = sub.pila?.fecha ? Math.floor((new Date(fecha) - new Date(sub.pila.fecha)) / 86400000) : 0;
+
+            // Registrar en historial
+            if (!biciActual.historial) biciActual.historial = [];
+            biciActual.historial.unshift({
+                id: Date.now().toString(),
+                fecha,
+                tipo: 'Recarga',
+                componente: `${componenteActual.tipo} - ${tipo}`,
+                descripcion: 'Recarga USB',
+                km,
+                coste: 0,
+                duracionKm: kmDesdeUltima,
+                duracionDias: diasDesdeUltima,
+                fechaCreacion: new Date().toISOString()
+            });
+
+            // Actualizar fecha y km de última carga
+            sub.pila = { ...sub.pila, km, fecha };
+
+            await guardarDatosUsuario();
+            document.getElementById('modal-registrar-recarga').remove();
+            abrirDetalleComponente(componenteActual);
+            mostrarNotificacion('⚡ Recarga registrada correctamente', 'exito');
+        }
+
         function editarSubpieza(tipo) {
             if (!componenteActual) return;
 
@@ -7172,7 +7381,7 @@
                 card.style.borderLeft = `4px solid ${colorTipo}`;
                 
                 let detalleExtra = '';
-                if (reg.tipo === 'Sustitución' && reg.duracionKm !== undefined) {
+                if (['Sustitución', 'Cambio de pila', 'Recarga'].includes(reg.tipo) && reg.duracionKm !== undefined) {
                     const duracionFormateada = formatearDuracion(reg.duracionDias || 0);
                     detalleExtra = `<div class="text-muted">Duró: <strong>${reg.duracionKm} km</strong> (${duracionFormateada})</div>`;
                 } else {
