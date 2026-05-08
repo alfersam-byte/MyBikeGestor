@@ -16,6 +16,7 @@
     <link rel="manifest" href="./manifest.json">
     
     <!-- Firebase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -66,6 +67,7 @@
             max-width: 420px;
             background: var(--white);
             min-height: 600px;
+            max-height: 90vh;
             box-shadow: 0 20px 60px var(--shadow);
             border-radius: 30px;
             overflow: hidden;
@@ -81,6 +83,9 @@
             flex-direction: column;
             padding: 30px;
             flex-grow: 1;
+            min-height: 0;
+            width: 100%;
+            overflow-y: auto;
             animation: fadeIn 0.3s ease;
         }
 
@@ -493,10 +498,13 @@
                 border-radius: 0;
                 max-width: 100%;
                 min-height: 100vh;
+                max-height: none;
             }
 
             body {
                 padding: 0;
+                align-items: flex-start;
+                justify-content: flex-start;
             }
         }
 
@@ -914,7 +922,10 @@
         <section id="sec-dashboard" class="seccion">
             <div class="topbar">
                 <div class="topbar-title">MyBikeGestor</div>
-                <button class="btn-back" onclick="cerrarSesion()">🚪</button>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn-back" onclick="abrirAyuda()" style="font-size:1.1em;">❓</button>
+                    <button class="btn-back" onclick="cerrarSesion()">🚪</button>
+                </div>
             </div>
 
             <!-- Perfil de usuario -->
@@ -1168,6 +1179,10 @@
                     <div style="display:flex; gap:8px; margin-bottom:8px;">
                         <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalCiclocomputador()">✏️ Editar</button>
                         <button class="btn btn-primary" style="flex:1;" onclick="abrirModalSustituirCiclocomputador()">🔄 Sustituir</button>
+                        <button class="btn btn-secondary" style="flex:1;" onclick="repararCiclocomputador()">🔧 Reparar</button>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="verHistorialCiclocomputador()">📋 Historial</button>
                     </div>
                     <button class="btn btn-danger" style="width:100%;" onclick="eliminarCiclocomputador()">🗑️ Eliminar</button>
                 </div>
@@ -1726,6 +1741,196 @@
             <button class="btn btn-primary mt-20" onclick="abrirModalNuevoMantenimiento()">➕ Registrar Mantenimiento</button>
         </section>
 
+        <section id="sec-ayuda" class="seccion" style="padding:0 0 20px 0;">
+            <div class="topbar">
+                <button class="btn-back" onclick="navegar(seccionAnterior)">←</button>
+                <div class="topbar-title">Ayuda y Tutorial</div>
+            </div>
+
+            <!-- TABS -->
+            <div style="display:flex;border-bottom:2px solid var(--light-gray);background:var(--white);margin-bottom:20px;">
+                <button id="tab-btn-instalar" onclick="cambiarTabAyuda('instalar')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:700;color:var(--primary);border-bottom:3px solid var(--primary);cursor:pointer;">📲 Instalar</button>
+                <button id="tab-btn-inicio" onclick="cambiarTabAyuda('inicio')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">🚴 Primeros pasos</button>
+                <button id="tab-btn-funciones" onclick="cambiarTabAyuda('funciones')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">ℹ️ Funciones</button>
+                <button id="tab-btn-contacto" onclick="cambiarTabAyuda('contacto')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">✉️ Contacto</button>
+            </div>
+
+            <div style="padding:0 20px;">
+
+                <!-- TAB INSTALAR -->
+                <div id="tab-instalar">
+                    <p style="color:var(--text);font-size:0.9em;margin-bottom:16px;">MyBikeGestor es una aplicación web (PWA). Para acceder fácilmente en el futuro, instálala en tu dispositivo siguiendo estos pasos:</p>
+
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">🤖 Android (Chrome)</div>
+                        <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
+                            <li>Abre la app en <strong>Google Chrome</strong></li>
+                            <li>Pulsa el menú <strong>⋮</strong> (tres puntos, arriba a la derecha)</li>
+                            <li>Selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
+                            <li>Pulsa <strong>"Añadir"</strong> en el diálogo que aparece</li>
+                        </ol>
+                    </div>
+
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">🍎 iPhone / iPad (Safari)</div>
+                        <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
+                            <li>Abre la app en <strong>Safari</strong> (obligatorio, no Chrome)</li>
+                            <li>Pulsa el botón <strong>Compartir</strong> (cuadrado con flecha ↑)</li>
+                            <li>Desplázate y selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
+                            <li>Pulsa <strong>"Añadir"</strong> arriba a la derecha</li>
+                        </ol>
+                    </div>
+
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">🖥️ PC / Mac (Chrome)</div>
+                        <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
+                            <li>Abre la app en <strong>Google Chrome</strong></li>
+                            <li>Busca el icono de <strong>instalar</strong> (⊕) en la barra de direcciones</li>
+                            <li>Haz clic en él y selecciona <strong>"Instalar"</strong></li>
+                            <li>La app se abrirá como una ventana independiente</li>
+                        </ol>
+                        <div style="margin-top:10px;padding:8px 10px;background:var(--white);border-radius:8px;border-left:3px solid var(--primary);">
+                            <div style="font-size:0.82em;font-weight:700;color:var(--primary);margin-bottom:2px;">Alternativa rápida</div>
+                            <div style="font-size:0.82em;color:var(--text);">Selecciona la <strong>★ estrella</strong> en la barra de direcciones para añadirla directamente a tu barra de favoritos.</div>
+                        </div>
+                    </div>
+
+                    <div style="background:#fff8e1;border-radius:12px;padding:12px;border-left:4px solid #f0a500;">
+                        <div style="font-size:0.85em;color:var(--text);">💡 <strong>Disponible en Google Play Store</strong> en versión de prueba. Contacta con nosotros a través de la pestaña <strong>Contacto</strong> para que te facilitemos el acceso.</div>
+                    </div>
+                </div>
+
+                <!-- TAB PRIMEROS PASOS -->
+                <div id="tab-inicio" style="display:none;">
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">1️⃣ Crea tu cuenta</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Regístrate con tu email. Si ya tienes cuenta, simplemente inicia sesión.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">2️⃣ Añade tu bici</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Ve a <strong>Mi Garaje → Nueva Bici</strong> e introduce los datos de tu bicicleta: marca, modelo, disciplina y km actuales. Puedes añadir todas las que quieras.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">3️⃣ Registra tus componentes</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Desde el taller de tu bici, entra en <strong>Componentes</strong> y añade cada pieza con su fecha de instalación y km.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:8px;">4️⃣ Actualiza tus km</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Tras cada salida, actualiza los km de cada bici desde el taller o vincula la app con <strong>Strava</strong> para sincronizarlos automáticamente.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;">
+                        <div style="font-weight:700;margin-bottom:8px;">5️⃣ Gestiona tu perfil</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">En <strong>Mi Perfil</strong> puedes registrar tu ciclocomputador GPS, configurar datos de entrenamiento y gestionar tu cuenta.</p>
+                    </div>
+                </div>
+
+                <!-- TAB FUNCIONES -->
+                <div id="tab-funciones" style="display:none;">
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:6px;">🏠 Mi Garaje</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Añade todas tus bicis sin límite y organiza tu flota completa. Accede a cada una con un toque.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:6px;">🔧 Componentes</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Realiza un despiece completo de tu bici por secciones. Edita, sustituye o repara cada pieza como quieras. La app calcula automáticamente los km acumulados y te avisa cuando necesitan mantenimiento según el historial de tus sustituciones.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:6px;">📦 Cajón de piezas</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Almacena piezas de repuesto o retiradas para usar o reutilizar en futuras sustituciones.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:6px;">📋 Historial</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Consulta el registro completo de sustituciones, reparaciones y mantenimientos de cada bici.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;margin-bottom:6px;">🚨 Alertas</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Recibe avisos cuando un componente se acerca al límite de km recomendado. Personaliza el umbral de cada alerta y pospónlas si no es el momento de actuar.</p>
+                    </div>
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;">
+                        <div style="font-weight:700;margin-bottom:6px;">🟠 Strava</div>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Vincula tu cuenta de Strava para sincronizar los km automáticamente tras cada actividad.</p>
+                    </div>
+                </div>
+
+                <!-- TAB CONTACTO -->
+                <div id="tab-contacto" style="display:none;">
+
+                    <p style="color:var(--text);font-size:0.9em;margin-bottom:16px;">¿En qué podemos ayudarte? Escríbenos según el motivo y te respondemos lo antes posible.</p>
+
+                    <!-- Acceso beta -->
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="font-weight:700;">🚀 Versión de prueba</div>
+                            <button onclick="toggleContacto('beta')" id="btn-contacto-beta" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                        </div>
+                        <div id="detalle-contacto-beta" style="display:none;margin-top:12px;">
+                            <p style="margin:0 0 10px 0;color:var(--text);font-size:0.85em;line-height:1.6;">Accede a MyBikeGestor de forma anticipada a través de <strong>Google Play Store</strong> en fase de prueba cerrada. La versión puede contener fallos menores — tu opinión nos ayuda a mejorarla antes del lanzamiento oficial.</p>
+                            <div style="background:var(--white);border-radius:8px;padding:10px;margin-bottom:10px;">
+                                <div style="font-weight:700;font-size:0.82em;color:var(--dark);margin-bottom:6px;">📋 Requisitos</div>
+                                <ul style="margin:0;padding-left:16px;color:var(--text);font-size:0.82em;line-height:1.8;">
+                                    <li>Dispositivo <strong>Android</strong></li>
+                                    <li>Cuenta de <strong>Gmail</strong> (necesaria para añadirte a la lista)</li>
+                                </ul>
+                            </div>
+                            <div style="background:var(--white);border-radius:8px;padding:10px;margin-bottom:10px;">
+                                <div style="font-weight:700;font-size:0.82em;color:var(--dark);margin-bottom:6px;">🤝 Te pedimos</div>
+                                <ul style="margin:0;padding-left:16px;color:var(--text);font-size:0.82em;line-height:1.8;">
+                                    <li>Acceder a la app durante los <strong>14 días</strong> que dura la prueba</li>
+                                    <li>Aceptar recibir comunicaciones sobre el estado y evolución de las pruebas</li>
+                                </ul>
+                            </div>
+                            <div style="background:#fff8e1;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f0a500;">
+                                <div style="font-size:0.8em;color:var(--text);line-height:1.5;">🔒 <strong>Consentimiento:</strong> Al solicitar el acceso autorizas a MyBikeGestor a usar tu dirección de Gmail para añadirte a la lista de testers de Google Play y enviarte información relacionada con las pruebas.</div>
+                            </div>
+                            <button onclick="abrirFormContacto('beta')" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Solicitar acceso</button>
+                        </div>
+                    </div>
+
+                    <!-- Dudas -->
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="font-weight:700;">❓ Dudas o preguntas</div>
+                            <button onclick="toggleContacto('dudas')" id="btn-contacto-dudas" style="background:var(--secondary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                        </div>
+                        <div id="detalle-contacto-dudas" style="display:none;margin-top:12px;">
+                            <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Algo no queda claro sobre cómo funciona la app? Cuéntanoslo con el mayor detalle posible y te respondemos lo antes posible.</p>
+                            <button onclick="abrirFormContacto('dudas')" style="width:100%;padding:10px;background:var(--secondary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar pregunta</button>
+                        </div>
+                    </div>
+
+                    <!-- Error -->
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="font-weight:700;">🐛 Reportar un error</div>
+                            <button onclick="toggleContacto('error')" id="btn-contacto-error" style="background:var(--danger);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                        </div>
+                        <div id="detalle-contacto-error" style="display:none;margin-top:12px;">
+                            <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Algo no funciona como debería? Descríbenos qué ocurrió, en qué pantalla y qué pasos seguiste. Nos ayuda muchísimo para mejorar la app.</p>
+                            <button onclick="abrirFormContacto('error')" style="width:100%;padding:10px;background:var(--danger);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Reportar error</button>
+                        </div>
+                    </div>
+
+                    <!-- Sugerencia -->
+                    <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="font-weight:700;">💡 Sugerencias</div>
+                            <button onclick="toggleContacto('sugerencia')" id="btn-contacto-sugerencia" style="background:var(--warning);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                        </div>
+                        <div id="detalle-contacto-sugerencia" style="display:none;margin-top:12px;">
+                            <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Se te ocurre algo que podríamos mejorar o añadir? Nos encanta recibir ideas de los usuarios — muchas de las funciones actuales nacieron así.</p>
+                            <button onclick="abrirFormContacto('sugerencia')" style="width:100%;padding:10px;background:var(--warning);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar sugerencia</button>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;padding:12px 0 4px 0;color:var(--text-light);font-size:0.8em;">
+                        mybikegestor@gmail.com
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
     <!-- ========================================
@@ -1926,7 +2131,7 @@
                 <input type="date" id="reparar-fecha">
             </div>
             <div class="form-group">
-                <label>Km actuales de la bici</label>
+                <label id="reparar-km-label">Km actuales de la bici</label>
                 <input type="number" id="reparar-km" placeholder="0" step="1">
             </div>
             <div class="form-group">
@@ -2958,6 +3163,30 @@
                 <button class="btn btn-danger" id="btn-confirmar-accion">Confirmar</button>
             </div>
         </div>
+
+
+
+    </div>
+
+        <!-- SECCIÓN AYUDA Y TUTORIAL -->
+    </div>
+
+
+    <!-- ========================================
+         MODAL: CONTACTO
+    ======================================== -->
+    <div id="modal-contacto" class="modal" style="display:none;">
+        <div class="modal-contenido" style="max-width:400px;">
+            <div class="modal-header" style="display:flex;align-items:center;gap:10px;">
+                <button onclick="cerrarFormContacto()" style="background:none;border:none;font-size:1.4em;cursor:pointer;padding:0;line-height:1;">←</button>
+                <h2 class="modal-title" style="margin:0;font-size:1em;" id="modal-contacto-titulo"></h2>
+            </div>
+            <div style="padding:4px 0 12px 0;">
+                <div style="font-size:0.82em;color:var(--text-light);margin-bottom:16px;">✉️ Se enviará desde: <strong id="modal-contacto-email"></strong></div>
+                <div id="modal-contacto-campos"></div>
+                <button id="btn-enviar-contacto" onclick="enviarContacto()" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.95em;cursor:pointer;margin-top:8px;">Enviar</button>
+            </div>
+        </div>
     </div>
 
     <!-- ========================================
@@ -2979,6 +3208,9 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Inicializar EmailJS
+        emailjs.init('t_9OhcFBgAFmuv8E2');
         const auth = firebase.auth();
         const storage = firebase.storage();
 
@@ -3435,6 +3667,13 @@
         function cargarDashboard() {
             if (!usuarioActual || !datosUsuario) return;
 
+            // Mostrar ayuda la primera vez
+            if (!datosUsuario.ayudaVista) {
+                setTimeout(() => abrirAyuda(), 800);
+                datosUsuario.ayudaVista = true;
+                guardarDatosUsuario();
+            }
+
             // Datos del usuario - mostrar nombre completo si existe
             const nombreCompleto = datosUsuario.nombre && datosUsuario.apellidos 
                 ? `${datosUsuario.nombre} ${datosUsuario.apellidos}` 
@@ -3731,6 +3970,106 @@
                     mostrarNotificacion('Error al registrar: ' + error.message, 'error');
                 }
             }
+        }
+
+        function abrirAyuda() {
+            cambiarTabAyuda('instalar');
+            navegar('sec-ayuda');
+        }
+
+        function toggleContacto(motivo) {
+            const detalle = document.getElementById('detalle-contacto-' + motivo);
+            const btn = document.getElementById('btn-contacto-' + motivo);
+            const abierto = detalle.style.display === 'block';
+            detalle.style.display = abierto ? 'none' : 'block';
+            btn.textContent = abierto ? 'Ver más ▼' : 'Ver menos ▲';
+        }
+
+        function abrirFormContacto(motivo) {
+            const titulos = {
+                beta: '🚀 Solicitar acceso a la versión de prueba',
+                dudas: '❓ Enviar una pregunta',
+                error: '🐛 Reportar un error',
+                sugerencia: '💡 Enviar una sugerencia'
+            };
+            const campos = {
+                beta: `<p style="font-size:0.85em;color:var(--text-light);margin-bottom:12px;">Tu email de acceso se enviará automáticamente.</p>
+                       <div class="form-group"><label>Mensaje (opcional)</label><textarea id="contacto-mensaje" rows="3" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Cuéntanos algo más si quieres..."></textarea></div>
+                       <div style="background:#fff8e1;border-radius:8px;padding:10px;margin-bottom:4px;border-left:3px solid #f0a500;"><div style="font-size:0.78em;color:var(--text);line-height:1.5;">🔒 Al enviar autorizas a MyBikeGestor a usar tu Gmail para añadirte a la lista de testers y enviarte información sobre las pruebas.</div></div>`,
+                dudas: `<div class="form-group"><label>¿En qué podemos ayudarte?</label><textarea id="contacto-mensaje" rows="5" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Escribe tu pregunta aquí..."></textarea></div>`,
+                error: `<div class="form-group"><label>¿En qué pantalla ocurrió?</label><input type="text" id="contacto-pantalla" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;" placeholder="Ej: Componentes, Taller..."></div>
+                        <div class="form-group"><label>¿Qué ocurrió?</label><textarea id="contacto-mensaje" rows="4" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Describe el error con el mayor detalle posible..."></textarea></div>`,
+                sugerencia: `<div class="form-group"><label>Tu sugerencia</label><textarea id="contacto-mensaje" rows="5" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Cuéntanos tu idea..."></textarea></div>`
+            };
+
+            document.getElementById('modal-contacto-titulo').textContent = titulos[motivo];
+            document.getElementById('modal-contacto-campos').innerHTML = campos[motivo];
+            document.getElementById('modal-contacto-email').textContent = usuarioActual?.email || '';
+            document.getElementById('modal-contacto').style.display = 'flex';
+            document.getElementById('modal-contacto').dataset.motivo = motivo;
+        }
+
+        function cerrarFormContacto() {
+            document.getElementById('modal-contacto').style.display = 'none';
+        }
+
+        async function enviarContacto() {
+            const motivo = document.getElementById('modal-contacto').dataset.motivo;
+            const email = usuarioActual?.email || 'desconocido';
+            const mensajeEl = document.getElementById('contacto-mensaje');
+            const pantallaEl = document.getElementById('contacto-pantalla');
+
+            const mensaje = mensajeEl ? mensajeEl.value.trim() : '';
+            const pantalla = pantallaEl ? pantallaEl.value.trim() : '';
+
+            if (!mensaje && motivo !== 'beta') {
+                mostrarNotificacion('Por favor escribe un mensaje', 'warning');
+                return;
+            }
+
+            const asuntos = { beta: 'Solicitud de acceso', dudas: 'Pregunta', error: 'Error reportado', sugerencia: 'Sugerencia' };
+            const motivos = { beta: 'Beta', dudas: 'Pregunta', error: 'Error', sugerencia: 'Sugerencia' };
+
+            let mensajeFinal = mensaje;
+            if (motivo === 'error' && pantalla) mensajeFinal = `Pantalla: ${pantalla}\n\n${mensaje}`;
+            if (motivo === 'beta' && !mensaje) mensajeFinal = 'Solicitud de acceso a la versión de prueba.';
+
+            const btn = document.getElementById('btn-enviar-contacto');
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+
+            try {
+                await emailjs.send('mybikegestor', 'template_9ep1bxr', {
+                    motivo: motivos[motivo],
+                    asunto: asuntos[motivo],
+                    email: email,
+                    mensaje: mensajeFinal
+                });
+                cerrarFormContacto();
+                const confirmaciones = {
+                    beta: 'En breve recibirás en tu correo el enlace para unirte a la versión de prueba. ✓',
+                    dudas: 'Hemos recibido tu pregunta. Te responderemos lo antes posible. ✓',
+                    error: 'Gracias por reportarlo. Trabajaremos para solucionarlo cuanto antes. ✓',
+                    sugerencia: 'Gracias por tu idea. La tendremos en cuenta para futuras versiones. ✓'
+                };
+                mostrarNotificacion(confirmaciones[motivo] || 'Mensaje enviado correctamente ✓', 'success');
+            } catch (err) {
+                console.error('EmailJS error:', err);
+                mostrarNotificacion('Error al enviar. Inténtalo de nuevo.', 'error');
+            } finally {
+                btn.textContent = 'Enviar';
+                btn.disabled = false;
+            }
+        }
+
+        function cambiarTabAyuda(tab) {
+            ['instalar', 'inicio', 'funciones', 'contacto'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+                const btn = document.getElementById(`tab-btn-${t}`);
+                btn.style.color = t === tab ? 'var(--primary)' : 'var(--text-light)';
+                btn.style.borderBottom = t === tab ? '3px solid var(--primary)' : '3px solid transparent';
+                btn.style.fontWeight = t === tab ? '700' : '600';
+            });
         }
 
         async function cerrarSesion() {
@@ -6088,16 +6427,75 @@
         }
         
         // Reparar
+        function verHistorialCiclocomputador() {
+            const ciclo = datosUsuario?.ciclocomputador;
+            if (!ciclo) return;
+
+            const historial = ciclo.historial || [];
+            const modalId = 'modal-historial-ciclocomputador';
+            const existente = document.getElementById(modalId);
+            if (existente) existente.remove();
+
+            const entradasHTML = historial.length === 0
+                ? '<p style="color:var(--text);text-align:center;padding:20px;">Sin registros aún</p>'
+                : historial.map(reg => {
+                    const fecha = reg.fecha ? new Date(reg.fecha).toLocaleDateString('es-ES') : '-';
+                    const costeHTML = reg.coste > 0 ? `<span style="color:var(--warning);font-weight:700;">${reg.coste}€</span>` : '<span style="color:var(--text-light);">0€</span>';
+                    return `
+                        <div style="background:var(--white);border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid var(--primary);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="color:var(--primary);font-size:0.85em;font-weight:600;">${reg.tipo || 'Reparación'}</span>
+                                <span style="font-size:0.85em;color:var(--text-light);">${fecha}</span>
+                            </div>
+                            <div style="font-weight:700;margin-bottom:4px;">${reg.componente || 'Ciclocomputador GPS'}</div>
+                            <div style="font-size:0.85em;color:var(--text);margin-bottom:6px;">${reg.descripcion || '-'}</div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.85em;">
+                                <span style="color:var(--text-light);">KM: <strong>${reg.km || 0}</strong></span>
+                                <span>Coste: ${costeHTML}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            const modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'modal activo';
+            modal.innerHTML = `
+                <div class="modal-contenido" style="max-width:420px;max-height:80vh;overflow-y:auto;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                        <button onclick="document.getElementById('${modalId}').remove()" style="background:none;border:none;font-size:1.4em;cursor:pointer;padding:0;line-height:1;">←</button>
+                        <h2 style="margin:0;font-size:1.1em;">📋 Historial GPS</h2>
+                    </div>
+                    <p style="font-size:0.85em;color:var(--text-light);margin-bottom:12px;">${ciclo.marca || ''} ${ciclo.modelo || ''}</p>
+                    ${entradasHTML}
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function repararCiclocomputador() {
+            if (!datosUsuario?.ciclocomputador) return;
+            const ciclo = datosUsuario.ciclocomputador;
+            document.getElementById('reparar-componente-nombre').textContent = `${ciclo.marca || ''} ${ciclo.modelo || ''} (Ciclocomputador GPS)`;
+            document.getElementById('reparar-descripcion').value = '';
+            document.getElementById('reparar-lugar').value = 'Taller';
+            document.getElementById('reparar-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('reparar-km').value = calcularKmTotalesCiclo();
+            document.getElementById('reparar-coste').value = '';
+            document.getElementById('reparar-km-label').textContent = 'Km totales del GPS';
+            window._repararModoCiclocomputador = true;
+            abrirModal('modal-reparar');
+        }
+
         function repararComponenteActual() {
             if (!componenteActual) return;
-            
             document.getElementById('reparar-componente-nombre').textContent = componenteActual.tipo;
             document.getElementById('reparar-descripcion').value = '';
             document.getElementById('reparar-lugar').value = 'Taller';
             document.getElementById('reparar-fecha').value = new Date().toISOString().split('T')[0];
             document.getElementById('reparar-km').value = biciActual.kmTotales || 0;
             document.getElementById('reparar-coste').value = '';
-            
+            document.getElementById('reparar-km-label').textContent = 'Km actuales de la bici';
             abrirModal('modal-reparar');
         }
         
@@ -6110,10 +6508,25 @@
             const coste = parseFloat(document.getElementById('reparar-coste').value) || 0;
             
             if (!desc) return mostrarNotificacion('Añade descripción', 'error');
-            
-            if (!biciActual.historial) biciActual.historial = [];
 
-            if (window._repararModoPiezaRueda && window._repararPiezaRuedaId) {
+            if (window._repararModoCiclocomputador) {
+                const ciclo = datosUsuario.ciclocomputador;
+                if (!ciclo.historial) ciclo.historial = [];
+                ciclo.historial.unshift({
+                    id: Date.now().toString(),
+                    fecha, tipo: 'Reparación',
+                    componente: `${ciclo.marca || ''} ${ciclo.modelo || ''}`.trim() || 'Ciclocomputador GPS',
+                    descripcion: `${desc} (${lugar})`,
+                    km, coste,
+                    fechaCreacion: new Date().toISOString()
+                });
+                window._repararModoCiclocomputador = false;
+                await guardarDatosUsuario();
+                cerrarModal('modal-reparar');
+                mostrarNotificacion('Reparación registrada', 'exito');
+                return;
+            } else if (window._repararModoPiezaRueda && window._repararPiezaRuedaId) {
+                if (!biciActual.historial) biciActual.historial = [];
                 // Reparar pieza del despiece
                 const lado = window._ladoRuedaActual;
                 const rueda = juegosRuedasActual.ruedas[lado];
@@ -6130,6 +6543,7 @@
                 window._repararPiezaRuedaId = null;
             } else if (window._repararModoRueda && window._repararRuedaLado) {
                 // Reparar rueda completa
+                if (!biciActual.historial) biciActual.historial = [];
                 biciActual.historial.unshift({
                     id: Date.now().toString(),
                     fecha, tipo: 'Reparación',
@@ -6141,6 +6555,7 @@
                 window._repararModoRueda = false;
             } else {
                 // Reparar componente normal
+                if (!biciActual.historial) biciActual.historial = [];
                 biciActual.historial.unshift({
                     id: Date.now().toString(),
                     fecha, tipo: 'Reparación',
