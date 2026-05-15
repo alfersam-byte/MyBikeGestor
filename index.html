@@ -1728,7 +1728,7 @@
             <div class="topbar">
                 <button class="btn-back" onclick="volverATaller()">←</button>
                 <div class="topbar-title">Historial</div>
-                <div style="width: 40px;"></div>
+                <button onclick="abrirModalNuevoMantenimiento()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.82em;font-weight:700;cursor:pointer;">➕ Añadir</button>
             </div>
 
             <div id="lista-historial" class="mt-20">
@@ -2493,8 +2493,7 @@
             <div class="form-group">
                 <label>Tipo</label>
                 <select id="mant-tipo">
-                    <option value="Reparación">Reparación</option>
-                    <option value="Sustitución">Sustitución</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
                     <option value="Mejora">Mejora</option>
                 </select>
             </div>
@@ -2505,6 +2504,10 @@
             <div class="form-group">
                 <label>Descripción</label>
                 <textarea id="mant-descripcion" placeholder="¿Qué has hecho?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Dónde</label>
+                <input type="text" id="mant-donde" placeholder="Ej: Casa, Ciclos Pepe...">
             </div>
             <div class="form-group">
                 <label>Coste (€)</label>
@@ -3471,7 +3474,11 @@
 
         function formatearFecha(fechaISO) {
             if (!fechaISO) return '-';
+            // Si ya viene en formato dd/mm/yyyy lo devolvemos tal cual
+            if (fechaISO.includes('/')) return fechaISO;
+            // Si viene en formato ISO yyyy-mm-dd lo convertimos
             const partes = fechaISO.split('T')[0].split('-');
+            if (partes.length !== 3 || !partes[0] || !partes[1] || !partes[2]) return fechaISO;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
         
@@ -7806,7 +7813,8 @@
 
             historialOrdenado.forEach(reg => {
                 const colorTipo = reg.tipo === 'Sustitución' ? 'var(--danger)' : 
-                                 reg.tipo === 'Reparación' ? 'var(--primary)' : 'var(--secondary)';
+                                 reg.tipo === 'Reparación' ? 'var(--primary)' :
+                                 reg.tipo === 'Mantenimiento' ? '#2196F3' : 'var(--secondary)';
                 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -7832,6 +7840,7 @@
                     </div>
                     <div class="card-title" style="font-size: 1em;">${reg.componente || reg.pieza || '-'}</div>
                     <div class="card-subtitle">${reg.descripcion}</div>
+                    ${reg.donde ? `<div class="text-muted" style="font-size:0.82em;margin-top:2px;">📍 ${reg.donde}</div>` : ''}
                     <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items:center;">
                         ${detalleExtra}
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -7907,6 +7916,7 @@
         function abrirModalNuevoMantenimiento() {
             document.getElementById('mant-pieza').value = '';
             document.getElementById('mant-descripcion').value = '';
+            document.getElementById('mant-donde').value = '';
             document.getElementById('mant-coste').value = '';
             abrirModal('modal-mantenimiento');
         }
@@ -7922,11 +7932,13 @@
                 return;
             }
 
+            const donde = document.getElementById('mant-donde').value.trim();
             const nuevoRegistro = {
                 id: Date.now().toString(),
                 tipo: tipo,
                 pieza: pieza,
                 descripcion: descripcion,
+                donde: donde,
                 coste: coste,
                 kmActuales: biciActual.kmTotales,
                 fecha: new Date().toLocaleDateString('es-ES')
