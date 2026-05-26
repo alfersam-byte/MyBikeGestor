@@ -1743,7 +1743,7 @@
 
         <section id="sec-ayuda" class="seccion" style="padding:0 0 20px 0;">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar(seccionAnterior)">←</button>
+                <button class="btn-back" onclick="marcarAyudaVista(); navegar('sec-dashboard')">←</button>
                 <div class="topbar-title">Ayuda y Tutorial</div>
             </div>
 
@@ -3674,11 +3674,9 @@
         function cargarDashboard() {
             if (!usuarioActual || !datosUsuario) return;
 
-            // Mostrar ayuda la primera vez
-            if (!datosUsuario.ayudaVista) {
+            // Mostrar ayuda la primera vez — solo si ya hizo login (no durante registro)
+            if (!datosUsuario.ayudaVista && usuarioActual) {
                 setTimeout(() => abrirAyuda(), 800);
-                datosUsuario.ayudaVista = true;
-                guardarDatosUsuario();
             }
 
             // Datos del usuario - mostrar nombre completo si existe
@@ -3945,9 +3943,9 @@
                 // Crear usuario con Firebase Auth
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                
-                // Crear documento inicial en Firestore
-                datosUsuario = {
+
+                // Guardar datos en Firestore ANTES de cerrar sesión
+                const datosNuevosUsuario = {
                     id: user.uid,
                     email: email,
                     garaje: [],
@@ -3957,14 +3955,44 @@
                     aceptoComunicaciones: aceptaComunicaciones,
                     fechaAceptacionComunicaciones: aceptaComunicaciones ? new Date().toISOString() : ""
                 };
-                
-                await db.collection('usuarios').doc(user.uid).set(datosUsuario);
-                
-                mostrarNotificacion('¡Cuenta creada! Ya puedes iniciar sesión', 'exito');
-                
-                // Cerrar sesión automáticamente para que haga login
+                await db.collection('usuarios').doc(user.uid).set(datosNuevosUsuario);
+
+                // Cerrar sesión y navegar al login
                 await auth.signOut();
-                setTimeout(() => navegar('sec-login'), 1500);
+                navegar('sec-login');
+
+                // Enviar email de bienvenida si aceptó comunicaciones
+                if (aceptaComunicaciones) {
+                    try {
+                        await emailjs.send('mybikegestor', 'template_9ep1bxr', {
+                            motivo: 'Bienvenida',
+                            asunto: 'Bienvenido/a a MyBikeGestor',
+                            email: email,
+                            mensaje: `Hola,
+
+Le damos la bienvenida a MyBikeGestor, la aplicación de gestión de mantenimiento para bicicletas.
+
+MyBikeGestor es una aplicación web progresiva (PWA) accesible desde cualquier dispositivo a través del navegador, sin necesidad de instalación. Para un acceso más cómodo, puede añadirla a la pantalla de inicio de su dispositivo móvil o a la barra de favoritos de su navegador. Las instrucciones detalladas están disponibles en el tutorial de la aplicación.
+
+La aplicación le permite gestionar todas sus bicicletas, registrar cada componente con sus kilómetros actuales y llevar un historial completo de sustituciones. A partir de ese historial, la app calcula el rendimiento real de cada pieza y le avisa cuando se acerca al límite, ayudándole a tomar mejores decisiones sobre cuándo y en qué merece la pena invertir.
+
+Si dispone de un dispositivo Android y desea acceder a la versión de prueba disponible en Google Play, puede solicitarlo a través de la pestaña Contacto de la aplicación.
+
+Para cualquier consulta puede contactarnos en mybikegestor@gmail.com.
+
+Atentamente,
+Alejandro
+MyBikeGestor`
+                        });
+                    } catch (emailError) {
+                        console.error('Error al enviar email de bienvenida:', emailError);
+                    }
+                }
+
+                mostrarNotificacion('¡Cuenta creada! Ya puedes iniciar sesión', 'exito');
+                if (aceptaComunicaciones) {
+                    setTimeout(() => mostrarNotificacion('📧 Te hemos enviado un email de bienvenida. Si no lo encuentras, revisa la carpeta de spam.', 'info'), 4000);
+                }
             } catch (error) {
                 console.error('Error al registrar:', error);
                 if (error.code === 'auth/email-already-in-use') {
@@ -3976,6 +4004,13 @@
                 } else {
                     mostrarNotificacion('Error al registrar: ' + error.message, 'error');
                 }
+            }
+        }
+
+        function marcarAyudaVista() {
+            if (datosUsuario && !datosUsuario.ayudaVista) {
+                datosUsuario.ayudaVista = true;
+                guardarDatosUsuario();
             }
         }
 
@@ -4046,7 +4081,7 @@
             btn.disabled = true;
 
             try {
-                await emailjs.send('mybikegestor', 'template_9ep1bxr', {
+                await emailjs.send('mybikegestor', 'template_qcxhd69', {
                     motivo: motivos[motivo],
                     asunto: asuntos[motivo],
                     email: email,
