@@ -5595,6 +5595,38 @@ MyBikeGestor`
             document.getElementById('sustituir-km').value = biciActual.kmTotales || 0;
             document.getElementById('sustituir-campos-extra').innerHTML = '';
 
+            // Comprobar si hay piezas compatibles en el cajón
+            const tipoPiezaRueda = pieza.tipo || '';
+            const cajonRueda = (biciActual.cajonPiezas || []).filter(p => {
+                const tipoCajon = p.tipo || '';
+                if (tipoCajon === tipoPiezaRueda) return true;
+                if (tipoCajon === 'Cubierta' && tipoPiezaRueda.includes('Cubierta')) return true;
+                if (tipoCajon === 'Cámara' && tipoPiezaRueda.includes('Cámara')) return true;
+                if (tipoCajon === 'Cierre' && tipoPiezaRueda.includes('Cierre')) return true;
+                if (tipoCajon === 'Núcleo' && tipoPiezaRueda.includes('Núcleo')) return true;
+                if (tipoPiezaRueda === 'Cubierta' && tipoCajon.includes('Cubierta')) return true;
+                if (tipoPiezaRueda === 'Cámara' && tipoCajon.includes('Cámara')) return true;
+                if (tipoPiezaRueda === 'Cierre' && tipoCajon.includes('Cierre')) return true;
+                if (tipoPiezaRueda === 'Núcleo' && tipoCajon.includes('Núcleo')) return true;
+                return false;
+            });
+            const cajónContainer = document.getElementById('sustituir-desde-cajon-container');
+            const select = document.getElementById('sustituir-cajon-select');
+            select.innerHTML = '<option value="">— Ver lista de piezas —</option>';
+            if (cajonRueda.length > 0) {
+                cajónContainer.style.display = 'block';
+                cajonRueda.forEach(p => {
+                    const kmAcum = (p.kmAlRetirar != null && p.kmInstalacion != null) ? p.kmAlRetirar - p.kmInstalacion : (p.kmAlRetirar || 0);
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.marca} ${p.modelo || ''} · ${kmAcum} km acumulados`;
+                    select.appendChild(opt);
+                });
+            } else {
+                cajónContainer.style.display = 'none';
+            }
+            document.getElementById('sustituir-form-nuevo').style.display = 'block';
+
             abrirModal('modal-sustituir');
         }
 
@@ -6635,7 +6667,19 @@ MyBikeGestor`
             document.getElementById('sustituir-campos-extra').innerHTML = '';
 
             // Comprobar si hay piezas del mismo tipo en el cajón
-            const cajon = (biciActual.cajonPiezas || []).filter(p => p.tipo === componenteActual.tipo);
+            // Las Cubiertas y Cámaras genéricas del cajón son compatibles con Delantera y Trasera
+            const tipoActual = componenteActual.tipo || '';
+            const cajon = (biciActual.cajonPiezas || []).filter(p => {
+                const tipoCajon = p.tipo || '';
+                if (tipoCajon === tipoActual) return true;
+                // Cubierta/Cámara genérica del cajón compatible con Delantera y Trasera
+                if (tipoCajon === 'Cubierta' && tipoActual.includes('Cubierta')) return true;
+                if (tipoCajon === 'Cámara' && tipoActual.includes('Cámara')) return true;
+                // También si el componente actual es genérico y el cajón tiene el mismo tipo
+                if (tipoActual === 'Cubierta' && tipoCajon.includes('Cubierta')) return true;
+                if (tipoActual === 'Cámara' && tipoCajon.includes('Cámara')) return true;
+                return false;
+            });
             const cajónContainer = document.getElementById('sustituir-desde-cajon-container');
             const select = document.getElementById('sustituir-cajon-select');
             select.innerHTML = '<option value="">— Ver lista de piezas —</option>';
@@ -6877,11 +6921,20 @@ MyBikeGestor`
 
             const sel = document.getElementById('cajon-nuevo-tipo');
             sel.innerHTML = '<option value="">-- Selecciona --</option>';
-            secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
+            // Tipos de consumibles de ruedas permitidos en el cajón
+            const CONSUMIBLES_RUEDAS = ['Cubierta', 'Cámara', 'Cierre', 'Núcleo'];
+
+            secciones.forEach(seccion => {
                 const seccionData = COMPONENTES_POR_SECCION[seccion];
                 if (!seccionData) return;
-                const tipos = seccionData[disciplina] || seccionData['todos'] || [];
+                let tipos = seccionData[disciplina] || seccionData['todos'] || [];
                 if (tipos.length === 0) return;
+
+                // Para Ruedas solo mostrar Cubierta y Cámara (sin Delantera/Trasera)
+                if (seccion === 'Ruedas') {
+                    tipos = CONSUMIBLES_RUEDAS;
+                }
+
                 const group = document.createElement('optgroup');
                 group.label = seccion;
                 tipos.forEach(t => {
