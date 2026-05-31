@@ -2889,6 +2889,11 @@
                 <input type="number" id="cajon-nuevo-peso" placeholder="0" step="1">
             </div>
             <div class="form-group">
+                <label>Km acumulados</label>
+                <input type="number" id="cajon-nuevo-km" placeholder="0" step="1" min="0">
+                <small style="color:var(--text-light);font-size:0.8em;">Introduce los km que ya tiene si es una pieza usada</small>
+            </div>
+            <div class="form-group">
                 <label>Precio (€)</label>
                 <input type="number" id="cajon-nuevo-precio" placeholder="0" step="0.01">
             </div>
@@ -6953,6 +6958,7 @@ MyBikeGestor`
             document.getElementById('cajon-nuevo-modelo').value = '';
             document.getElementById('cajon-nuevo-material').value = '';
             document.getElementById('cajon-nuevo-peso').value = '';
+            document.getElementById('cajon-nuevo-km').value = '';
             document.getElementById('cajon-nuevo-precio').value = '';
             document.getElementById('cajon-nuevo-notas').value = '';
             abrirModal('modal-anadir-cajon');
@@ -6965,6 +6971,7 @@ MyBikeGestor`
             const modelo = document.getElementById('cajon-nuevo-modelo').value.trim();
             const material = document.getElementById('cajon-nuevo-material').value;
             const peso = parseFloat(document.getElementById('cajon-nuevo-peso').value) || 0;
+            const kmAcumulados = parseInt(document.getElementById('cajon-nuevo-km').value) || 0;
             const precio = parseFloat(document.getElementById('cajon-nuevo-precio').value) || 0;
             const notas = document.getElementById('cajon-nuevo-notas').value.trim();
 
@@ -6976,7 +6983,7 @@ MyBikeGestor`
             if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
             biciActual.cajonPiezas.push({
                 id: Date.now().toString(),
-                tipo, marca, modelo, material, peso, precio, notas,
+                tipo, marca, modelo, material, peso, kmAcumulados, precio, notas,
                 manual: true,
                 fechaEntrada: new Date().toISOString()
             });
@@ -7021,6 +7028,7 @@ MyBikeGestor`
             document.getElementById('cajon-nuevo-modelo').value = pieza.modelo || '';
             document.getElementById('cajon-nuevo-material').value = pieza.material || '';
             document.getElementById('cajon-nuevo-peso').value = pieza.peso || '';
+            document.getElementById('cajon-nuevo-km').value = pieza.kmAcumulados || 0;
             document.getElementById('cajon-nuevo-precio').value = pieza.precio || '';
             document.getElementById('cajon-nuevo-notas').value = pieza.notas || '';
         }
@@ -7032,6 +7040,7 @@ MyBikeGestor`
             const modelo = document.getElementById('cajon-nuevo-modelo').value.trim();
             const material = document.getElementById('cajon-nuevo-material').value;
             const peso = parseFloat(document.getElementById('cajon-nuevo-peso').value) || 0;
+            const kmAcumulados = parseInt(document.getElementById('cajon-nuevo-km').value) || 0;
             const precio = parseFloat(document.getElementById('cajon-nuevo-precio').value) || 0;
             const notas = document.getElementById('cajon-nuevo-notas').value.trim();
 
@@ -7042,7 +7051,7 @@ MyBikeGestor`
 
             const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
             if (pieza) {
-                Object.assign(pieza, { tipo, marca, modelo, material, peso, precio, notas });
+                Object.assign(pieza, { tipo, marca, modelo, material, peso, kmAcumulados, precio, notas });
             }
 
             await guardarDatosUsuario();
@@ -7061,7 +7070,10 @@ MyBikeGestor`
             }
             container.innerHTML = '';
             biciActual.cajonPiezas.forEach(pieza => {
-                const kmUso = (pieza.kmAlRetirar || 0) - (pieza.kmInstalacion || 0);
+                // Para piezas manuales usar kmAcumulados; para piezas retiradas usar kmAlRetirar - kmInstalacion
+                const kmUso = pieza.manual && pieza.kmAcumulados != null
+                    ? pieza.kmAcumulados
+                    : Math.max(0, (pieza.kmAlRetirar || 0) - (pieza.kmInstalacion || 0));
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
