@@ -1796,7 +1796,7 @@
                     </div>
 
                     <div style="background:#fff8e1;border-radius:12px;padding:12px;border-left:4px solid #f0a500;">
-                        <div style="font-size:0.85em;color:var(--text);">💡 <strong>Disponible en Google Play Store</strong> en versión de prueba. Contacta con nosotros a través de la pestaña <strong>Contacto</strong> para que te facilitemos el acceso.</div>
+                        <div style="font-size:0.85em;color:var(--text);">💡 <strong>Disponible en Google Play Store</strong>. Descárgala gratis buscando <strong>MyBikeGestor</strong> en Google Play o desde la pestaña <strong>Contacto</strong>.</div>
                     </div>
                 </div>
 
@@ -1857,32 +1857,15 @@
 
                     <p style="color:var(--text);font-size:0.9em;margin-bottom:16px;">¿En qué podemos ayudarte? Escríbenos según el motivo y te respondemos lo antes posible.</p>
 
-                    <!-- Acceso beta -->
+                    <!-- Google Play -->
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="font-weight:700;">🚀 Versión de prueba</div>
+                            <div style="font-weight:700;">🚀 Descarga en Google Play</div>
                             <button onclick="toggleContacto('beta')" id="btn-contacto-beta" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
                         </div>
                         <div id="detalle-contacto-beta" style="display:none;margin-top:12px;">
-                            <p style="margin:0 0 10px 0;color:var(--text);font-size:0.85em;line-height:1.6;">Accede a MyBikeGestor de forma anticipada a través de <strong>Google Play Store</strong> en fase de prueba cerrada. La versión puede contener fallos menores — tu opinión nos ayuda a mejorarla antes del lanzamiento oficial.</p>
-                            <div style="background:var(--white);border-radius:8px;padding:10px;margin-bottom:10px;">
-                                <div style="font-weight:700;font-size:0.82em;color:var(--dark);margin-bottom:6px;">📋 Requisitos</div>
-                                <ul style="margin:0;padding-left:16px;color:var(--text);font-size:0.82em;line-height:1.8;">
-                                    <li>Dispositivo <strong>Android</strong></li>
-                                    <li>Cuenta de <strong>Gmail</strong> (necesaria para añadirte a la lista)</li>
-                                </ul>
-                            </div>
-                            <div style="background:var(--white);border-radius:8px;padding:10px;margin-bottom:10px;">
-                                <div style="font-weight:700;font-size:0.82em;color:var(--dark);margin-bottom:6px;">🤝 Te pedimos</div>
-                                <ul style="margin:0;padding-left:16px;color:var(--text);font-size:0.82em;line-height:1.8;">
-                                    <li>Acceder a la app durante los <strong>14 días</strong> que dura la prueba</li>
-                                    <li>Aceptar recibir comunicaciones sobre el estado y evolución de las pruebas</li>
-                                </ul>
-                            </div>
-                            <div style="background:#fff8e1;border-radius:8px;padding:10px;margin-bottom:12px;border-left:3px solid #f0a500;">
-                                <div style="font-size:0.8em;color:var(--text);line-height:1.5;">🔒 <strong>Consentimiento:</strong> Al solicitar el acceso autorizas a MyBikeGestor a usar tu dirección de Gmail para añadirte a la lista de testers de Google Play y enviarte información relacionada con las pruebas.</div>
-                            </div>
-                            <button onclick="abrirFormContacto('beta')" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Solicitar acceso</button>
+                            <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">MyBikeGestor está disponible gratuitamente en <strong>Google Play Store</strong> para dispositivos Android. Búscala por nombre o escríbenos y te enviamos el enlace directo.</p>
+                            <button onclick="abrirFormContacto('beta')" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar enlace de descarga</button>
                         </div>
                     </div>
 
@@ -3981,7 +3964,7 @@ MyBikeGestor es una aplicación web progresiva (PWA) accesible desde cualquier d
 
 La aplicación le permite gestionar todas sus bicicletas, registrar cada componente con sus kilómetros actuales y llevar un historial completo de sustituciones. A partir de ese historial, la app calcula el rendimiento real de cada pieza y le avisa cuando se acerca al límite, ayudándole a tomar mejores decisiones sobre cuándo y en qué merece la pena invertir.
 
-Si dispone de un dispositivo Android y desea acceder a la versión de prueba disponible en Google Play, puede solicitarlo a través de la pestaña Contacto de la aplicación.
+Si dispone de un dispositivo Android, puede descargar MyBikeGestor gratuitamente desde Google Play Store.
 
 Para cualquier consulta puede contactarnos en mybikegestor@gmail.com.
 
@@ -4034,7 +4017,7 @@ MyBikeGestor`
 
         function abrirFormContacto(motivo) {
             const titulos = {
-                beta: '🚀 Solicitar acceso a la versión de prueba',
+                beta: '🚀 Descarga en Google Play',
                 dudas: '❓ Enviar una pregunta',
                 error: '🐛 Reportar un error',
                 sugerencia: '💡 Enviar una sugerencia'
@@ -4079,7 +4062,7 @@ MyBikeGestor`
 
             let mensajeFinal = mensaje;
             if (motivo === 'error' && pantalla) mensajeFinal = `Pantalla: ${pantalla}\n\n${mensaje}`;
-            if (motivo === 'beta' && !mensaje) mensajeFinal = 'Solicitud de acceso a la versión de prueba.';
+            if (motivo === 'beta' && !mensaje) mensajeFinal = 'Solicitud de enlace de descarga de Google Play.';
 
             const btn = document.getElementById('btn-enviar-contacto');
             btn.textContent = 'Enviando...';
@@ -4094,7 +4077,7 @@ MyBikeGestor`
                 });
                 cerrarFormContacto();
                 const confirmaciones = {
-                    beta: 'En breve recibirás en tu correo el enlace para unirte a la versión de prueba. ✓',
+                    beta: 'En breve recibirás el enlace de descarga de Google Play en tu correo. ✓',
                     dudas: 'Hemos recibido tu pregunta. Te responderemos lo antes posible. ✓',
                     error: 'Gracias por reportarlo. Trabajaremos para solucionarlo cuanto antes. ✓',
                     sugerencia: 'Gracias por tu idea. La tendremos en cuenta para futuras versiones. ✓'
