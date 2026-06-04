@@ -1356,6 +1356,13 @@
                 </select>
             </div>
 
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="margin-bottom: 0;">⚡ ¿Es eléctrica?</label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="nueva-es-electrica" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+            </div>
+
             <div class="form-group">
                 <label>Fecha de compra</label>
                 <input type="date" id="nueva-fecha" value="">
@@ -1709,6 +1716,9 @@
                     <div class="btn-grid-item-icon">🗑️</div>
                 </button>
             </div>
+
+            <!-- Datos eléctricos (si aplica) -->
+            <div id="detalle-electrico-container" style="display:none;"></div>
 
             <!-- Subpiezas (si las tiene) -->
             <div id="subpiezas-container" style="display: none; margin-top: 20px;">
@@ -4193,7 +4203,7 @@ MyBikeGestor`
                 const biciTemp = bici; // referencia temporal
                 const hayAlertas = (() => {
                     const kmActuales = bici.kmTotales || 0;
-                    const secciones = SECCIONES_COMPONENTES[bici.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+                    const secciones = getSeccionesBici(bici);
                     for (const seccion of secciones.filter(s => s !== 'Ruedas')) {
                         const comps = (bici.componentesV2 && bici.componentesV2[seccion]) || [];
                         for (const comp of comps) {
@@ -4230,7 +4240,10 @@ MyBikeGestor`
                             <div class="card-title">${bici.alias}</div>
                             <div class="card-subtitle">${bici.marca} ${bici.modelo}</div>
                         </div>
-                        <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            ${bici.esElectrica ? '<span style="font-size:1.1em;" title="Bici eléctrica">⚡</span>' : ''}
+                            <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
+                        </div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 15px; align-items: center;">
                         <div class="text-muted">
@@ -4373,6 +4386,7 @@ MyBikeGestor`
             if (marca === 'Otra') marca = document.getElementById('nueva-marca-otra').value.trim() || 'Otra';
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
+            const esElectrica = document.getElementById('nueva-es-electrica').checked;
             const fechaCompra = document.getElementById('nueva-fecha').value;
             const kmIniciales = parseFloat(document.getElementById('nueva-km').value) || 0;
 
@@ -4392,6 +4406,7 @@ MyBikeGestor`
                 marca: marca,
                 modelo: modelo,
                 disciplina: disciplina,
+                esElectrica: esElectrica,
                 fechaCompra: fechaCompra,
                 kmTotales: kmIniciales,
                 inversion: 0,
@@ -4411,6 +4426,7 @@ MyBikeGestor`
             document.getElementById('nueva-modelo').value = '';
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
+            document.getElementById('nueva-es-electrica').checked = false;
 
             mostrarNotificacion('¡Bicicleta creada correctamente!', 'exito');
             navegar('sec-garaje');
@@ -4564,6 +4580,7 @@ MyBikeGestor`
             }
             document.getElementById('nueva-modelo').value = biciActual.modelo || '';
             document.getElementById('nueva-disciplina').value = biciActual.disciplina || 'Carretera';
+            document.getElementById('nueva-es-electrica').checked = biciActual.esElectrica || false;
             document.getElementById('nueva-fecha').value = biciActual.fechaCompra || '';
             document.getElementById('nueva-km').value = biciActual.kmTotales || 0;
 
@@ -4597,6 +4614,7 @@ MyBikeGestor`
             document.getElementById('nueva-modelo').value = '';
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
+            document.getElementById('nueva-es-electrica').checked = false;
 
             navegar(editando ? 'sec-taller' : 'sec-garaje');
         }
@@ -4615,6 +4633,7 @@ MyBikeGestor`
             if (marca === 'Otra') marca = document.getElementById('nueva-marca-otra').value.trim() || 'Otra';
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
+            const esElectrica = document.getElementById('nueva-es-electrica').checked;
             const fechaCompra = document.getElementById('nueva-fecha').value;
             const kmTotales = parseFloat(document.getElementById('nueva-km').value) || 0;
 
@@ -4636,7 +4655,7 @@ MyBikeGestor`
             // Actualizar conservando componentes, historial, etc.
             datosUsuario.garaje[biciIndex] = {
                 ...datosUsuario.garaje[biciIndex],
-                alias, marca, modelo, disciplina, fechaCompra, kmTotales
+                alias, marca, modelo, disciplina, esElectrica, fechaCompra, kmTotales
             };
 
             biciActual = datosUsuario.garaje[biciIndex];
@@ -4694,6 +4713,12 @@ MyBikeGestor`
             'Urbana': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos'],
             'Eléctrica': ['Cuadro', 'Transmisión', 'Frenos', 'Ruedas', 'Periféricos']
         };
+
+        function getSeccionesBici(bici) {
+            const secciones = [...(SECCIONES_COMPONENTES[bici.disciplina] || SECCIONES_COMPONENTES['Carretera'])];
+            if (bici.esElectrica) secciones.push('Sistema Eléctrico');
+            return secciones;
+        }
         
         // Componentes por sección
         const COMPONENTES_POR_SECCION = {
@@ -4723,6 +4748,9 @@ MyBikeGestor`
             },
             'Suspensiones': {
                 'MTB': ['Horquilla', 'Amortiguador', 'Rodamientos/Casquillos', 'Mando Remoto Trasero', 'Mando Remoto Delantero']
+            },
+            'Sistema Eléctrico': {
+                'todos': ['Motor', 'Batería Principal', 'Batería Secundaria', 'Cargador', 'Display/Consola', 'Controlador', 'Sensor de Torque']
             }
         };
         
@@ -4780,10 +4808,10 @@ MyBikeGestor`
             if (!biciActual) return;
             
             const grid = document.getElementById('grid-secciones-componentes');
-            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const secciones = getSeccionesBici(biciActual);
             
             grid.innerHTML = '';
-            const iconos = {'Cuadro': '🚲', 'Transmisión': '⚙️', 'Frenos': '🛑', 'Ruedas': '⭕', 'Periféricos': '🎯', 'Suspensiones': '🦘'};
+            const iconos = {'Cuadro': '🚲', 'Transmisión': '⚙️', 'Frenos': '🛑', 'Ruedas': '⭕', 'Periféricos': '🎯', 'Suspensiones': '🦘', 'Sistema Eléctrico': '⚡'};
             
             secciones.forEach(seccion => {
                 const card = document.createElement('div');
@@ -5655,7 +5683,7 @@ MyBikeGestor`
         function calcularAlertas(umbral = 0.9) {
             const alertas = [];
             const kmActuales = biciActual.kmTotales || 0;
-            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const secciones = getSeccionesBici(biciActual);
 
             secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
                 const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
@@ -5882,7 +5910,7 @@ MyBikeGestor`
             const container = document.getElementById('contenido-desglose-peso');
             container.innerHTML = '';
             let totalGeneral = 0;
-            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const secciones = getSeccionesBici(biciActual);
 
             secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
                 const comps = (biciActual.componentesV2 && biciActual.componentesV2[seccion]) || [];
@@ -5966,7 +5994,7 @@ MyBikeGestor`
                 return false;
             };
 
-            const secciones = SECCIONES_COMPONENTES[biciActual.disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const secciones = getSeccionesBici(biciActual);
             const itemsIniciales = [];
 
             secciones.filter(s => s !== 'Ruedas').forEach(seccion => {
@@ -6151,6 +6179,42 @@ MyBikeGestor`
             } else {
                 document.getElementById('subpiezas-container').style.display = 'none';
             }
+
+            // Datos eléctricos
+            const contenedorElectrico = document.getElementById('detalle-electrico-container');
+            const tiposElectrico = {
+                'Motor': [
+                    { id: 'elec-potencia', label: 'Potencia', suffix: 'W' },
+                    { id: 'elec-par', label: 'Par máximo', suffix: 'Nm' },
+                    { id: 'elec-tipo-motor', label: 'Tipo', suffix: '' }
+                ],
+                'Batería Principal': [
+                    { id: 'elec-capacidad', label: 'Capacidad', suffix: 'Wh' },
+                    { id: 'elec-voltaje', label: 'Voltaje', suffix: 'V' },
+                    { id: 'elec-ciclos', label: 'Ciclos de carga', suffix: '' }
+                ],
+                'Batería Secundaria': [
+                    { id: 'elec-capacidad', label: 'Capacidad', suffix: 'Wh' },
+                    { id: 'elec-voltaje', label: 'Voltaje', suffix: 'V' },
+                    { id: 'elec-ciclos', label: 'Ciclos de carga', suffix: '' }
+                ],
+                'Cargador': [
+                    { id: 'elec-potencia', label: 'Potencia', suffix: 'W' }
+                ]
+            };
+            if (contenedorElectrico) {
+                const campos = tiposElectrico[comp.tipo];
+                if (campos) {
+                    const filas = campos.filter(c => comp[c.id] && comp[c.id] !== 0 && comp[c.id] !== '').map(c =>
+                        `<div><span style="color:var(--text);">${c.label}:</span><div style="font-weight:bold;">${comp[c.id]}${c.suffix ? ' ' + c.suffix : ''}</div></div>`
+                    ).join('');
+                    contenedorElectrico.style.display = filas ? 'block' : 'none';
+                    contenedorElectrico.innerHTML = filas ? `<div class="card" style="margin-top:15px;"><div class="card-title">⚡ Datos eléctricos</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.9em;margin-top:15px;">${filas}</div></div>` : '';
+                } else {
+                    contenedorElectrico.style.display = 'none';
+                    contenedorElectrico.innerHTML = '';
+                }
+            }
             
             navegar('sec-detalle-componente');
         }
@@ -6301,6 +6365,46 @@ MyBikeGestor`
                 if (chkMedidor && componenteActual) componenteActual.conMedidorPotencia = chkMedidor.checked;
             }
 
+            // Campos específicos Sistema Eléctrico
+            const camposElectrico = {
+                'Motor': [
+                    { id: 'elec-potencia', label: 'Potencia (W)', type: 'number', placeholder: 'Ej: 250' },
+                    { id: 'elec-par', label: 'Par máximo (Nm)', type: 'number', placeholder: 'Ej: 85' },
+                    { id: 'elec-tipo-motor', label: 'Tipo de motor', type: 'select', options: ['-- Selecciona --', 'Motor central', 'Buje delantero', 'Buje trasero'] }
+                ],
+                'Batería Principal': [
+                    { id: 'elec-capacidad', label: 'Capacidad (Wh)', type: 'number', placeholder: 'Ej: 500' },
+                    { id: 'elec-voltaje', label: 'Voltaje (V)', type: 'number', placeholder: 'Ej: 36' },
+                    { id: 'elec-ciclos', label: 'Ciclos de carga', type: 'number', placeholder: 'Ej: 0' }
+                ],
+                'Batería Secundaria': [
+                    { id: 'elec-capacidad', label: 'Capacidad (Wh)', type: 'number', placeholder: 'Ej: 250' },
+                    { id: 'elec-voltaje', label: 'Voltaje (V)', type: 'number', placeholder: 'Ej: 36' },
+                    { id: 'elec-ciclos', label: 'Ciclos de carga', type: 'number', placeholder: 'Ej: 0' }
+                ],
+                'Cargador': [
+                    { id: 'elec-potencia', label: 'Potencia (W)', type: 'number', placeholder: 'Ej: 100' }
+                ]
+            };
+
+            if (camposElectrico[tipo]) {
+                const campos = camposElectrico[tipo];
+                container.innerHTML = campos.map(campo => {
+                    if (campo.type === 'select') {
+                        const opts = campo.options.map((o, i) => `<option value="${i === 0 ? '' : o}">${o}</option>`).join('');
+                        return `<div class="form-group"><label>${campo.label}</label><select id="${campo.id}">${opts}</select></div>`;
+                    }
+                    return `<div class="form-group"><label>${campo.label}</label><input type="${campo.type}" id="${campo.id}" placeholder="${campo.placeholder}" value="0"></div>`;
+                }).join('');
+                // Restaurar valores si estamos editando
+                if (componenteActual) {
+                    campos.forEach(c => {
+                        const el = document.getElementById(c.id);
+                        if (el && componenteActual[c.id] !== undefined) el.value = componenteActual[c.id];
+                    });
+                }
+            }
+
             if (tipo === 'Bielas') {
                 container.innerHTML = `
                     <div class="form-group">
@@ -6430,6 +6534,13 @@ MyBikeGestor`
                 const chkMedidor = document.getElementById('comp-con-medidor-potencia');
                 comp.conMedidorPotencia = chkMedidor ? chkMedidor.checked : false;
             }
+
+            // Guardar campos eléctricos
+            const idsElectrico = ['elec-potencia','elec-par','elec-tipo-motor','elec-capacidad','elec-voltaje','elec-ciclos'];
+            idsElectrico.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) comp[id] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
+            });
             
             if (SUBPIEZAS[tipo]) comp.subpiezas = {};
             
@@ -6904,8 +7015,7 @@ MyBikeGestor`
 
         function abrirModalAnadirCajon() {
             if (!biciActual) return;
-            const disciplina = biciActual.disciplina || 'Carretera';
-            const secciones = SECCIONES_COMPONENTES[disciplina] || SECCIONES_COMPONENTES['Carretera'];
+            const secciones = getSeccionesBici(biciActual);
 
             const sel = document.getElementById('cajon-nuevo-tipo');
             sel.innerHTML = '<option value="">-- Selecciona --</option>';
@@ -7188,7 +7298,7 @@ MyBikeGestor`
         
         // Editar/Añadir subpieza
         // Marcas genéricas para subpiezas
-        const MARCAS = ['Basso','Beeline','BH','Bianchi','BMC','Bontrager','Bryton','Bulls','Campagnolo','Cannondale','Canyon','Cateye','Cervélo','Colnago','Continental','Cube','DT Swiss','Factor','Favero','Fizik','Focus','Fox','Garmin','Giant','Hammerhead','iGPSport','Kodak','Kona','Lezyne','Lifefitness','Look','Magene','Magura','Maxxis','Megamo','Merida','Michelin','Orbea','Pinarello','Pirelli','Pivot','Polar','Pro','Prólogo','RockShox','Santa Cruz','Schwalbe','Scott','Selle Italia','Shimano','Sigma','Specialized','Sram','Trek','Van Rysel','Varta','Wahoo','Wilier','Yeti','Zipp','Otra'];
+        const MARCAS = ['Bafang','Basso','Beeline','BH','Bianchi','BMC','Bontrager','Bosch','Brose','Bryton','Bulls','Campagnolo','Cannondale','Canyon','Cateye','Cervélo','Colnago','Continental','Cube','DT Swiss','Factor','Favero','Fazua','Fizik','Focus','Fox','FSA','Garmin','Giant','Hammerhead','iGPSport','Kodak','Kona','Lezyne','Lifefitness','Look','Magene','Magura','Mahle','Maxxis','Megamo','Merida','Michelin','Orbea','Panasonic','Pinarello','Pirelli','Pivot','Polar','Pro','Prólogo','RockShox','Santa Cruz','Schwalbe','Scott','Selle Italia','Shimano','Sigma','Specialized','Sram','TQ','Trek','Van Rysel','Varta','Wahoo','Wilier','Yamaha','Yeti','Zipp','Otra'];
         const MATERIALES = ['Acero','Aluminio','Carbono','Caucho','Cromo','Goma','Latón','Plástico','TPU','Titanio','Varios','Otro'];
         const MARCAS_SUBPIEZA_GENERICAS = MARCAS;
 
