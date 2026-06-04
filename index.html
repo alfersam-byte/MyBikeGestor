@@ -1547,43 +1547,55 @@
                 <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
             </div>
 
-            <!-- Resumen de la bici -->
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title" id="taller-alias" style="font-size: 1.3em; font-weight: 700;"></div>
-                        <div class="card-subtitle" id="taller-modelo" style="font-size: 1em; font-weight: 600; color: var(--text);"></div>
+            <!-- Resumen de la bici con foto -->
+            <div class="card" style="overflow:hidden; padding:0; border-left:none;">
+                <div id="taller-foto-bg" style="position:relative;">
+                    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 18px,rgba(46,204,113,0.03) 18px,rgba(46,204,113,0.03) 19px);"></div>
+                    <div id="taller-foto-svg" style="position:absolute;inset:0;pointer-events:none;"></div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.7) 100%);"></div>
+                    <div style="position:relative;z-index:1;padding:12px 14px;">
+                        <!-- Nombre, modelo, badge -->
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+                            <div>
+                                <div class="card-title" id="taller-alias" style="font-size:1.3em;font-weight:700;color:white;"></div>
+                                <div class="card-subtitle" id="taller-modelo" style="font-size:1em;font-weight:600;color:rgba(255,255,255,0.8);"></div>
+                            </div>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <button onclick="cambiarFotoBici()" style="background:rgba(0,0,0,0.4);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;color:white;" title="Cambiar foto">📷</button>
+                                <span class="badge badge-primary" id="taller-disciplina" style="font-weight:600;"></span>
+                            </div>
+                        </div>
+                        <!-- Stats -->
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
+                                <div style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">Kilómetros</div>
+                                <div style="font-size:1.5em;font-weight:700;color:#2ECC71;" id="taller-km">0</div>
+                            </div>
+                            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
+                                <div style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">Uso</div>
+                                <div style="font-size:1.5em;font-weight:700;color:#2ECC71;" id="taller-uso">0d</div>
+                            </div>
+                            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;" onclick="navegar('sec-desglose-peso')">
+                                <div style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">Peso</div>
+                                <div style="font-size:1.5em;font-weight:700;color:rgba(255,255,255,0.9);" id="taller-peso">0</div>
+                            </div>
+                            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;" onclick="navegar('sec-desglose-inversion')">
+                                <div style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">Inversión</div>
+                                <div style="font-size:1.5em;font-weight:700;color:#f0a500;" id="taller-inversion">0€</div>
+                            </div>
+                        </div>
                     </div>
-                    <span class="badge badge-primary" id="taller-disciplina" style="font-weight: 600;"></span>
                 </div>
-                
+                <input type="file" id="input-foto-bici" accept="image/*" style="display:none;" onchange="guardarFotoBici(this)">
+
                 <!-- Indicador de Strava -->
-                <div id="taller-strava-vinculado" style="display: none; margin-top: 15px;">
-                    <div style="background: #FC4C02; color: white; padding: 8px 12px; border-radius: 8px 8px 0 0; font-size: 0.85em; text-align: center;">
+                <div id="taller-strava-vinculado" style="display: none;">
+                    <div style="background: #FC4C02; color: white; padding: 8px 12px; font-size: 0.85em; text-align: center;">
                         🚴 Vinculada con Strava: <span id="taller-strava-nombre" style="font-weight: bold;"></span>
                     </div>
-                    <button onclick="sincronizarBiciStrava()" style="width:100%; background:#E34402; color:white; border:none; padding:10px; border-radius:0 0 8px 8px; font-size:0.9em; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onmouseover="this.style.background='#cc3d02'" onmouseout="this.style.background='#E34402'">
+                    <button onclick="sincronizarBiciStrava()" style="width:100%; background:#E34402; color:white; border:none; padding:10px; font-size:0.9em; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onmouseover="this.style.background='#cc3d02'" onmouseout="this.style.background='#E34402'">
                         🔄 Sincronizar KM con Strava
                     </button>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;">
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
-                        <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Kilómetros</div>
-                        <div style="font-size: 1.6em; font-weight: 700; color: var(--primary);" id="taller-km">0</div>
-                    </div>
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px;">
-                        <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Uso</div>
-                        <div style="font-size: 1.6em; font-weight: 700; color: var(--primary);" id="taller-uso">0d</div>
-                    </div>
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px; cursor:pointer;" onclick="navegar('sec-desglose-peso')">
-                        <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Peso</div>
-                        <div style="font-size: 1.6em; font-weight: 700; color: var(--secondary);" id="taller-peso">0</div>
-                    </div>
-                    <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 8px; cursor:pointer;" onclick="navegar('sec-desglose-inversion')">
-                        <div style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin-bottom: 5px; font-weight: 600;">Inversión</div>
-                        <div style="font-size: 1.6em; font-weight: 700; color: var(--warning);" id="taller-inversion">0€</div>
-                    </div>
                 </div>
             </div>
 
@@ -4232,26 +4244,148 @@ MyBikeGestor`
                 const badgeTitle = hayAlertas ? 'Hay alertas de sustitución' : 'Sin alertas de sustitución';
                 const badgeClick = hayAlertas ? `onclick="abrirTaller('${bici.id}', true)"` : `title="${badgeTitle}"`;
 
+                // Color de fondo según disciplina
+                const bgColors = {
+                    'Carretera': '#1a2a1e',
+                    'MTB':       '#1a2416',
+                    'Gravel':    '#1e2318',
+                    'Urbana':    '#1a1e2a',
+                    'Eléctrica': '#1a2420',
+                    'Indoor':    '#1e1a2a',
+                    'Otra':      '#1a1a1a'
+                };
+                const bgColor = bgColors[bici.disciplina] || '#1a2a1e';
+
+                // SVG silueta según disciplina
+                const svgBici = {
+                    'Carretera': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="295" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="355" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="295" cy="60" r="3" fill="white"/>
+                            <circle cx="355" cy="60" r="3" fill="white"/>
+                            <polyline points="295,60 322,28 355,60" stroke-width="3.5"/>
+                            <polyline points="295,60 312,50 355,60" stroke-width="3"/>
+                            <line x1="322" y1="28" x2="320" y2="16" stroke-width="3.5"/>
+                            <line x1="315" y1="16" x2="328" y2="16" stroke-width="2.5"/>
+                            <line x1="322" y1="28" x2="308" y2="26" stroke-width="3"/>
+                            <polyline points="308,26 304,20 310,20" stroke-width="2.5"/>
+                        </g>
+                    </svg>`,
+                    'MTB': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="290" cy="60" r="24" stroke-width="4"/>
+                            <circle cx="355" cy="60" r="24" stroke-width="4"/>
+                            <circle cx="290" cy="60" r="3" fill="white"/>
+                            <circle cx="355" cy="60" r="3" fill="white"/>
+                            <polyline points="290,60 322,30 355,60" stroke-width="3.5"/>
+                            <polyline points="290,60 314,52 355,60" stroke-width="3"/>
+                            <line x1="322" y1="30" x2="320" y2="16" stroke-width="3.5"/>
+                            <line x1="313" y1="16" x2="327" y2="16" stroke-width="3"/>
+                            <line x1="313" y1="16" x2="313" y2="20" stroke-width="2.5"/>
+                            <line x1="327" y1="16" x2="327" y2="20" stroke-width="2.5"/>
+                            <line x1="322" y1="30" x2="306" y2="28" stroke-width="3"/>
+                            <line x1="306" y1="28" x2="303" y2="23" stroke-width="2.5"/>
+                            <line x1="303" y1="23" x2="303" y2="19" stroke-width="2.5"/>
+                        </g>
+                    </svg>`,
+                    'Gravel': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="293" cy="60" r="23" stroke-width="3.5"/>
+                            <circle cx="355" cy="60" r="23" stroke-width="3.5"/>
+                            <circle cx="293" cy="60" r="3" fill="white"/>
+                            <circle cx="355" cy="60" r="3" fill="white"/>
+                            <polyline points="293,60 322,29 355,60" stroke-width="3.5"/>
+                            <polyline points="293,60 312,50 355,60" stroke-width="3"/>
+                            <line x1="322" y1="29" x2="320" y2="16" stroke-width="3.5"/>
+                            <line x1="315" y1="16" x2="328" y2="16" stroke-width="2.5"/>
+                            <line x1="322" y1="29" x2="307" y2="27" stroke-width="3"/>
+                            <polyline points="307,27 302,21 309,21" stroke-width="2.5"/>
+                        </g>
+                    </svg>`,
+                    'Urbana': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="293" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="353" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="293" cy="60" r="3" fill="white"/>
+                            <circle cx="353" cy="60" r="3" fill="white"/>
+                            <polyline points="293,60 316,38 353,60" stroke-width="3.5"/>
+                            <polyline points="293,60 310,50 353,60" stroke-width="3"/>
+                            <line x1="316" y1="38" x2="316" y2="20" stroke-width="3.5"/>
+                            <line x1="310" y1="20" x2="322" y2="20" stroke-width="3"/>
+                            <line x1="316" y1="38" x2="305" y2="36" stroke-width="3"/>
+                            <line x1="305" y1="36" x2="303" y2="28" stroke-width="2.5"/>
+                            <line x1="300" y1="28" x2="308" y2="28" stroke-width="2.5"/>
+                            <path d="M285,60 Q280,50 285,45 Q290,40 293,45" stroke-width="2" opacity="0.5"/>
+                            <path d="M353,60 Q348,50 353,45 Q358,40 361,45" stroke-width="2" opacity="0.5"/>
+                        </g>
+                    </svg>`,
+                    'Indoor': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="300" cy="62" r="20" stroke-width="3.5"/>
+                            <circle cx="300" cy="62" r="3" fill="white"/>
+                            <line x1="300" y1="62" x2="320" y2="32" stroke-width="3.5"/>
+                            <line x1="300" y1="62" x2="280" y2="62" stroke-width="3"/>
+                            <line x1="280" y1="62" x2="270" y2="72" stroke-width="3"/>
+                            <line x1="270" y1="72" x2="340" y2="72" stroke-width="3"/>
+                            <line x1="340" y1="72" x2="330" y2="62" stroke-width="3"/>
+                            <line x1="320" y1="32" x2="318" y2="18" stroke-width="3.5"/>
+                            <line x1="313" y1="18" x2="326" y2="18" stroke-width="3"/>
+                            <line x1="320" y1="32" x2="333" y2="32" stroke-width="3"/>
+                            <line x1="333" y1="32" x2="336" y2="26" stroke-width="2.5"/>
+                            <rect x="325" y="68" width="30" height="6" rx="2" fill="white" opacity="0.15"/>
+                        </g>
+                    </svg>`,
+                    'Eléctrica': `<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+                        <g opacity="0.2" stroke="white" fill="none" stroke-linecap="round">
+                            <circle cx="293" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="353" cy="60" r="22" stroke-width="3.5"/>
+                            <circle cx="293" cy="60" r="3" fill="white"/>
+                            <circle cx="353" cy="60" r="3" fill="white"/>
+                            <polyline points="293,60 322,28 353,60" stroke-width="3.5"/>
+                            <polyline points="293,60 312,50 353,60" stroke-width="3"/>
+                            <line x1="322" y1="28" x2="320" y2="16" stroke-width="3.5"/>
+                            <line x1="315" y1="16" x2="328" y2="16" stroke-width="2.5"/>
+                            <line x1="322" y1="28" x2="308" y2="26" stroke-width="3"/>
+                            <polyline points="308,26 304,20 310,20" stroke-width="2.5"/>
+                            <rect x="305" y="40" width="20" height="10" rx="2" fill="white" opacity="0.4"/>
+                            <polyline points="313,35 310,43 315,43 312,50" stroke="white" stroke-width="2" fill="none" opacity="0.6"/>
+                        </g>
+                    </svg>`
+                };
+
+                const svgFondo = bici.fotoBici
+                    ? ''
+                    : (svgBici[bici.disciplina] || svgBici['Carretera']);
+
+                const bgStyle = bici.fotoBici
+                    ? `background:url('${bici.fotoBici}') center/cover no-repeat;`
+                    : `background:${bgColor};`;
+
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.style.cssText = 'overflow:hidden; padding:0; border-left:none;';
                 card.innerHTML = `
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${bici.alias}</div>
-                            <div class="card-subtitle">${bici.marca} ${bici.modelo}</div>
+                    <div style="position:relative; ${bgStyle} min-height:90px;">
+                        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 18px,rgba(46,204,113,0.03) 18px,rgba(46,204,113,0.03) 19px);"></div>
+                        ${svgFondo}
+                        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.65) 100%);"></div>
+                        <div style="position:relative;z-index:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                                <div>
+                                    <div style="font-weight:600;font-size:1.05em;color:white;">${bici.alias}</div>
+                                    <div style="font-size:0.78em;color:rgba(255,255,255,0.75);">${bici.marca} ${bici.modelo}</div>
+                                </div>
+                                <div style="display:flex;gap:6px;align-items:center;">
+                                    ${bici.esElectrica ? '<span style="font-size:1em;color:rgba(255,255,255,0.9);" title="Bici eléctrica">⚡</span>' : ''}
+                                    <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <strong style="color:white;font-size:1.15em;">${bici.kmTotales || 0} km</strong>
+                                <button class="btn" style="width:auto;padding:8px 18px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;backdrop-filter:blur(4px);" onclick="abrirTaller('${bici.id}')">Abrir</button>
+                            </div>
                         </div>
-                        <div style="display:flex;gap:6px;align-items:center;">
-                            ${bici.esElectrica ? '<span style="font-size:1.1em;" title="Bici eléctrica">⚡</span>' : ''}
-                            <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
-                        </div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 15px; align-items: center;">
-                        <div class="text-muted">
-                            <strong style="color: var(--primary); font-size: 1.2em;">${bici.kmTotales || 0} km</strong>
-                        </div>
-                        <button class="btn btn-secondary" style="width: auto; padding: 10px 20px;" onclick="abrirTaller('${bici.id}')">
-                            Abrir
-                        </button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -4407,6 +4541,7 @@ MyBikeGestor`
                 modelo: modelo,
                 disciplina: disciplina,
                 esElectrica: esElectrica,
+                fotoBici: null,
                 fechaCompra: fechaCompra,
                 kmTotales: kmIniciales,
                 inversion: 0,
@@ -4427,6 +4562,7 @@ MyBikeGestor`
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
             document.getElementById('nueva-es-electrica').checked = false;
+            eliminarFotoBici();
 
             mostrarNotificacion('¡Bicicleta creada correctamente!', 'exito');
             navegar('sec-garaje');
@@ -4454,6 +4590,9 @@ MyBikeGestor`
             document.getElementById('taller-modelo').textContent = `${biciActual.marca} ${biciActual.modelo}`;
             document.getElementById('taller-disciplina').textContent = biciActual.disciplina;
             document.getElementById('taller-km').textContent = `${biciActual.kmTotales || 0} km`;
+
+            // Foto de fondo en el taller
+            actualizarFondoTaller();
             
             // Calcular peso total — excluir sección 'Ruedas' antigua
             let pesoTotal = 0;
@@ -4597,6 +4736,85 @@ MyBikeGestor`
             navegar('sec-nueva-bici');
         }
 
+        function actualizarFondoTaller() {
+            if (!biciActual) return;
+            const bg = document.getElementById('taller-foto-bg');
+            const svgContainer = document.getElementById('taller-foto-svg');
+            if (!bg) return;
+
+            const bgColors = {
+                'Carretera': '#1a2a1e', 'MTB': '#1a2416', 'Gravel': '#1e2318',
+                'Urbana': '#1a1e2a', 'Eléctrica': '#1a2420', 'Indoor': '#1e1a2a', 'Otra': '#1a1a1a'
+            };
+
+            if (biciActual.fotoBici) {
+                bg.style.background = `url('${biciActual.fotoBici}') center/cover no-repeat`;
+                bg.style.backgroundSize = 'cover';
+                if (svgContainer) svgContainer.innerHTML = '';
+            } else {
+                bg.style.background = bgColors[biciActual.disciplina] || '#1a2a1e';
+                // Reutilizar el mismo SVG del garaje
+                const svgBici = {
+                    'Carretera': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="295" cy="70" r="26" stroke-width="3.5"/><circle cx="355" cy="70" r="26" stroke-width="3.5"/><circle cx="295" cy="70" r="3" fill="white"/><circle cx="355" cy="70" r="3" fill="white"/><polyline points="295,70 322,36 355,70" stroke-width="3.5"/><polyline points="295,70 312,60 355,70" stroke-width="3"/><line x1="322" y1="36" x2="320" y2="22" stroke-width="3.5"/><line x1="315" y1="22" x2="328" y2="22" stroke-width="2.5"/><line x1="322" y1="36" x2="308" y2="34" stroke-width="3"/><polyline points="308,34 304,26 310,26" stroke-width="2.5"/></g></svg>`,
+                    'MTB': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="290" cy="72" r="28" stroke-width="4"/><circle cx="355" cy="72" r="28" stroke-width="4"/><circle cx="290" cy="72" r="3" fill="white"/><circle cx="355" cy="72" r="3" fill="white"/><polyline points="290,72 322,36 355,72" stroke-width="3.5"/><polyline points="290,72 314,62 355,72" stroke-width="3"/><line x1="322" y1="36" x2="320" y2="20" stroke-width="3.5"/><line x1="313" y1="20" x2="327" y2="20" stroke-width="3"/><line x1="322" y1="36" x2="306" y2="34" stroke-width="3"/><line x1="306" y1="34" x2="303" y2="26" stroke-width="2.5"/></g></svg>`,
+                    'Gravel': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="293" cy="72" r="27" stroke-width="3.5"/><circle cx="355" cy="72" r="27" stroke-width="3.5"/><circle cx="293" cy="72" r="3" fill="white"/><circle cx="355" cy="72" r="3" fill="white"/><polyline points="293,72 322,36 355,72" stroke-width="3.5"/><polyline points="293,72 312,60 355,72" stroke-width="3"/><line x1="322" y1="36" x2="320" y2="22" stroke-width="3.5"/><line x1="315" y1="22" x2="328" y2="22" stroke-width="2.5"/><line x1="322" y1="36" x2="307" y2="34" stroke-width="3"/><polyline points="307,34 302,26 309,26" stroke-width="2.5"/></g></svg>`,
+                    'Urbana': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="293" cy="72" r="26" stroke-width="3.5"/><circle cx="353" cy="72" r="26" stroke-width="3.5"/><circle cx="293" cy="72" r="3" fill="white"/><circle cx="353" cy="72" r="3" fill="white"/><polyline points="293,72 316,48 353,72" stroke-width="3.5"/><polyline points="293,72 310,62 353,72" stroke-width="3"/><line x1="316" y1="48" x2="316" y2="28" stroke-width="3.5"/><line x1="310" y1="28" x2="322" y2="28" stroke-width="3"/></g></svg>`,
+                    'Indoor': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="300" cy="74" r="24" stroke-width="3.5"/><circle cx="300" cy="74" r="3" fill="white"/><line x1="300" y1="74" x2="320" y2="42" stroke-width="3.5"/><line x1="300" y1="74" x2="280" y2="74" stroke-width="3"/><line x1="280" y1="74" x2="268" y2="86" stroke-width="3"/><line x1="268" y1="86" x2="342" y2="86" stroke-width="3"/><line x1="342" y1="86" x2="330" y2="74" stroke-width="3"/><line x1="320" y1="42" x2="318" y2="26" stroke-width="3.5"/><line x1="313" y1="26" x2="326" y2="26" stroke-width="3"/></g></svg>`,
+                    'Eléctrica': `<svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><g opacity="0.2" stroke="white" fill="none" stroke-linecap="round"><circle cx="293" cy="72" r="26" stroke-width="3.5"/><circle cx="353" cy="72" r="26" stroke-width="3.5"/><circle cx="293" cy="72" r="3" fill="white"/><circle cx="353" cy="72" r="3" fill="white"/><polyline points="293,72 322,36 353,72" stroke-width="3.5"/><polyline points="293,72 312,62 353,72" stroke-width="3"/><line x1="322" y1="36" x2="320" y2="22" stroke-width="3.5"/><line x1="315" y1="22" x2="328" y2="22" stroke-width="2.5"/><polyline points="318,30 314,40 320,40 317,50" stroke="white" stroke-width="2" fill="none" opacity="0.6"/></g></svg>`
+                };
+                if (svgContainer) svgContainer.innerHTML = svgBici[biciActual.disciplina] || svgBici['Carretera'];
+            }
+        }
+
+        function cambiarFotoBici() {
+            document.getElementById('input-foto-bici').click();
+        }
+
+        async function guardarFotoBici(input) {
+            if (!input.files || !input.files[0] || !biciActual) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = async e => {
+                biciActual.fotoBici = e.target.result;
+                const idx = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
+                if (idx !== -1) datosUsuario.garaje[idx].fotoBici = e.target.result;
+                await guardarDatosUsuario();
+                actualizarFondoTaller();
+                mostrarNotificacion('Foto actualizada ✅', 'exito');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previsualizarFotoBici(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('foto-bici-preview');
+                const img = document.getElementById('foto-bici-img');
+                img.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById('btn-subir-foto').textContent = 'Cambiar foto';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function eliminarFotoBici() {
+            const preview = document.getElementById('foto-bici-preview');
+            if (preview) preview.style.display = 'none';
+            const img = document.getElementById('foto-bici-img');
+            if (img) img.src = '';
+            const input = document.getElementById('nueva-foto-bici');
+            if (input) input.value = '';
+            const btn = document.getElementById('btn-subir-foto');
+            if (btn) btn.textContent = 'Seleccionar foto';
+        }
+
+        function getFotoBiciBase64() {
+            const img = document.getElementById('foto-bici-img');
+            return img && img.src && img.src.startsWith('data:') ? img.src : null;
+        }
+
         function cancelarFormBici() {
             const editando = window._editandoBiciId;
             window._editandoBiciId = null;
@@ -4615,6 +4833,7 @@ MyBikeGestor`
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
             document.getElementById('nueva-es-electrica').checked = false;
+            eliminarFotoBici();
 
             navegar(editando ? 'sec-taller' : 'sec-garaje');
         }
@@ -4634,6 +4853,7 @@ MyBikeGestor`
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
             const esElectrica = document.getElementById('nueva-es-electrica').checked;
+            const fotoBici = biciActual.fotoBici || null;
             const fechaCompra = document.getElementById('nueva-fecha').value;
             const kmTotales = parseFloat(document.getElementById('nueva-km').value) || 0;
 
@@ -4655,7 +4875,7 @@ MyBikeGestor`
             // Actualizar conservando componentes, historial, etc.
             datosUsuario.garaje[biciIndex] = {
                 ...datosUsuario.garaje[biciIndex],
-                alias, marca, modelo, disciplina, esElectrica, fechaCompra, kmTotales
+                alias, marca, modelo, disciplina, esElectrica, fotoBici, fechaCompra, kmTotales
             };
 
             biciActual = datosUsuario.garaje[biciIndex];
