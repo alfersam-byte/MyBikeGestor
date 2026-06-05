@@ -1943,6 +1943,28 @@
     <!-- ========================================
          MODAL: AÑADIR KILÓMETROS
     ======================================== -->
+    <!-- Modal foto bici -->
+    <div id="modal-foto-bici" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="width:100%; max-width:430px; padding:20px;">
+            <div style="color:white; font-size:1.1em; font-weight:600; margin-bottom:16px; text-align:center;">Ajustar foto</div>
+            <!-- Contenedor de recorte -->
+            <div style="position:relative; width:100%; height:200px; overflow:hidden; border-radius:12px; background:#111; margin-bottom:12px;">
+                <img id="foto-bici-crop-img" src="" style="position:absolute; cursor:grab; user-select:none; touch-action:none;" draggable="false">
+            </div>
+            <!-- Controles -->
+            <div style="margin-bottom:12px;">
+                <div style="color:rgba(255,255,255,0.6); font-size:0.75em; margin-bottom:6px;">Zoom</div>
+                <input type="range" id="foto-bici-zoom" min="1" max="3" step="0.01" value="1" style="width:100%;">
+            </div>
+            <!-- Botones -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                <button onclick="guardarFotoBiciModal()" style="background:#2ECC71; color:white; border:none; padding:12px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer;">Guardar</button>
+                <button onclick="cerrarModalFotoBici()" style="background:rgba(255,255,255,0.15); color:white; border:none; padding:12px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer;">Cancelar</button>
+            </div>
+            <button onclick="eliminarFotoBiciPersonalizada()" style="width:100%; background:rgba(220,50,50,0.3); color:#ff6b6b; border:1px solid rgba(220,50,50,0.5); padding:10px; border-radius:8px; font-size:0.9em; cursor:pointer;">🗑 Volver a foto genérica</button>
+        </div>
+    </div>
+
     <div id="modal-km" class="modal">
         <div class="modal-contenido">
             <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
@@ -4649,23 +4671,141 @@ MyBikeGestor`
             if (svgContainer) svgContainer.innerHTML = '';
         }
 
+        // ── Foto bici ──────────────────────────────────────────
+        let _fotoBiciCropState = { x: 0, y: 0, scale: 1, dragging: false, startX: 0, startY: 0, lastX: 0, lastY: 0 };
+        let _fotoBiciFile = null;
+
         function cambiarFotoBici() {
             document.getElementById('input-foto-bici').click();
         }
 
-        async function guardarFotoBici(input) {
-            if (!input.files || !input.files[0] || !biciActual) return;
-            const file = input.files[0];
+        function cerrarModalFotoBici() {
+            document.getElementById('modal-foto-bici').style.display = 'none';
+            document.getElementById('input-foto-bici').value = '';
+            _fotoBiciFile = null;
+        }
+
+        function abrirModalFotoBici(file) {
+            _fotoBiciFile = file;
+            const state = _fotoBiciCropState;
+            state.x = 0; state.y = 0; state.scale = 1;
+
+            const modal = document.getElementById('modal-foto-bici');
+            const img = document.getElementById('foto-bici-crop-img');
+            const zoom = document.getElementById('foto-bici-zoom');
+            zoom.value = 1;
+
             const reader = new FileReader();
-            reader.onload = async e => {
-                biciActual.fotoBici = e.target.result;
-                const idx = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
-                if (idx !== -1) datosUsuario.garaje[idx].fotoBici = e.target.result;
-                await guardarDatosUsuario();
-                actualizarFondoTaller();
-                mostrarNotificacion('Foto actualizada ✅', 'exito');
+            reader.onload = e => {
+                img.src = e.target.result;
+                img.onload = () => aplicarTransformFotoBici();
             };
             reader.readAsDataURL(file);
+            modal.style.display = 'flex';
+
+            // Zoom
+            zoom.oninput = () => {
+                state.scale = parseFloat(zoom.value);
+                aplicarTransformFotoBici();
+            };
+
+            // Drag mouse
+            img.onmousedown = ev => { state.dragging = true; state.startX = ev.clientX - state.x; state.startY = ev.clientY - state.y; img.style.cursor = 'grabbing'; ev.preventDefault(); };
+            document.onmousemove = ev => { if (!state.dragging) return; state.x = ev.clientX - state.startX; state.y = ev.clientY - state.startY; aplicarTransformFotoBici(); };
+            document.onmouseup = () => { state.dragging = false; img.style.cursor = 'grab'; };
+
+            // Drag touch
+            img.ontouchstart = ev => { state.dragging = true; state.startX = ev.touches[0].clientX - state.x; state.startY = ev.touches[0].clientY - state.y; ev.preventDefault(); };
+            img.ontouchmove = ev => { if (!state.dragging) return; state.x = ev.touches[0].clientX - state.startX; state.y = ev.touches[0].clientY - state.startY; aplicarTransformFotoBici(); ev.preventDefault(); };
+            img.ontouchend = () => { state.dragging = false; };
+        }
+
+        function aplicarTransformFotoBici() {
+            const img = document.getElementById('foto-bici-crop-img');
+            const state = _fotoBiciCropState;
+            const container = img.parentElement;
+            const cw = container.offsetWidth, ch = container.offsetHeight;
+            const iw = img.naturalWidth * state.scale, ih = img.naturalHeight * state.scale;
+            const scaledW = cw * state.scale, scaledH = (img.naturalHeight / img.naturalWidth) * scaledW;
+            img.style.width = scaledW + 'px';
+            img.style.height = 'auto';
+            // Limitar drag para que no salga del contenedor
+            const maxX = 0, minX = cw - scaledW;
+            const maxY = 0, minY = ch - (img.offsetHeight || ch);
+            state.x = Math.min(maxX, Math.max(minX, state.x));
+            state.y = Math.min(maxY, Math.max(minY, state.y));
+            img.style.left = state.x + 'px';
+            img.style.top = state.y + 'px';
+        }
+
+        async function guardarFotoBiciModal() {
+            if (!_fotoBiciFile || !biciActual) return;
+            cerrarModalFotoBici();
+            mostrarNotificacion('Subiendo foto...', 'exito');
+            try {
+                // Renderizar el recorte en canvas
+                const img = new Image();
+                img.src = URL.createObjectURL(_fotoBiciFile);
+                await new Promise(r => img.onload = r);
+
+                const state = _fotoBiciCropState;
+                const container = document.getElementById('foto-bici-crop-img').parentElement;
+                const cw = container.offsetWidth || 390, ch = 200;
+                const displayW = cw * state.scale;
+                const scaleRatio = img.naturalWidth / displayW;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = 780; canvas.height = 400;
+                const ctx = canvas.getContext('2d');
+                const srcX = (-state.x) * scaleRatio;
+                const srcY = (-state.y) * scaleRatio;
+                const srcW = cw * scaleRatio;
+                const srcH = ch * scaleRatio;
+                ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, 780, 400);
+
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+                const file = new File([blob], 'bike-photo.jpg', { type: 'image/jpeg' });
+
+                // Subir a Storage
+                const ref = storage.ref().child(`bike-photos/${usuarioActual.uid}/${biciActual.id}`);
+                await ref.put(file);
+                const url = await ref.getDownloadURL();
+
+                // Guardar URL en Firestore
+                biciActual.fotoBici = url;
+                const idx = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
+                if (idx !== -1) datosUsuario.garaje[idx].fotoBici = url;
+                await guardarDatosUsuario();
+                actualizarFondoTaller();
+                cargarGaraje();
+                mostrarNotificacion('Foto guardada ✅', 'exito');
+            } catch(e) {
+                console.error(e);
+                mostrarNotificacion('Error al subir la foto', 'error');
+            }
+        }
+
+        async function eliminarFotoBiciPersonalizada() {
+            cerrarModalFotoBici();
+            confirmar('¿Volver a la foto genérica?', 'Se eliminará tu foto personalizada.',
+                async () => {
+                    try {
+                        await storage.ref().child(`bike-photos/${usuarioActual.uid}/${biciActual.id}`).delete().catch(() => {});
+                        biciActual.fotoBici = null;
+                        const idx = datosUsuario.garaje.findIndex(b => b.id === biciActual.id);
+                        if (idx !== -1) datosUsuario.garaje[idx].fotoBici = null;
+                        await guardarDatosUsuario();
+                        actualizarFondoTaller();
+                        cargarGaraje();
+                        mostrarNotificacion('Foto eliminada', 'exito');
+                    } catch(e) { mostrarNotificacion('Error al eliminar', 'error'); }
+                }
+            );
+        }
+
+        async function guardarFotoBici(input) {
+            if (!input.files || !input.files[0] || !biciActual) return;
+            abrirModalFotoBici(input.files[0]);
         }
 
         function previsualizarFotoBici(input) {
