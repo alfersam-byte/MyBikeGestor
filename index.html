@@ -4740,15 +4740,15 @@ MyBikeGestor`
 
         async function guardarFotoBiciModal() {
             if (!_fotoBiciFile || !biciActual) return;
+            const file = _fotoBiciFile; // guardar referencia antes de cerrar
+            const state = { ..._fotoBiciCropState }; // copia del estado
             cerrarModalFotoBici();
             mostrarNotificacion('Subiendo foto...', 'exito');
             try {
-                // Renderizar el recorte en canvas
                 const img = new Image();
-                img.src = URL.createObjectURL(_fotoBiciFile);
+                img.src = URL.createObjectURL(file);
                 await new Promise(r => img.onload = r);
 
-                const state = _fotoBiciCropState;
                 const container = document.getElementById('foto-bici-crop-img').parentElement;
                 const cw = container.offsetWidth || 390, ch = 200;
                 const displayW = cw * state.scale;
