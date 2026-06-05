@@ -4740,13 +4740,13 @@ MyBikeGestor`
 
         async function guardarFotoBiciModal() {
             if (!_fotoBiciFile || !biciActual) return;
-            const file = _fotoBiciFile; // guardar referencia antes de cerrar
-            const state = { ..._fotoBiciCropState }; // copia del estado
+            const fileToUpload = _fotoBiciFile;
+            const state = { ..._fotoBiciCropState };
             cerrarModalFotoBici();
             mostrarNotificacion('Subiendo foto...', 'exito');
             try {
                 const img = new Image();
-                img.src = URL.createObjectURL(file);
+                img.src = URL.createObjectURL(fileToUpload);
                 await new Promise(r => img.onload = r);
 
                 const container = document.getElementById('foto-bici-crop-img').parentElement;
@@ -4764,11 +4764,11 @@ MyBikeGestor`
                 ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, 780, 400);
 
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
-                const file = new File([blob], 'bike-photo.jpg', { type: 'image/jpeg' });
+                const fileComprimido = new File([blob], 'bike-photo.jpg', { type: 'image/jpeg' });
 
                 // Subir a Storage
                 const ref = storage.ref().child(`bike-photos/${usuarioActual.uid}/${biciActual.id}`);
-                await ref.put(file);
+                await ref.put(fileComprimido);
                 const url = await ref.getDownloadURL();
 
                 // Guardar URL en Firestore
