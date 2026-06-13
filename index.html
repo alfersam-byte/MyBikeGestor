@@ -2812,6 +2812,83 @@
     </div>
 
     <!-- ========================================
+         MODAL: VALORAR COMPONENTE SUSTITUIDO
+    ======================================== -->
+    <div id="modal-valoracion" class="modal">
+        <div class="modal-contenido" style="max-height:85vh; overflow-y:auto; overflow-x:hidden; padding:20px;">
+            <div class="modal-header" style="margin-bottom:12px;">
+                <h2 class="modal-title" style="font-size:1.2em;">⭐ Valorar componente</h2>
+            </div>
+            <div id="valoracion-info" style="background:var(--light-gray); border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85em; color:var(--dark);"></div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+                <label style="font-weight:600; font-size:0.9em;">Motivo <span style="font-weight:400; color:var(--text);">(opcional)</span></label>
+                <select id="valoracion-motivo" style="width:100%; padding:8px; border-radius:8px; border:1px solid #555; background:#383838; color:#F0EBEB; font-size:0.9em;">
+                    <option value="">-- Sin especificar --</option>
+                    <option value="Desgaste">⚙️ Desgaste</option>
+                    <option value="Avería">🔧 Avería</option>
+                    <option value="Rendimiento">📉 Rendimiento insuficiente</option>
+                    <option value="Estética">🎨 Estética</option>
+                    <option value="Preventivo">🛡️ Preventivo</option>
+                    <option value="Actualización">⬆️ Actualización / Mejora</option>
+                    <option value="Otro">💬 Otro</option>
+                </select>
+            </div>
+
+            <div style="text-align:center; margin-bottom:12px;">
+                <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.9em;">Valoración global</label>
+                <div id="estrellas-global" style="display:flex; justify-content:center; gap:8px; font-size:2em; cursor:pointer;">
+                    <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.9em;">Criterios <span style="font-weight:400; color:var(--text);">(opcional)</span></label>
+                <div id="criterios-valoracion" style="display:flex; flex-direction:column; gap:6px;">
+                    <div class="criterio-row" data-criterio="duracion" style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">⏱ Duración</span>
+                        <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
+                            <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
+                        </div>
+                    </div>
+                    <div class="criterio-row" data-criterio="estetica" style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">🎨 Estética</span>
+                        <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
+                            <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
+                        </div>
+                    </div>
+                    <div class="criterio-row" data-criterio="peso" style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">⚖️ Peso</span>
+                        <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
+                            <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
+                        </div>
+                    </div>
+                    <div class="criterio-row" data-criterio="precio" style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">💶 Precio</span>
+                        <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
+                            <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:0.9em;">Comentario <span style="font-weight:400; color:var(--text);">(opcional)</span></label>
+                <textarea id="valoracion-comentario" placeholder="Rendimiento, sensaciones, problemas..." style="width:100%; min-height:55px; padding:8px; border-radius:8px; border:1px solid #555; background:#383838; color:#F0EBEB; font-size:0.85em; resize:vertical; box-sizing:border-box;"></textarea>
+            </div>
+
+            <div style="background:#1a2a1a; border:1px solid #2ECC71; border-radius:8px; padding:8px; margin-bottom:12px; font-size:0.75em; color:#aaa;">
+                🔒 Datos totalmente privados, de uso exclusivo tuyo.
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="omitirValoracion()">Omitir</button>
+                <button class="btn btn-primary" onclick="guardarValoracion()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
          MODAL: AÑADIR PIEZA AL CAJÓN
     ======================================== -->
     <div id="modal-anadir-cajon" class="modal">
@@ -7240,9 +7317,103 @@ MyBikeGestor`
             actualizarBotonCajon();
             cargarListaComponentesSeccion();
             abrirDetalleComponente(componenteActual);
-            mostrarNotificacion(desdeСajon ? 'Instalado desde el cajón 📦✅' : destinoViejo === 'cajon' ? 'Pieza guardada en el cajón 📦' : 'Sustituido ✅', 'exito');
+
+            // Abrir modal de valoración con pequeño delay para que cierre el anterior
+            const entradaHistorial = biciActual.historial[0]; // la que acabamos de añadir
+            setTimeout(() => {
+                abrirModalValoracion(entradaHistorial, desdeСajon ? 'Instalado desde el cajón 📦✅' : destinoViejo === 'cajon' ? 'Pieza guardada en el cajón 📦' : 'Sustituido ✅');
+            }, 300);
         }
         
+        // ===== VALORACIÓN DE COMPONENTE SUSTITUIDO =====
+        function abrirModalValoracion(entradaHistorial, mensajeExito) {
+            window._valoracionHistorialId = entradaHistorial.id;
+            window._valoracionMensajeExito = mensajeExito || 'Sustituido ✅';
+
+            document.getElementById('valoracion-info').innerHTML =
+                `<strong>${entradaHistorial.componente || '-'}</strong><br>
+                 <span style="color:#aaa;">${entradaHistorial.descripcion || ''}</span>`;
+
+            // Reset estrellas globales
+            document.querySelectorAll('#estrellas-global span').forEach(s => s.textContent = '☆');
+            window._valoracionGlobal = 0;
+
+            // Reset criterios
+            document.querySelectorAll('#criterios-valoracion .criterio-row').forEach(row => {
+                row.querySelectorAll('.estrellas-criterio span').forEach(s => s.textContent = '☆');
+                row._valorCriterio = 0;
+            });
+
+            document.getElementById('valoracion-comentario').value = '';
+            document.getElementById('valoracion-motivo').value = '';
+
+            // Listeners estrellas globales
+            const globalContainer = document.getElementById('estrellas-global');
+            globalContainer.onclick = null;
+            globalContainer.addEventListener('click', function handler(e) {
+                const span = e.target.closest('span[data-val]');
+                if (!span) return;
+                const val = parseInt(span.dataset.val);
+                window._valoracionGlobal = val;
+                globalContainer.querySelectorAll('span').forEach(s => {
+                    s.textContent = parseInt(s.dataset.val) <= val ? '★' : '☆';
+                    s.style.color = parseInt(s.dataset.val) <= val ? '#f0a500' : 'var(--text)';
+                });
+            });
+
+            // Listeners estrellas criterios
+            document.querySelectorAll('#criterios-valoracion .criterio-row').forEach(row => {
+                const container = row.querySelector('.estrellas-criterio');
+                container.addEventListener('click', function(e) {
+                    const span = e.target.closest('span[data-val]');
+                    if (!span) return;
+                    const val = parseInt(span.dataset.val);
+                    row._valorCriterio = val;
+                    container.querySelectorAll('span').forEach(s => {
+                        s.textContent = parseInt(s.dataset.val) <= val ? '★' : '☆';
+                        s.style.color = parseInt(s.dataset.val) <= val ? '#f0a500' : 'var(--text)';
+                    });
+                });
+            });
+
+            abrirModal('modal-valoracion');
+        }
+
+        async function guardarValoracion() {
+            const id = window._valoracionHistorialId;
+            const reg = (biciActual.historial || []).find(r => r.id === id);
+            if (!reg) { cerrarModal('modal-valoracion'); return; }
+
+            const global = window._valoracionGlobal || 0;
+            const motivo = document.getElementById('valoracion-motivo').value;
+            const criterios = {};
+            document.querySelectorAll('#criterios-valoracion .criterio-row').forEach(row => {
+                const criterio = row.dataset.criterio;
+                const val = row._valorCriterio || 0;
+                if (val > 0) criterios[criterio] = val;
+            });
+            const comentario = document.getElementById('valoracion-comentario').value.trim();
+
+            reg.valoracion = {
+                global,
+                motivo,
+                criterios,
+                comentario
+            };
+
+            await guardarDatosUsuario();
+            cerrarModal('modal-valoracion');
+            mostrarNotificacion(window._valoracionMensajeExito, 'exito');
+            if (document.getElementById('sec-historial').classList.contains('activa')) cargarHistorial();
+        }
+
+        function omitirValoracion() {
+            cerrarModal('modal-valoracion');
+            mostrarNotificacion(window._valoracionMensajeExito || 'Sustituido ✅', 'exito');
+        }
+
+        // ===== FIN VALORACIÓN =====
+
         // Eliminar componente actual
         async function eliminarComponenteActual() {
             if (!componenteActual) return;
@@ -8280,6 +8451,31 @@ MyBikeGestor`
                 } else {
                     detalleExtra = `<div class="text-muted">KM: <strong>${reg.km || reg.kmActuales || 0}</strong></div>`;
                 }
+
+                let valoracionHtml = '';
+                if (reg.valoracion) {
+                    const v = reg.valoracion;
+                    const estrellas = n => 
+                        '<span style="color:#f0a500;">★</span>'.repeat(n || 0) + 
+                        '<span style="color:#555;">★</span>'.repeat(5 - (n || 0));
+                    const criteriosHtml = v.criterios && Object.keys(v.criterios).length > 0
+                        ? Object.entries(v.criterios).map(([k, val]) => {
+                            const labels = {duracion: '⏱ Duración', estetica: '🎨 Estética', peso: '⚖️ Peso', precio: '💶 Precio'};
+                            return `<div style="display:flex; justify-content:space-between; font-size:0.82em; color:var(--text); margin-bottom:3px;"><span>${labels[k] || k}</span><span style="color:#f0a500;">${estrellas(val)}</span></div>`;
+                          }).join('') : '';
+                    const comentarioHtml = v.comentario ? `<div style="font-size:0.82em; color:var(--text); margin-top:8px; font-style:italic;">"${v.comentario}"</div>` : '';
+                    valoracionHtml = `
+                        <div style="margin-top:10px; border-top:1px solid #444; padding-top:8px;">
+                            <button onclick="var d=this.nextElementSibling; var open=d.style.display!=='none'; d.style.display=open?'none':'block'; this.textContent=open?'⭐ Ver valoración ▼':'⭐ Ver valoración ▲';"
+                                style="background:none; border:none; color:#f0a500; cursor:pointer; font-size:0.82em; padding:0;">⭐ Ver valoración ▼</button>
+                            <div style="display:none; margin-top:8px; background:#1e1e1e; border-radius:8px; padding:10px;">
+                                ${v.motivo ? `<div style="font-size:0.85em; color:var(--text); margin-bottom:8px;">Motivo: <strong style="color:#F0EBEB;">${v.motivo}</strong></div>` : ''}
+                                <div style="text-align:center; font-size:1.5em; color:#f0a500; margin-bottom:6px;">${estrellas(v.global || 0)}</div>
+                                ${criteriosHtml}
+                                ${comentarioHtml}
+                            </div>
+                        </div>`;
+                }
                 
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
@@ -8301,6 +8497,7 @@ MyBikeGestor`
                             <button onclick="editarCosteHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:0.9em; color:var(--secondary); padding:0;" title="Editar coste">✏️</button>
                         </div>
                     </div>
+                    ${valoracionHtml}
                 `;
                 container.appendChild(card);
             });
