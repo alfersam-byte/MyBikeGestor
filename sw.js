@@ -1,7 +1,7 @@
 // ========================================
-// SERVICE WORKER - MyBikeGestor v4.0
+// SERVICE WORKER - MyBikeGestor v4.1
 // ========================================
-const CACHE_NAME = 'mybikegestor-v4';
+const CACHE_NAME = 'mybikegestor-v5';
 const ASSETS_TO_CACHE = [
     './manifest.json',
     './logo.png'
