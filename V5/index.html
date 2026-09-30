@@ -5151,6 +5151,14 @@ MyBikeGestor`
             
             grid.innerHTML = '';
             const iconos = {'Cuadro': '🚲', 'Transmisión': '⚙️', 'Frenos': '🛑', 'Ruedas': '⭕', 'Periféricos': '🎯', 'Suspensiones': '🦘', 'Sistema Eléctrico': '⚡'};
+            // v5: fotos reales por sección. Secciones sin entrada aquí siguen usando el emoji (ver 'iconos' arriba).
+            const imagenesSeccion = {
+                'Cuadro': '../icons/componentes/cuadro.jpg',
+                'Transmisión': '../icons/componentes/transmision.jpg',
+                'Frenos': '../icons/componentes/frenos.jpg',
+                'Ruedas': '../icons/componentes/ruedas.jpg',
+                'Periféricos': '../icons/componentes/perifericos.jpg'
+            };
             
             secciones.forEach(seccion => {
                 const card = document.createElement('div');
@@ -5158,12 +5166,25 @@ MyBikeGestor`
                 card.style.cursor = 'pointer';
                 // Ruedas tiene su propio sistema de juegos
                 card.onclick = () => seccion === 'Ruedas' ? abrirGarajeRuedas() : abrirSeccionComponentes(seccion);
-                card.innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 2.5em; margin-bottom: 10px;">${iconos[seccion]}</div>
-                        <div class="card-title" style="font-size: 1em;">${seccion}</div>
-                    </div>
-                `;
+                const imgSrc = imagenesSeccion[seccion];
+                if (imgSrc) {
+                    card.style.padding = '0';
+                    card.style.overflow = 'hidden';
+                    card.style.position = 'relative';
+                    card.innerHTML = `
+                        <img src="${imgSrc}" alt="${seccion}" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0)); padding: 18px 10px 10px;">
+                            <div class="card-title" style="font-size: 1em; text-align: center; margin: 0;">${seccion}</div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5em; margin-bottom: 10px;">${iconos[seccion]}</div>
+                            <div class="card-title" style="font-size: 1em;">${seccion}</div>
+                        </div>
+                    `;
+                }
                 grid.appendChild(card);
             });
         }
