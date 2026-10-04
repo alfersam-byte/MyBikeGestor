@@ -507,7 +507,7 @@
         .titulo-redondo {
             font-family: 'Quicksand', sans-serif;
             font-weight: 700;
-            font-size: 1.15em;
+            font-size: 1.15rem; /* rem = mismo tamaño en cualquier contenedor (los <button> no heredan el tamaño) */
             color: var(--primary);
         }
 
@@ -525,6 +525,66 @@
         .badge-circulo i {
             font-size: 26px;
             color: var(--primary);
+        }
+
+        /* v5: nombre de la bici sobre su foto (opción B): alias blanco y grande; marca en verde y mayúsculas; modelo en blanco suave.
+           La sombra de texto ayuda a leer sobre zonas claras de la foto. Reutilizable en otras listas de bicis. */
+        .bici-alias {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+        }
+        .bici-marca-modelo {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+        }
+        .bici-marca-modelo strong {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        /* v5: iconos dentro de las filas de usuario del panel admin (el texto es pequeño, 0.78em) */
+        .admin-user-meta .ti {
+            font-size: 1.3em;
+            vertical-align: -0.18em;
+            margin-right: 2px;
+        }
+
+        /* v5: flecha de salida fija en la parte inferior de la pantalla: siempre visible aunque la lista sea larga.
+           Reutilizable en cualquier pantalla con scroll (debe ser el último elemento de la sección). */
+        .btn-back-fijo {
+            position: sticky;
+            bottom: 16px;
+            align-self: flex-start;
+            margin-top: 20px;
+            z-index: 5;
+            border: 1px solid #555555;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+        }
+
+        /* v5: títulos largos de pantalla (ej. "Alertas de sustitución"): tamaño medido para que quepa en una línea
+           incluso en móviles de 360px; si aun así no cupiera, se parte centrado */
+        .topbar-title-largo {
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        /* v5: iconos de la cabecera del dashboard (ayuda / salir): mismo tamaño exacto, algo mayor que las flechas */
+        .btn-back-icono {
+            font-size: 1.5rem;
+        }
+
+        /* v5: los iconos dentro de etiquetas de formulario llevan tamaño propio (la etiqueta es pequeña, 0.85em) */
+        .form-group label .ti {
+            font-size: 1.45em;
+            vertical-align: -0.2em;
+            margin-right: 4px;
         }
 
         /* v5: subtítulos de sección en verde (Datos Personales, Datos Físicos, etc.) */
@@ -962,11 +1022,9 @@
         ======================================== -->
         <section id="sec-dashboard" class="seccion">
             <div class="topbar">
+                <button class="btn-back btn-back-icono" onclick="abrirAyuda()" title="Ayuda y tutorial"><i class="ti ti-help-circle"></i></button>
                 <div class="topbar-title"><span style="color: var(--secondary); font-family: 'Quicksand', sans-serif; font-weight: 700;">MyBike</span><span style="color: var(--primary); font-family: 'Quicksand', sans-serif; font-weight: 700;">Gestor</span></div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <button class="btn-back" onclick="abrirAyuda()" style="font-size:1.1em;" title="Ayuda y tutorial"><i class="ti ti-help-circle"></i></button>
-                    <button class="btn-back" onclick="cerrarSesion()" title="Cerrar sesión"><i class="ti ti-logout"></i></button>
-                </div>
+                <button class="btn-back btn-back-icono" onclick="cerrarSesion()" title="Cerrar sesión"><i class="ti ti-logout"></i></button>
             </div>
 
             <!-- Perfil de usuario -->
@@ -990,7 +1048,7 @@
 
             <!-- Resumen de bicis -->
             <div class="card">
-                <div class="card-title titulo-redondo"><i class="ti ti-chart-bar"></i> Resumen</div>
+                <div class="card-title titulo-redondo">Resumen</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                     <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 10px;">
                         <div class="text-muted" style="font-size: 0.8em;">Bicis Activas</div>
@@ -1019,7 +1077,7 @@
                     <div class="badge-circulo"><i class="ti ti-settings"></i></div>
                     <div class="btn-grid-item-text titulo-redondo">Ajustes</div>
                 </button>
-                <button class="btn-grid-item" id="btn-admin-dashboard" style="display:none; grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="navegar('sec-admin')">
+                <button class="btn-grid-item" id="btn-admin-dashboard" style="display:none; flex-direction: column; align-items: center; justify-content: center; grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="navegar('sec-admin')">
                     <div class="badge-circulo"><i class="ti ti-crown"></i></div>
                     <div class="btn-grid-item-text titulo-redondo">Panel Admin</div>
                 </button>
@@ -1032,19 +1090,18 @@
         <section id="sec-ajustes" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">⚙️ Ajustes</div>
+                <div class="topbar-title">Ajustes</div>
                 <div style="width:40px;"></div>
             </div>
             <div class="mt-20">
                 <div class="card" onclick="navegar('sec-ajuste-alertas')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
                     <div style="display:flex; align-items:center; gap:14px;">
-                        <span style="font-size:1.6em;">🔔</span>
+                        <span style="font-size:1.9rem; line-height:1; color:var(--primary);"><i class="ti ti-bell"></i></span>
                         <div>
-                            <div style="font-weight:700;">Alertas de sustitución</div>
-                            <div style="font-size:0.82em; color:var(--text);">Umbral global de aviso por desgaste</div>
+                            <div class="titulo-redondo">Alertas de sustitución</div>
+                            <div style="font-size:0.82em; color:var(--text);">Umbral de aviso por desgaste</div>
                         </div>
                     </div>
-                    <span style="color:var(--text); font-size:1.2em;">›</span>
                 </div>
             </div>
         </section>
@@ -1053,13 +1110,13 @@
              SECCIÓN: AJUSTE — ALERTAS
         ======================================== -->
         <section id="sec-ajuste-alertas" class="seccion">
-            <div class="topbar">
+            <div class="topbar" style="padding: 20px 15px;">
                 <button class="btn-back" onclick="navegar('sec-ajustes')">←</button>
-                <div class="topbar-title">🔔 Alertas de sustitución</div>
+                <div class="topbar-title topbar-title-largo">Alertas de sustitución</div>
                 <div style="width:40px;"></div>
             </div>
             <div class="card mt-20">
-                <p style="font-size:0.9em; color:var(--text); margin-bottom:20px;">Umbral global de aviso para todas las bicis, basado en la vida media de cada componente según tu historial.</p>
+                <p style="font-size:0.9em; color:var(--text); margin-bottom:20px;">Umbral de aviso para todas las bicis, basado en la vida media de cada componente según tu historial.</p>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <label style="font-weight:600;">Avisar al</label>
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -1167,10 +1224,10 @@
                     <div style="font-size: 0.85em; font-weight: 600;" id="perfil-imc-categoria">-</div>
                 </div>
 
-                <div style="font-weight: 700; color: var(--text); margin: 4px 0 12px;"><i class="ti ti-bolt"></i> Rendimiento</div>
+                <div class="card-title subtitulo-verde" style="margin: 24px 0 20px;">Rendimiento</div>
 
                 <div class="form-group">
-                    <label>FTP - Potencia Umbral (W) — <span id="perfil-ftp-valor" style="color: var(--primary); font-weight: 700;">200</span> W</label>
+                    <label><i class="ti ti-bolt"></i> FTP - Potencia Umbral (W) — <span id="perfil-ftp-valor" style="color: var(--primary); font-weight: 700;">200</span> W</label>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <button type="button" onclick="ajustarFtp(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:#2D2D2D; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
                         <input type="range" id="perfil-ftp" min="50" max="500" step="1" value="200"
@@ -1181,7 +1238,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>FC Máxima (ppm) — <span id="perfil-fc-max-valor" style="color: var(--primary); font-weight: 700;">190</span> ppm</label>
+                    <label><i class="ti ti-heartbeat"></i> FC Máxima (ppm) — <span id="perfil-fc-max-valor" style="color: var(--primary); font-weight: 700;">190</span> ppm</label>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <button type="button" onclick="ajustarFcMax(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:#2D2D2D; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
                         <input type="range" id="perfil-fc-max" min="100" max="230" step="1" value="190"
@@ -1192,7 +1249,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>VO2 Max (ml/kg/min) — <span id="perfil-vo2max-valor" style="color: var(--primary); font-weight: 700;">50.0</span></label>
+                    <label><i class="ti ti-lungs"></i> VO2 Max (ml/kg/min) — <span id="perfil-vo2max-valor" style="color: var(--primary); font-weight: 700;">50.0</span></label>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <button type="button" onclick="ajustarVo2(-0.5)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:#2D2D2D; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
                         <input type="range" id="perfil-vo2max" min="20" max="90" step="0.5" value="50"
@@ -1284,7 +1341,7 @@
         <section id="sec-garaje" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">Garaje 🚴</div>
+                <div class="topbar-title">Garaje</div>
                 <div style="width: 40px;"></div>
             </div>
 
@@ -1292,11 +1349,11 @@
                 <!-- Aquí se generarán las tarjetas de las bicis -->
             </div>
 
-            <button class="btn btn-primary mt-20" onclick="navegar('sec-nueva-bici')">➕ Añadir Bicicleta</button>
+            <button class="btn btn-primary mt-20" onclick="navegar('sec-nueva-bici')">Añadir Bicicleta</button>
             
             <!-- Botón para ver bicis retiradas (solo visible si hay alguna) -->
             <button id="btn-ver-retiradas" class="btn btn-secondary mt-20" style="display: none;" onclick="navegar('sec-bicis-retiradas')">
-                📦 Ver Bicis Retiradas
+                <i class="ti ti-archive"></i> Ver Bicis Retiradas
             </button>
         </section>
 
@@ -1558,7 +1615,7 @@
         <section id="sec-admin" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">👑 Panel Admin</div>
+                <div class="topbar-title">Panel Admin</div>
                 <div style="width: 40px;"></div>
             </div>
 
@@ -1582,6 +1639,8 @@
             <div id="admin-lista-usuarios">
                 <div class="text-center text-muted">Cargando usuarios...</div>
             </div>
+
+            <button class="btn-back btn-back-fijo" onclick="navegar('sec-dashboard')" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -3562,7 +3621,7 @@
                 });
 
                 if (usuarios.length === 0) {
-                    container.innerHTML = '<div class="lista-vacia"><div class="lista-vacia-icon">👥</div><p>No hay usuarios registrados</p></div>';
+                    container.innerHTML = '<div class="lista-vacia"><div class="lista-vacia-icon"><i class="ti ti-users"></i></div><p>No hay usuarios registrados</p></div>';
                     return;
                 }
 
@@ -3582,8 +3641,9 @@
 
                     const bicisActivas = u.garaje ? u.garaje.filter(b => b.activa !== false).length : 0;
                     const bicisRetiradas = u.garaje ? u.garaje.filter(b => b.activa === false).length : 0;
-                    const stravaStatus = u.stravaAccessToken ? '🟢 Strava' : '⚪ Sin Strava';
-                    const esAdmin = u.email === 'alfersam@gmail.com' ? ' 👑' : '';
+                    const stravaStatus = u.stravaAccessToken
+                        ? '<i class="ti ti-brand-strava" style="color: var(--primary);"></i> Strava'
+                        : '<i class="ti ti-brand-strava" style="opacity: 0.45;"></i> Sin Strava';
 
                     // Calcular días desde registro
                     let diasRegistro = '';
@@ -3596,15 +3656,15 @@
                     const card = document.createElement('div');
                     card.className = 'admin-user-card';
                     card.innerHTML = `
-                        <div class="admin-user-name">${nombre}${esAdmin}</div>
+                        <div class="admin-user-name">${nombre}</div>
                         <div class="admin-user-email">${u.email || 'Sin email'}</div>
                         <div class="admin-user-meta">
-                            <span>📅 Registro: ${fechaReg}${diasRegistro}</span>
-                            <span>🕐 Última: ${ultimaConexion}</span>
+                            <span><i class="ti ti-calendar"></i> Registro: ${fechaReg}${diasRegistro}</span>
+                            <span><i class="ti ti-clock"></i> Última: ${ultimaConexion}</span>
                         </div>
                         <div class="admin-user-meta" style="margin-top: 5px;">
-                            <span>🚴 ${bicisActivas} activa${bicisActivas !== 1 ? 's' : ''}</span>
-                            <span>📦 ${bicisRetiradas} retirada${bicisRetiradas !== 1 ? 's' : ''}</span>
+                            <span><i class="ti ti-bike"></i> ${bicisActivas} activa${bicisActivas !== 1 ? 's' : ''}</span>
+                            <span><i class="ti ti-archive"></i> ${bicisRetiradas} retirada${bicisRetiradas !== 1 ? 's' : ''}</span>
                             <span>${stravaStatus}</span>
                         </div>
                     `;
@@ -4364,7 +4424,7 @@ MyBikeGestor`
             const btnRetiradas = document.getElementById('btn-ver-retiradas');
             if (bicisRetiradas.length > 0) {
                 btnRetiradas.style.display = 'block';
-                btnRetiradas.innerHTML = `📦 Ver Bicis Retiradas (${bicisRetiradas.length})`;
+                btnRetiradas.innerHTML = `<i class="ti ti-archive"></i> Ver Bicis Retiradas (${bicisRetiradas.length})`;
             } else {
                 btnRetiradas.style.display = 'none';
             }
@@ -4372,7 +4432,7 @@ MyBikeGestor`
             if (!bicisActivas || bicisActivas.length === 0) {
                 container.innerHTML = `
                     <div class="lista-vacia">
-                        <div class="lista-vacia-icon">🚴</div>
+                        <div class="lista-vacia-icon"><i class="ti ti-bike"></i></div>
                         <p>No tienes ninguna bici en el garaje</p>
                         <p class="text-muted">¡Añade tu primera bicicleta!</p>
                     </div>
@@ -4446,11 +4506,11 @@ MyBikeGestor`
                         <div style="position:relative;z-index:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                                 <div>
-                                    <div style="font-weight:600;font-size:1.05em;color:white;">${bici.alias}</div>
-                                    <div style="font-size:0.78em;"><strong style="color:rgba(255,255,255,0.9);">${bici.marca}</strong> <span style="color:rgba(255,255,255,0.55);">${bici.modelo}</span></div>
+                                    <div class="bici-alias">${bici.alias}</div>
+                                    <div class="bici-marca-modelo"><strong>${bici.marca}</strong> <span>${bici.modelo}</span></div>
                                 </div>
                                 <div style="display:flex;gap:6px;align-items:center;">
-                                    ${bici.esElectrica ? '<span style="font-size:1em;color:rgba(255,255,255,0.9);" title="Bici eléctrica">⚡</span>' : ''}
+                                    ${bici.esElectrica ? '<span style="font-size:1em;color:rgba(255,255,255,0.9);" title="Bici eléctrica"><i class="ti ti-bolt"></i></span>' : ''}
                                     <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
                                 </div>
                             </div>
