@@ -15,6 +15,12 @@
     <link rel="apple-touch-icon" href="../icons/favicon.png">
     <!-- Manifest desactivado en v5 mientras se prueba (evita instalación PWA duplicada) -->
     <!-- <link rel="manifest" href="../manifest.json"> -->
+
+    <!-- Tipografía redondeada v5 (solo para ciertos títulos, ver clase .titulo-redondo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css">
     
     <!-- Firebase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -52,7 +58,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: var(--bg);
             color: #F0EBEB;
             display: flex;
@@ -354,7 +360,7 @@
         .topbar-title {
             font-size: 1.3em;
             font-weight: 700;
-            color: #F0EBEB;
+            color: var(--secondary);
         }
 
         .btn-back {
@@ -369,7 +375,7 @@
             justify-content: center;
             font-size: 1.2em;
             transition: all 0.2s;
-            color: #F0EBEB;
+            color: var(--primary);
         }
 
         .btn-back:hover {
@@ -495,6 +501,35 @@
         .btn-grid-item-text {
             font-weight: 600;
             color: #F0EBEB;
+        }
+
+        /* v5: tipografía redondeada para Resumen / Garaje / Perfil / Ajustes */
+        .titulo-redondo {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1.15em;
+            color: var(--primary);
+        }
+
+        /* v5: insignia circular para Perfil / Ajustes (sustituye al emoji) */
+        .badge-circulo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+        .badge-circulo i {
+            font-size: 26px;
+            color: var(--primary);
+        }
+
+        /* v5: subtítulos de sección en verde (Datos Personales, Datos Físicos, etc.) */
+        .subtitulo-verde {
+            color: var(--primary) !important;
         }
 
         /* ========================================
@@ -927,10 +962,10 @@
         ======================================== -->
         <section id="sec-dashboard" class="seccion">
             <div class="topbar">
-                <div class="topbar-title">MyBikeGestor</div>
+                <div class="topbar-title"><span style="color: var(--secondary); font-family: 'Quicksand', sans-serif; font-weight: 700;">MyBike</span><span style="color: var(--primary); font-family: 'Quicksand', sans-serif; font-weight: 700;">Gestor</span></div>
                 <div style="display:flex;gap:8px;align-items:center;">
-                    <button class="btn-back" onclick="abrirAyuda()" style="font-size:1.1em;">❓</button>
-                    <button class="btn-back" onclick="cerrarSesion()">🚪</button>
+                    <button class="btn-back" onclick="abrirAyuda()" style="font-size:1.1em;" title="Ayuda y tutorial"><i class="ti ti-help-circle"></i></button>
+                    <button class="btn-back" onclick="cerrarSesion()" title="Cerrar sesión"><i class="ti ti-logout"></i></button>
                 </div>
             </div>
 
@@ -941,11 +976,11 @@
                         <span id="dashboard-initials">👤</span>
                         <img id="dashboard-photo-img" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
                     </div>
-                    <div class="profile-photo-overlay">📷</div>
+                    <div class="profile-photo-overlay"><i class="ti ti-camera"></i></div>
                     <div class="photo-options" id="photo-options">
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('camera')">📷 Tomar foto</button>
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('gallery')">🖼️ Elegir de galería</button>
-                        <button class="photo-option-btn" onclick="event.stopPropagation(); removeProfilePhoto()" style="color:var(--danger)">🗑️ Eliminar foto</button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('camera')"><i class="ti ti-camera"></i> Tomar foto</button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); selectPhotoSource('gallery')"><i class="ti ti-photo"></i> Elegir de galería</button>
+                        <button class="photo-option-btn" onclick="event.stopPropagation(); removeProfilePhoto()" style="color:var(--danger)"><i class="ti ti-trash"></i> Eliminar foto</button>
                     </div>
                 </div>
                 <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
@@ -955,7 +990,7 @@
 
             <!-- Resumen de bicis -->
             <div class="card">
-                <div class="card-title">📊 Resumen</div>
+                <div class="card-title titulo-redondo"><i class="ti ti-chart-bar"></i> Resumen</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                     <div style="text-align: center; padding: 10px; background: var(--light-gray); border-radius: 10px;">
                         <div class="text-muted" style="font-size: 0.8em;">Bicis Activas</div>
@@ -970,21 +1005,23 @@
 
             <!-- Botones de navegación -->
             <div class="btn-grid">
-                <button class="btn-grid-item" onclick="navegar('sec-garaje')" style="grid-column: span 2;">
-                    <div class="btn-grid-item-icon">🚴</div>
-                    <div class="btn-grid-item-text">Mi Garaje</div>
+                <button class="btn-grid-item" onclick="navegar('sec-garaje')" style="grid-column: span 2; padding: 0; overflow: hidden; position: relative; text-align: left;">
+                    <img src="../icons/dashboard/garaje.jpg" alt="Garaje" style="width: 100%; aspect-ratio: 3.6 / 1; object-fit: cover; display: block;">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0)); padding: 20px 14px 10px; display: flex; align-items: center; gap: 8px;">
+                        <span class="btn-grid-item-text titulo-redondo" style="margin: 0;">Garaje</span>
+                    </div>
                 </button>
                 <button class="btn-grid-item" onclick="navegar('sec-perfil')">
-                    <div class="btn-grid-item-icon">👤</div>
-                    <div class="btn-grid-item-text">Mi Perfil</div>
+                    <div class="badge-circulo"><i class="ti ti-user"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Perfil</div>
                 </button>
                 <button class="btn-grid-item" onclick="navegar('sec-ajustes')">
-                    <div class="btn-grid-item-icon">⚙️</div>
-                    <div class="btn-grid-item-text">Ajustes</div>
+                    <div class="badge-circulo"><i class="ti ti-settings"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Ajustes</div>
                 </button>
                 <button class="btn-grid-item" id="btn-admin-dashboard" style="display:none; grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;" onclick="navegar('sec-admin')">
-                    <div class="btn-grid-item-icon">👑</div>
-                    <div class="btn-grid-item-text">Panel Admin</div>
+                    <div class="badge-circulo"><i class="ti ti-crown"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Panel Admin</div>
                 </button>
             </div>
         </section>
@@ -1043,18 +1080,21 @@
         <section id="sec-perfil" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">Mi Perfil</div>
+                <div class="topbar-title">Perfil</div>
                 <div style="width: 40px;"></div>
             </div>
 
             <div style="text-align: center; margin: 20px 0 30px 0;">
-                <div style="font-size: 4em;">👤</div>
+                <div style="width: 100px; height: 100px; margin: 0 auto; position: relative;">
+                    <img id="perfil-foto-img" src="" alt="Foto de perfil" style="display:none; width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--secondary);">
+                    <div id="perfil-foto-emoji" style="display:block; font-size: 2.6em; line-height: 100px; color: var(--secondary);"><i class="ti ti-user"></i></div>
+                </div>
                 <div style="font-size: 1.3em; font-weight: bold; color: var(--dark); margin-top: 10px;" id="perfil-nombre-completo">Usuario</div>
             </div>
 
             <!-- DATOS PERSONALES -->
             <div class="card">
-                <div class="card-title" style="margin-bottom: 20px;">📋 Datos Personales</div>
+                <div class="card-title subtitulo-verde" style="margin-bottom: 20px;"><i class="ti ti-clipboard-text"></i> Datos Personales</div>
                 
                 <div class="form-group">
                     <label>Email</label>
@@ -1090,10 +1130,10 @@
 
             <!-- DATOS FÍSICOS -->
             <div class="card mt-20">
-                <div class="card-title" style="margin-bottom: 20px;">💪 Datos Físicos</div>
+                <div class="card-title subtitulo-verde" style="margin-bottom: 20px;">Datos Físicos</div>
                 
                 <div class="form-group">
-                    <label>Peso (kg) — <span id="perfil-peso-valor" style="color: var(--primary); font-weight: 700;">70</span> kg</label>
+                    <label><i class="ti ti-scale"></i> Peso (kg) — <span id="perfil-peso-valor" style="color: var(--primary); font-weight: 700;">70</span> kg</label>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <button type="button" onclick="ajustarPeso(-0.1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:#2D2D2D; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
                         <input type="range" id="perfil-peso" min="30" max="200" step="0.1" value="70"
@@ -1107,7 +1147,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Altura (cm) — <span id="perfil-altura-valor" style="color: var(--primary); font-weight: 700;">175</span> cm</label>
+                    <label><i class="ti ti-ruler-2"></i> Altura (cm) — <span id="perfil-altura-valor" style="color: var(--primary); font-weight: 700;">175</span> cm</label>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <button type="button" onclick="ajustarAltura(-1)" style="width:36px; height:36px; min-width:36px; border-radius:50%; border:2px solid var(--primary); background:#2D2D2D; color:var(--primary); font-size:1.2em; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">−</button>
                         <input type="range" id="perfil-altura" min="100" max="220" step="1" value="175"
@@ -1126,6 +1166,8 @@
                     <div style="font-weight: bold; font-size: 1.8em; margin-bottom: 5px;" id="perfil-imc-valor">0.0</div>
                     <div style="font-size: 0.85em; font-weight: 600;" id="perfil-imc-categoria">-</div>
                 </div>
+
+                <div style="font-weight: 700; color: var(--text); margin: 4px 0 12px;"><i class="ti ti-bolt"></i> Rendimiento</div>
 
                 <div class="form-group">
                     <label>FTP - Potencia Umbral (W) — <span id="perfil-ftp-valor" style="color: var(--primary); font-weight: 700;">200</span> W</label>
@@ -1163,11 +1205,11 @@
 
             <!-- CICLOCOMPUTADOR GPS -->
             <div class="card mt-20">
-                <div class="card-title" style="margin-bottom: 20px;">🖥️ Ciclocomputador GPS</div>
+                <div class="card-title subtitulo-verde" style="margin-bottom: 20px;"><i class="ti ti-device-desktop"></i> Ciclocomputador GPS</div>
                 <p style="color:var(--text); font-size:0.85em; margin-bottom:15px;">Registra tu ciclocomputador aquí y sus km se acumularán automáticamente con los de todas tus bicis.</p>
 
                 <div id="ciclo-sin-datos" style="display:none;">
-                    <button class="btn btn-primary" onclick="abrirModalCiclocomputador()">➕ Añadir ciclocomputador</button>
+                    <button class="btn btn-primary" onclick="abrirModalCiclocomputador()"><i class="ti ti-plus"></i> Añadir ciclocomputador</button>
                 </div>
 
                 <div id="ciclo-con-datos" style="display:none;">
@@ -1183,20 +1225,20 @@
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-bottom:8px;">
-                        <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalCiclocomputador()">✏️ Editar</button>
-                        <button class="btn btn-primary" style="flex:1;" onclick="abrirModalSustituirCiclocomputador()">🔄 Sustituir</button>
-                        <button class="btn btn-secondary" style="flex:1;" onclick="repararCiclocomputador()">🔧 Reparar</button>
+                        <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalCiclocomputador()"><i class="ti ti-pencil"></i> Editar</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="abrirModalSustituirCiclocomputador()"><i class="ti ti-refresh"></i> Sustituir</button>
+                        <button class="btn btn-secondary" style="flex:1;" onclick="repararCiclocomputador()"><i class="ti ti-tool"></i> Reparar</button>
                     </div>
                     <div style="display:flex; gap:8px; margin-bottom:8px;">
-                        <button class="btn btn-secondary" style="flex:1;" onclick="verHistorialCiclocomputador()">📋 Historial</button>
+                        <button class="btn btn-secondary" style="flex:1;" onclick="verHistorialCiclocomputador()"><i class="ti ti-history"></i> Historial</button>
                     </div>
-                    <button class="btn btn-danger" style="width:100%;" onclick="eliminarCiclocomputador()">🗑️ Eliminar</button>
+                    <button class="btn btn-danger" style="width:100%;" onclick="eliminarCiclocomputador()"><i class="ti ti-trash"></i> Eliminar</button>
                 </div>
             </div>
 
             <!-- INTEGRACIÓN CON STRAVA -->
             <div class="card mt-20">
-                <div class="card-title" style="margin-bottom: 20px;">🚴 Conexión con Strava</div>
+                <div class="card-title subtitulo-verde" style="margin-bottom: 20px;"><i class="ti ti-brand-strava"></i> Conexión con Strava</div>
                 
                 <div id="strava-desconectado" style="display: none;">
                     <p style="color: var(--text); margin-bottom: 15px; font-size: 0.9em;">
@@ -1214,7 +1256,7 @@
                 <div id="strava-conectado" style="display: none;">
                     <div style="background: var(--light-gray); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 2em;">✅</span>
+                            <span style="font-size: 2em; color: var(--primary);"><i class="ti ti-circle-check"></i></span>
                             <div>
                                 <div style="font-weight: bold; color: var(--primary);">Conectado con Strava</div>
                                 <div style="font-size: 0.85em; color: var(--text);" id="strava-atleta-nombre">Atleta</div>
@@ -1242,7 +1284,7 @@
         <section id="sec-garaje" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">Mi Garaje 🚴</div>
+                <div class="topbar-title">Garaje 🚴</div>
                 <div style="width: 40px;"></div>
             </div>
 
@@ -1838,7 +1880,7 @@
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="font-weight:700;margin-bottom:8px;">2️⃣ Añade tu bici</div>
-                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Ve a <strong>Mi Garaje → Nueva Bici</strong> e introduce los datos de tu bicicleta: marca, modelo, disciplina y km actuales. Puedes añadir todas las que quieras.</p>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Ve a <strong>Garaje → Nueva Bici</strong> e introduce los datos de tu bicicleta: marca, modelo, disciplina y km actuales. Puedes añadir todas las que quieras.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="font-weight:700;margin-bottom:8px;">3️⃣ Registra tus componentes</div>
@@ -1850,14 +1892,14 @@
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;">
                         <div style="font-weight:700;margin-bottom:8px;">5️⃣ Gestiona tu perfil</div>
-                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">En <strong>Mi Perfil</strong> puedes registrar tu ciclocomputador GPS, configurar datos de entrenamiento y gestionar tu cuenta.</p>
+                        <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">En <strong>Perfil</strong> puedes registrar tu ciclocomputador GPS, configurar datos de entrenamiento y gestionar tu cuenta.</p>
                     </div>
                 </div>
 
                 <!-- TAB FUNCIONES -->
                 <div id="tab-funciones" style="display:none;">
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">🏠 Mi Garaje</div>
+                        <div style="font-weight:700;margin-bottom:6px;">🏠 Garaje</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Añade todas tus bicis sin límite y organiza tu flota completa. Accede a cada una con un toque.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
@@ -3409,9 +3451,17 @@
         function mostrarFotoPerfil(url) {
             const img = document.getElementById('dashboard-photo-img');
             const ini = document.getElementById('dashboard-initials');
-            if (!img || !ini) return;
-            if (url) { img.src = url; img.style.display = 'block'; ini.style.display = 'none'; }
-            else { img.style.display = 'none'; ini.style.display = 'block'; }
+            if (img && ini) {
+                if (url) { img.src = url; img.style.display = 'block'; ini.style.display = 'none'; }
+                else { img.style.display = 'none'; ini.style.display = 'block'; }
+            }
+            // v5: avatar grande de la pantalla de Perfil (foto si existe, si no el emoji por defecto)
+            const imgPerfil = document.getElementById('perfil-foto-img');
+            const emojiPerfil = document.getElementById('perfil-foto-emoji');
+            if (imgPerfil && emojiPerfil) {
+                if (url) { imgPerfil.src = url; imgPerfil.style.display = 'block'; emojiPerfil.style.display = 'none'; }
+                else { imgPerfil.style.display = 'none'; emojiPerfil.style.display = 'block'; }
+            }
         }
         function mostrarIniciales(nombre) {
             if (!nombre) return '👤';
@@ -3874,6 +3924,9 @@
 
             // Actualizar nombre completo en el header
             actualizarNombreCompleto();
+
+            // v5: mostrar foto de perfil si existe, si no el emoji por defecto
+            mostrarFotoPerfil(datosUsuario.photoURL || null);
             
             // Actualizar estado de Strava
             actualizarEstadoStrava();
