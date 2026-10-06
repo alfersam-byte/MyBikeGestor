@@ -527,8 +527,9 @@
             color: var(--primary);
         }
 
-        /* v5: nombre de la bici sobre su foto (opción B): alias blanco y grande; marca en verde y mayúsculas; modelo en blanco suave.
-           La sombra de texto ayuda a leer sobre zonas claras de la foto. Reutilizable en otras listas de bicis. */
+        /* v5: nombre de la bici sobre su foto: alias blanco y grande; marca destacada (más grande que el modelo, en ámbar y mayúsculas);
+           modelo pequeño en blanco. Combinación elegida con el probador. La sombra de texto ayuda a leer sobre zonas claras de la foto.
+           Se usa en las tarjetas del Garaje y en la tarjeta de la bici (taller). Reutilizable en otras listas de bicis. */
         .bici-alias {
             font-weight: 700;
             font-size: 1.25rem;
@@ -536,17 +537,17 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
         }
         .bici-marca-modelo {
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.8);
+            color: #ffffff;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
         }
         .bici-marca-modelo strong {
-            font-size: 0.72rem;
+            font-size: 0.95rem;
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--primary);
+            color: #f0a500;
         }
 
         /* v5: iconos dentro de las filas de usuario del panel admin (el texto es pequeño, 0.78em) */
@@ -573,6 +574,29 @@
         .topbar-title-largo {
             font-size: 1.05rem;
             text-align: center;
+        }
+
+        /* v5: botón naranja de Strava de la pantalla de la bici (sincronizar / vincular) */
+        .btn-strava {
+            width: 100%;
+            background: #FC4C02;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* v5: rejilla de botones de la bici. "Componentes" mide 123px al tamaño del dashboard y en un móvil de 360px
+           cada celda solo da ~102px útiles: se reduce un poco la etiqueta y el margen lateral para que quepa. */
+        .btn-grid-compacto .btn-grid-item {
+            padding: 20px 8px;
+        }
+        .btn-grid-compacto .titulo-redondo {
+            font-size: 1.1rem;
         }
 
         /* v5: iconos de la cabecera del dashboard (ayuda / salir): mismo tamaño exacto, algo mayor que las flechas */
@@ -1650,11 +1674,11 @@
             <div class="topbar">
                 <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
                 <div class="topbar-title" id="taller-nombre-bici">Taller</div>
-                <button class="btn-back" onclick="mostrarMenuBici()">⚙️</button>
+                <button class="btn-back btn-back-icono" onclick="mostrarMenuBici()" title="Opciones de la bici: editar, retirar o eliminar"><i class="ti ti-settings"></i></button>
             </div>
 
             <!-- Resumen de la bici con foto -->
-            <div class="card" style="overflow:hidden; padding:0; border-left:none;">
+            <div class="card" style="overflow:hidden; padding:0; border-left:none; flex-shrink:0;">
                 <div id="taller-foto-bg" style="position:relative; min-height:220px;">
                     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:0;"></div>
                     <div id="taller-foto-svg" style="position:absolute;inset:0;pointer-events:none;"></div>
@@ -1662,11 +1686,10 @@
                         <!-- Nombre, modelo, badge -->
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
                             <div>
-                                <div class="card-title" id="taller-alias" style="font-size:1.2em;font-weight:700;color:white;"></div>
-                                <div class="card-subtitle" id="taller-modelo" style="font-size:0.85em;font-weight:500;"></div>
+                                <div class="bici-marca-modelo" id="taller-modelo"></div>
                             </div>
                             <div style="display:flex;gap:6px;align-items:center;">
-                                <button onclick="cambiarFotoBici()" style="background:rgba(0,0,0,0.4);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;color:white;" title="Cambiar foto">📷</button>
+                                <button onclick="cambiarFotoBici()" style="background:rgba(0,0,0,0.4);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;color:white;" title="Cambiar foto"><i class="ti ti-camera"></i></button>
                                 <span class="badge badge-primary" id="taller-disciplina" style="font-weight:600;font-size:0.8em;"></span>
                             </div>
                         </div>
@@ -1694,41 +1717,46 @@
                 <input type="file" id="input-foto-bici" accept="image/*" style="display:none;" onchange="guardarFotoBici(this)">
             </div>
 
-            <!-- Strava vinculado (solo visible si hay vinculación) -->
-            <div id="taller-strava-vinculado" class="card" style="display:none;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <!-- Strava: vinculada → nombre + "Sincronizar KM"; sin vincular → solo "Vincular con Strava" (lo decide cargarTaller) -->
+            <div id="taller-strava-vinculado" class="card">
+                <div id="taller-strava-info" style="display:none;justify-content:space-between;align-items:center;margin-bottom:10px;">
                     <div>
                         <div style="font-size:0.8em;color:var(--text);">Vinculada con Strava</div>
                         <div style="font-weight:700;color:#FC4C02;" id="taller-strava-nombre"></div>
                     </div>
-                    <span style="font-size:1.5em;">🚴</span>
+                    <span style="font-size:1.9rem;line-height:1;color:#FC4C02;"><i class="ti ti-brand-strava"></i></span>
                 </div>
-                <button onclick="sincronizarBiciStrava()" style="width:100%;background:#FC4C02;color:white;border:none;padding:10px;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;">
-                    🔄 Sincronizar KM con Strava
+                <button id="btn-strava-sync" class="btn-strava" onclick="sincronizarBiciStrava()" title="Actualizar los KM de esta bici desde Strava">
+                    <i class="ti ti-refresh"></i> Sincronizar KM con Strava
+                </button>
+                <button id="btn-strava-vincular" class="btn-strava" style="display:none;" onclick="abrirModalVincularStrava()" title="Vincular esta bici con una bici de tu cuenta de Strava">
+                    <i class="ti ti-brand-strava"></i> Vincular con Strava
                 </button>
             </div>
 
             <!-- Botones de acción -->
-            <div class="btn-grid">
-                <button class="btn-grid-item" onclick="navegar('sec-componentes')">
-                    <div class="btn-grid-item-icon">🧱</div>
-                    <div class="btn-grid-item-text">Componentes</div>
+            <div class="btn-grid btn-grid-compacto">
+                <button class="btn-grid-item" onclick="navegar('sec-componentes')" title="Despiece completo de la bici por secciones">
+                    <div class="badge-circulo"><i class="ti ti-assembly"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Componentes</div>
                 </button>
-                <button class="btn-grid-item" onclick="navegar('sec-historial')">
-                    <div class="btn-grid-item-icon">📋</div>
-                    <div class="btn-grid-item-text">Historial</div>
+                <button class="btn-grid-item" onclick="navegar('sec-historial')" title="Registro de sustituciones, reparaciones y mantenimientos">
+                    <div class="badge-circulo"><i class="ti ti-history"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Historial</div>
                 </button>
-                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')">
-                    <div class="btn-grid-item-icon">📦</div>
-                    <div class="btn-grid-item-text">Cajón (<span id="cajon-count-taller">0</span>)</div>
+                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')" title="Piezas de repuesto o retiradas para reutilizar">
+                    <div class="badge-circulo"><i class="ti ti-package"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Cajón (<span id="cajon-count-taller">0</span>)</div>
                 </button>
-                <button class="btn-grid-item" id="btn-vincular-strava" onclick="accionStravaBici()">
-                    <div class="btn-grid-item-icon" id="btn-vincular-strava-icon">🚴</div>
-                    <div class="btn-grid-item-text" id="btn-vincular-strava-texto">Vincular Strava</div>
+                <!-- Solo visible con la bici vinculada -->
+                <button class="btn-grid-item" id="btn-vincular-strava" style="display:none;" onclick="accionStravaBici()" title="Quitar la vinculación con Strava (los KM se conservan)">
+                    <div class="badge-circulo"><i class="ti ti-link-off"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Desvincular</div>
                 </button>
-                <button class="btn-grid-item" onclick="abrirModalKm()">
-                    <div class="btn-grid-item-icon">📏</div>
-                    <div class="btn-grid-item-text">Añadir KM</div>
+                <!-- Solo visible con la bici sin vincular -->
+                <button class="btn-grid-item" id="btn-add-km-taller" onclick="abrirModalKm()" title="Añadir kilómetros manualmente">
+                    <div class="badge-circulo"><i class="ti ti-route"></i></div>
+                    <div class="btn-grid-item-text titulo-redondo">Añadir KM</div>
                 </button>
             </div>
         </section>
@@ -4719,8 +4747,7 @@ MyBikeGestor`
             if (!biciActual) return;
 
             document.getElementById('taller-nombre-bici').textContent = biciActual.alias;
-            document.getElementById('taller-alias').textContent = biciActual.alias;
-            document.getElementById('taller-modelo').innerHTML = `<strong style="color:#F0EBEB;">${biciActual.marca}</strong> <span style="color:#B0A0A0;">${biciActual.modelo}</span>`;
+            document.getElementById('taller-modelo').innerHTML = `<strong>${biciActual.marca}</strong> <span>${biciActual.modelo}</span>`;
             document.getElementById('taller-disciplina').textContent = biciActual.disciplina;
             document.getElementById('taller-km').textContent = `${biciActual.kmTotales || 0} km`;
 
@@ -4769,17 +4796,16 @@ MyBikeGestor`
                 document.getElementById('taller-uso').textContent = '0d';
             }
             
-            // Mostrar vinculación con Strava si existe
-            if (biciActual.stravaBiciId) {
-                document.getElementById('taller-strava-vinculado').style.display = 'block';
-                document.getElementById('taller-strava-nombre').textContent = biciActual.stravaBiciNombre || 'Bici de Strava';
-                document.getElementById('btn-vincular-strava-icon').textContent = '🔓';
-                document.getElementById('btn-vincular-strava-texto').textContent = 'Desvincular';
-            } else {
-                document.getElementById('taller-strava-vinculado').style.display = 'none';
-                document.getElementById('btn-vincular-strava-icon').textContent = '🚴';
-                document.getElementById('btn-vincular-strava-texto').textContent = 'Vincular Strava';
-            }
+            // Strava (v5):
+            //  - vinculada:   nombre + "Sincronizar KM" arriba, y "Desvincular" en la rejilla (los KM llegan de Strava)
+            //  - sin vincular: solo "Vincular con Strava" arriba, y "Añadir KM" manual en la rejilla
+            const vinculada = !!biciActual.stravaBiciId;
+            document.getElementById('taller-strava-info').style.display = vinculada ? 'flex' : 'none';
+            document.getElementById('taller-strava-nombre').textContent = vinculada ? (biciActual.stravaBiciNombre || 'Bici de Strava') : '';
+            document.getElementById('btn-strava-sync').style.display = vinculada ? 'block' : 'none';
+            document.getElementById('btn-strava-vincular').style.display = vinculada ? 'none' : 'block';
+            document.getElementById('btn-vincular-strava').style.display = vinculada ? '' : 'none';
+            document.getElementById('btn-add-km-taller').style.display = vinculada ? 'none' : '';
 
             actualizarBotonCajon();
         }
@@ -4800,17 +4826,17 @@ MyBikeGestor`
             modal.className = 'modal activo';
             modal.innerHTML = `
                 <div class="modal-contenido" style="max-width: 320px;">
-                    <div class="modal-confirmar-titulo" style="font-size: 1.1em; margin-bottom: 5px;">⚙️ ${biciActual.alias}</div>
+                    <div class="modal-confirmar-titulo" style="font-size: 1.1em; margin-bottom: 5px; text-align: center;">${biciActual.alias}</div>
                     <div class="text-muted" style="font-size: 0.85em; margin-bottom: 20px; text-align: center;">${biciActual.marca} ${biciActual.modelo}</div>
                     
                     <button class="btn btn-primary" style="width:100%; margin-bottom: 10px;" onclick="cerrarMenuBici(); editarBici();">
-                        ✏️ Editar datos
+                        <i class="ti ti-pencil"></i> Editar datos
                     </button>
                     <button class="btn btn-secondary" style="width:100%; margin-bottom: 10px;" onclick="cerrarMenuBici(); retirarBici(biciActual.id);">
-                        📦 Retirar bici
+                        <i class="ti ti-archive"></i> Retirar bici
                     </button>
                     <button class="btn btn-danger" style="width:100%; margin-bottom: 15px;" onclick="cerrarMenuBici(); eliminarBici(biciActual.id);">
-                        🗑️ Eliminar bici
+                        <i class="ti ti-trash"></i> Eliminar bici
                     </button>
                     <button class="btn btn-secondary" onclick="cerrarMenuBici();">
                         ← Cancelar
