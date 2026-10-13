@@ -599,6 +599,59 @@
             font-size: 1.1rem;
         }
 
+        /* v5: tarjeta ancha con foto de fondo (Componentes en el taller) */
+        .btn-foto-ancho {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 140px;
+            margin-top: 20px;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            background-color: #2D2D2D;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.2s;
+        }
+        .btn-foto-ancho::before,
+        .btn-grid-foto::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.7));
+        }
+        .btn-foto-ancho > *,
+        .btn-grid-foto > * { position: relative; z-index: 1; }
+        .btn-foto-ancho:hover { transform: translateY(-2px); }
+        /* variante más baja, con icono y texto en línea (Cajón) */
+        .btn-foto-medio {
+            flex-direction: row;
+            gap: 14px;
+            min-height: 96px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+        }
+        .btn-foto-medio .badge-circulo { margin: 0; width: 46px; height: 46px; }
+        .btn-foto-medio .badge-circulo i { font-size: 24px; }
+        .btn-foto-ancho .badge-circulo,
+        .btn-grid-foto .badge-circulo { background: rgba(0, 0, 0, 0.45); }
+        .btn-foto-ancho .titulo-redondo,
+        .btn-grid-foto .titulo-redondo { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+        .btn-grid-foto {
+            position: relative;
+            overflow: hidden;
+            background-color: #2D2D2D;
+            background-size: cover;
+            background-position: center;
+        }
+
         /* v5: iconos de la cabecera del dashboard (ayuda / salir): mismo tamaño exacto, algo mayor que las flechas */
         .btn-back-icono {
             font-size: 1.5rem;
@@ -612,6 +665,19 @@
         }
 
         /* v5: subtítulos de sección en verde (Datos Personales, Datos Físicos, etc.) */
+
+        /* v5: pantalla Ayuda y Tutorial — títulos de tarjeta azules con icono verde */
+        .ayuda-titulo {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--secondary);
+        }
+        .ayuda-titulo .ti { color: var(--primary); font-size: 1.15em; vertical-align: -2px; }
+        .titulo-redondo-barra { font-family: 'Quicksand', sans-serif; text-align: center; }
+        #sec-ayuda [id^="tab-btn-"] .ti { font-size: 1.35rem; }
+        #sec-ayuda li .ti, #sec-ayuda p .ti { vertical-align: -2px; }
+
         .subtitulo-verde {
             color: var(--primary) !important;
         }
@@ -676,6 +742,17 @@
             border-left: 4px solid var(--secondary);
         }
 
+        .notificacion-aviso {
+            border-left: 4px solid #f0a500;
+        }
+
+        .notificacion-exito .notificacion-icono { color: var(--primary); }
+        .notificacion-error .notificacion-icono { color: var(--danger); }
+        .notificacion-info .notificacion-icono { color: var(--secondary); }
+        .notificacion-aviso .notificacion-icono { color: #f0a500; }
+        .notificacion-icono { display: flex; align-items: center; }
+        .notificacion-texto { font-family: 'Quicksand', sans-serif; }
+
         .notificacion-icono {
             font-size: 1.5em;
         }
@@ -714,10 +791,11 @@
         }
 
         .modal-confirmar-titulo {
+            font-family: 'Quicksand', sans-serif;
             font-size: 1.2em;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 15px;
-            color: var(--dark);
+            color: var(--secondary);
         }
 
         .modal-confirmar-botones {
@@ -1113,7 +1191,7 @@
         ======================================== -->
         <section id="sec-ajustes" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Ajustes</div>
                 <div style="width:40px;"></div>
             </div>
@@ -1135,7 +1213,7 @@
         ======================================== -->
         <section id="sec-ajuste-alertas" class="seccion">
             <div class="topbar" style="padding: 20px 15px;">
-                <button class="btn-back" onclick="navegar('sec-ajustes')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title topbar-title-largo">Alertas de sustitución</div>
                 <div style="width:40px;"></div>
             </div>
@@ -1160,7 +1238,7 @@
         ======================================== -->
         <section id="sec-perfil" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Perfil</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1356,7 +1434,7 @@
             </div>
 
             <button class="btn btn-primary mt-20" onclick="guardarPerfil()">Guardar Cambios</button>
-            <button class="btn-back mt-20" onclick="navegar('sec-dashboard')" style="align-self:flex-start;">←</button>
+            <button class="btn-back mt-20" onclick="volver()" style="align-self:flex-start;">←</button>
         </section>
 
         <!-- ========================================
@@ -1364,7 +1442,7 @@
         ======================================== -->
         <section id="sec-garaje" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Garaje</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1386,7 +1464,7 @@
         ======================================== -->
         <section id="sec-nueva-bici" class="seccion">
             <div class="topbar">
-                <button class="btn-back" id="btn-back-nueva-bici" onclick="navegar('sec-garaje')">←</button>
+                <button class="btn-back" id="btn-back-nueva-bici" onclick="volver()">←</button>
                 <div class="topbar-title" id="titulo-nueva-bici">Nueva Bici</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1510,7 +1588,7 @@
         ======================================== -->
         <section id="sec-garaje-ruedas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-componentes')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" style="font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">⭕ Ruedas · <span id="garaje-ruedas-nombre-bici"></span></div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1528,7 +1606,7 @@
         ======================================== -->
         <section id="sec-ruedas-retiradas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-garaje-ruedas')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">📦 Ruedas Retiradas</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1543,7 +1621,7 @@
         ======================================== -->
         <section id="sec-detalle-juego-ruedas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-garaje-ruedas')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" id="detalle-juego-ruedas-titulo">Juego de Ruedas</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1555,7 +1633,7 @@
         ======================================== -->
         <section id="sec-despiece-rueda" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-detalle-juego-ruedas')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" id="despiece-rueda-titulo">Despiece</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1566,9 +1644,9 @@
              SECCIÓN: ALERTAS DE SUSTITUCIÓN
         ======================================== -->
         <section id="sec-alertas" class="seccion">
-            <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
-                <div class="topbar-title">🔔 Alertas de sustitución</div>
+            <div class="topbar" style="padding: 20px 15px;">
+                <button class="btn-back" onclick="volver()">←</button>
+                <div class="topbar-title topbar-title-largo">Alertas de sustitución</div>
                 <div style="width:40px;"></div>
             </div>
             <div id="contenido-alertas" class="mt-20"></div>
@@ -1579,7 +1657,7 @@
         ======================================== -->
         <section id="sec-desglose-peso" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">⚖️ Desglose de Peso</div>
                 <div style="width:40px;"></div>
             </div>
@@ -1591,7 +1669,7 @@
         ======================================== -->
         <section id="sec-desglose-inversion" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">💰 Desglose de Inversión</div>
                 <div style="width:40px;"></div>
             </div>
@@ -1603,7 +1681,7 @@
         ======================================== -->
         <section id="sec-cajon-piezas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-taller')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">📦 Cajón de Piezas</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1619,7 +1697,7 @@
         ======================================== -->
         <section id="sec-bicis-retiradas" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Bicis Retiradas 📦</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1638,7 +1716,7 @@
         ======================================== -->
         <section id="sec-admin" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-dashboard')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Panel Admin</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1664,7 +1742,7 @@
                 <div class="text-center text-muted">Cargando usuarios...</div>
             </div>
 
-            <button class="btn-back btn-back-fijo" onclick="navegar('sec-dashboard')" title="Volver">←</button>
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1672,7 +1750,7 @@
         ======================================== -->
         <section id="sec-taller" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-garaje')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" id="taller-nombre-bici">Taller</div>
                 <button class="btn-back btn-back-icono" onclick="mostrarMenuBici()" title="Opciones de la bici: editar, retirar o eliminar"><i class="ti ti-settings"></i></button>
             </div>
@@ -1734,19 +1812,17 @@
                 </button>
             </div>
 
+            <!-- Componentes: tarjeta ancha con la foto del despiece -->
+            <button class="btn-foto-ancho" style="background-image:url('../icons/componentes/despiece-banner.jpg');" onclick="navegar('sec-componentes')" title="Despiece completo de la bici por secciones">
+                <div class="badge-circulo"><i class="ti ti-assembly"></i></div>
+                <div class="titulo-redondo">Componentes</div>
+            </button>
+
             <!-- Botones de acción -->
-            <div class="btn-grid btn-grid-compacto">
-                <button class="btn-grid-item" onclick="navegar('sec-componentes')" title="Despiece completo de la bici por secciones">
-                    <div class="badge-circulo"><i class="ti ti-assembly"></i></div>
-                    <div class="btn-grid-item-text titulo-redondo">Componentes</div>
-                </button>
+            <div class="btn-grid btn-grid-compacto" style="margin-top:15px; margin-bottom:20px;">
                 <button class="btn-grid-item" onclick="navegar('sec-historial')" title="Registro de sustituciones, reparaciones y mantenimientos">
                     <div class="badge-circulo"><i class="ti ti-history"></i></div>
                     <div class="btn-grid-item-text titulo-redondo">Historial</div>
-                </button>
-                <button class="btn-grid-item" onclick="navegar('sec-cajon-piezas')" title="Piezas de repuesto o retiradas para reutilizar">
-                    <div class="badge-circulo"><i class="ti ti-package"></i></div>
-                    <div class="btn-grid-item-text titulo-redondo">Cajón (<span id="cajon-count-taller">0</span>)</div>
                 </button>
                 <!-- Solo visible con la bici vinculada -->
                 <button class="btn-grid-item" id="btn-vincular-strava" style="display:none;" onclick="accionStravaBici()" title="Quitar la vinculación con Strava (los KM se conservan)">
@@ -1766,7 +1842,7 @@
         ======================================== -->
         <section id="sec-componentes" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="volverATaller()">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Componentes</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1778,8 +1854,11 @@
                 <!-- Se generará dinámicamente según la disciplina -->
             </div>
 
-            <!-- Cajón de piezas (solo visible si hay piezas) -->
-            <button id="btn-ver-cajon" class="btn btn-secondary mt-20" style="display:none;" onclick="navegar('sec-cajon-piezas')">📦 Cajón de piezas (<span id="cajon-count">0</span>)</button>
+            <!-- Cajón de piezas: tarjeta con foto (única entrada al cajón; siempre visible para poder añadir la primera pieza) -->
+            <button id="btn-ver-cajon" class="btn-foto-ancho btn-foto-medio" style="background-image:url('../icons/componentes/cajon.jpg');" onclick="navegar('sec-cajon-piezas')" title="Piezas de repuesto o retiradas para reutilizar">
+                <div class="badge-circulo"><i class="ti ti-package"></i></div>
+                <div class="titulo-redondo">Cajón de piezas (<span id="cajon-count">0</span>)</div>
+            </button>
         </section>
 
         <!-- ========================================
@@ -1787,7 +1866,7 @@
         ======================================== -->
         <section id="sec-lista-componentes-seccion" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="navegar('sec-componentes')">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" id="titulo-seccion-componentes">Sección</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1804,7 +1883,7 @@
         ======================================== -->
         <section id="sec-detalle-componente" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="volverAListaComponentes()">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title" id="titulo-detalle-componente">Componente</div>
                 <div style="width: 40px;"></div>
             </div>
@@ -1885,7 +1964,7 @@
         ======================================== -->
         <section id="sec-historial" class="seccion">
             <div class="topbar">
-                <button class="btn-back" onclick="volverATaller()">←</button>
+                <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Historial</div>
                 <button onclick="abrirModalNuevoMantenimiento()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.82em;font-weight:700;cursor:pointer;">➕ Añadir</button>
             </div>
@@ -1902,16 +1981,17 @@
 
         <section id="sec-ayuda" class="seccion" style="padding:0 0 20px 0;">
             <div class="topbar">
-                <button class="btn-back" onclick="marcarAyudaVista(); navegar('sec-dashboard')">←</button>
-                <div class="topbar-title">Ayuda y Tutorial</div>
+                <button class="btn-back" onclick="marcarAyudaVista(); volver()">←</button>
+                <div class="topbar-title titulo-redondo-barra">Ayuda y Tutorial</div>
+                <div style="width:40px;"></div>
             </div>
 
             <!-- TABS -->
             <div style="display:flex;border-bottom:2px solid var(--light-gray);background:var(--white);margin-bottom:20px;">
-                <button id="tab-btn-instalar" onclick="cambiarTabAyuda('instalar')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:700;color:var(--primary);border-bottom:3px solid var(--primary);cursor:pointer;">📲 Instalar</button>
-                <button id="tab-btn-inicio" onclick="cambiarTabAyuda('inicio')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">🚴 Primeros pasos</button>
-                <button id="tab-btn-funciones" onclick="cambiarTabAyuda('funciones')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">ℹ️ Funciones</button>
-                <button id="tab-btn-contacto" onclick="cambiarTabAyuda('contacto')" style="flex:1;padding:10px 4px;border:none;background:none;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;">✉️ Contacto</button>
+                <button id="tab-btn-instalar" onclick="cambiarTabAyuda('instalar')" style="flex:1;padding:8px 2px;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.8em;font-weight:700;color:var(--primary);border-bottom:3px solid var(--primary);cursor:pointer;"><i class="ti ti-download"></i><span>Instalar</span></button>
+                <button id="tab-btn-inicio" onclick="cambiarTabAyuda('inicio')" style="flex:1;padding:8px 2px;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;"><i class="ti ti-bike"></i><span>Primeros pasos</span></button>
+                <button id="tab-btn-funciones" onclick="cambiarTabAyuda('funciones')" style="flex:1;padding:8px 2px;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;"><i class="ti ti-list-details"></i><span>Funciones</span></button>
+                <button id="tab-btn-contacto" onclick="cambiarTabAyuda('contacto')" style="flex:1;padding:8px 2px;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.8em;font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;cursor:pointer;"><i class="ti ti-mail"></i><span>Contacto</span></button>
             </div>
 
             <div style="padding:0 20px;">
@@ -1921,64 +2001,64 @@
                     <p style="color:var(--text);font-size:0.9em;margin-bottom:16px;">MyBikeGestor es una aplicación web (PWA). Para acceder fácilmente en el futuro, instálala en tu dispositivo siguiendo estos pasos:</p>
 
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">🤖 Android (Chrome)</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-brand-android"></i> Android (Chrome)</div>
                         <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
                             <li>Abre la app en <strong>Google Chrome</strong></li>
-                            <li>Pulsa el menú <strong>⋮</strong> (tres puntos, arriba a la derecha)</li>
+                            <li>Pulsa el menú <strong><i class="ti ti-dots-vertical"></i></strong> (tres puntos, arriba a la derecha)</li>
                             <li>Selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
                             <li>Pulsa <strong>"Añadir"</strong> en el diálogo que aparece</li>
                         </ol>
                     </div>
 
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">🍎 iPhone / iPad (Safari)</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-brand-apple"></i> iPhone / iPad (Safari)</div>
                         <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
                             <li>Abre la app en <strong>Safari</strong> (obligatorio, no Chrome)</li>
-                            <li>Pulsa el botón <strong>Compartir</strong> (cuadrado con flecha ↑)</li>
+                            <li>Pulsa el botón <strong>Compartir</strong> (cuadrado con flecha <i class="ti ti-share-2"></i>)</li>
                             <li>Desplázate y selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
                             <li>Pulsa <strong>"Añadir"</strong> arriba a la derecha</li>
                         </ol>
                     </div>
 
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">🖥️ PC / Mac (Chrome)</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-device-desktop"></i> PC / Mac (Chrome)</div>
                         <ol style="margin:0;padding-left:18px;color:var(--text);font-size:0.88em;line-height:1.8;">
                             <li>Abre la app en <strong>Google Chrome</strong></li>
-                            <li>Busca el icono de <strong>instalar</strong> (⊕) en la barra de direcciones</li>
+                            <li>Busca el icono de <strong>instalar</strong> <i class="ti ti-circle-plus"></i> en la barra de direcciones</li>
                             <li>Haz clic en él y selecciona <strong>"Instalar"</strong></li>
                             <li>La app se abrirá como una ventana independiente</li>
                         </ol>
                         <div style="margin-top:10px;padding:8px 10px;background:var(--white);border-radius:8px;border-left:3px solid var(--primary);">
                             <div style="font-size:0.82em;font-weight:700;color:var(--primary);margin-bottom:2px;">Alternativa rápida</div>
-                            <div style="font-size:0.82em;color:var(--text);">Selecciona la <strong>★ estrella</strong> en la barra de direcciones para añadirla directamente a tu barra de favoritos.</div>
+                            <div style="font-size:0.82em;color:var(--text);">Selecciona la <strong><i class="ti ti-star"></i> estrella</strong> en la barra de direcciones para añadirla directamente a tu barra de favoritos.</div>
                         </div>
                     </div>
 
                     <div style="background:rgba(240,165,0,0.15);border-radius:12px;padding:12px;border-left:4px solid #f0a500;">
-                        <div style="font-size:0.85em;color:var(--text);">💡 <strong>Disponible en Google Play Store</strong>. Descárgala gratis buscando <strong>MyBikeGestor</strong> en Google Play o desde la pestaña <strong>Contacto</strong>.</div>
+                        <div style="font-size:0.85em;color:var(--text);"><i class="ti ti-bulb" style="color:#f0a500;"></i> <strong>Disponible en Google Play Store</strong>. Descárgala gratis buscando <strong>MyBikeGestor</strong> en Google Play o desde la pestaña <strong>Contacto</strong>.</div>
                     </div>
                 </div>
 
                 <!-- TAB PRIMEROS PASOS -->
                 <div id="tab-inicio" style="display:none;">
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">1️⃣ Crea tu cuenta</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-number-1"></i> Crea tu cuenta</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Regístrate con tu email. Si ya tienes cuenta, simplemente inicia sesión.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">2️⃣ Añade tu bici</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-number-2"></i> Añade tu bici</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Ve a <strong>Garaje → Nueva Bici</strong> e introduce los datos de tu bicicleta: marca, modelo, disciplina y km actuales. Puedes añadir todas las que quieras.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">3️⃣ Registra tus componentes</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-number-3"></i> Registra tus componentes</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Desde el taller de tu bici, entra en <strong>Componentes</strong> y añade cada pieza con su fecha de instalación y km.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:8px;">4️⃣ Actualiza tus km</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-number-4"></i> Actualiza tus km</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Tras cada salida, actualiza los km de cada bici desde el taller o vincula la app con <strong>Strava</strong> para sincronizarlos automáticamente.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;">
-                        <div style="font-weight:700;margin-bottom:8px;">5️⃣ Gestiona tu perfil</div>
+                        <div class="ayuda-titulo" style="margin-bottom:8px;"><i class="ti ti-number-5"></i> Gestiona tu perfil</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">En <strong>Perfil</strong> puedes registrar tu ciclocomputador GPS, configurar datos de entrenamiento y gestionar tu cuenta.</p>
                     </div>
                 </div>
@@ -1986,27 +2066,27 @@
                 <!-- TAB FUNCIONES -->
                 <div id="tab-funciones" style="display:none;">
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">🏠 Garaje</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-home"></i> Garaje</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Añade todas tus bicis sin límite y organiza tu flota completa. Accede a cada una con un toque.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">🔧 Componentes</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-assembly"></i> Componentes</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Realiza un despiece completo de tu bici por secciones. Edita, sustituye o repara cada pieza como quieras. La app calcula automáticamente los km acumulados y te avisa cuando necesitan mantenimiento según el historial de tus sustituciones.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">📦 Cajón de piezas</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-package"></i> Cajón de piezas</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Almacena piezas de repuesto o retiradas para usar o reutilizar en futuras sustituciones.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">📋 Historial</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-history"></i> Historial</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Consulta el registro completo de sustituciones, reparaciones y mantenimientos de cada bici.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;margin-bottom:6px;">🚨 Alertas</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-bell"></i> Alertas</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Recibe avisos cuando un componente se acerca al límite de km recomendado. Personaliza el umbral de cada alerta y pospónlas si no es el momento de actuar.</p>
                     </div>
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;">
-                        <div style="font-weight:700;margin-bottom:6px;">🟠 Strava</div>
+                        <div class="ayuda-titulo" style="margin-bottom:6px;"><i class="ti ti-brand-strava"></i> Strava</div>
                         <p style="margin:0;color:var(--text);font-size:0.88em;line-height:1.6;">Vincula tu cuenta de Strava para sincronizar los km automáticamente tras cada actividad.</p>
                     </div>
                 </div>
@@ -2019,53 +2099,53 @@
                     <!-- Google Play -->
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="font-weight:700;">🚀 Descarga en Google Play</div>
-                            <button onclick="toggleContacto('beta')" id="btn-contacto-beta" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                            <div class="ayuda-titulo"><i class="ti ti-brand-google-play"></i> Descarga en Google Play</div>
+                            <button onclick="toggleContacto('beta')" id="btn-contacto-beta" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más <i class="ti ti-chevron-down"></i></button>
                         </div>
                         <div id="detalle-contacto-beta" style="display:none;margin-top:12px;">
                             <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">MyBikeGestor está disponible gratuitamente en <strong>Google Play Store</strong> para dispositivos Android. Búscala por nombre o escríbenos y te enviamos el enlace directo.</p>
-                            <button onclick="abrirFormContacto('beta')" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar enlace de descarga</button>
+                            <button onclick="abrirFormContacto('beta')" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;"><i class="ti ti-send"></i> Enviar enlace de descarga</button>
                         </div>
                     </div>
 
                     <!-- Dudas -->
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="font-weight:700;">❓ Dudas o preguntas</div>
-                            <button onclick="toggleContacto('dudas')" id="btn-contacto-dudas" style="background:var(--secondary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                            <div class="ayuda-titulo"><i class="ti ti-help-circle"></i> Dudas o preguntas</div>
+                            <button onclick="toggleContacto('dudas')" id="btn-contacto-dudas" style="background:var(--secondary);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más <i class="ti ti-chevron-down"></i></button>
                         </div>
                         <div id="detalle-contacto-dudas" style="display:none;margin-top:12px;">
                             <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Algo no queda claro sobre cómo funciona la app? Cuéntanoslo con el mayor detalle posible y te respondemos lo antes posible.</p>
-                            <button onclick="abrirFormContacto('dudas')" style="width:100%;padding:10px;background:var(--secondary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar pregunta</button>
+                            <button onclick="abrirFormContacto('dudas')" style="width:100%;padding:10px;background:var(--secondary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;"><i class="ti ti-send"></i> Enviar pregunta</button>
                         </div>
                     </div>
 
                     <!-- Error -->
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="font-weight:700;">🐛 Reportar un error</div>
-                            <button onclick="toggleContacto('error')" id="btn-contacto-error" style="background:var(--danger);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                            <div class="ayuda-titulo"><i class="ti ti-bug"></i> Reportar un error</div>
+                            <button onclick="toggleContacto('error')" id="btn-contacto-error" style="background:var(--danger);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más <i class="ti ti-chevron-down"></i></button>
                         </div>
                         <div id="detalle-contacto-error" style="display:none;margin-top:12px;">
                             <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Algo no funciona como debería? Descríbenos qué ocurrió, en qué pantalla y qué pasos seguiste. Nos ayuda muchísimo para mejorar la app.</p>
-                            <button onclick="abrirFormContacto('error')" style="width:100%;padding:10px;background:var(--danger);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Reportar error</button>
+                            <button onclick="abrirFormContacto('error')" style="width:100%;padding:10px;background:var(--danger);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;"><i class="ti ti-send"></i> Reportar error</button>
                         </div>
                     </div>
 
                     <!-- Sugerencia -->
                     <div style="background:var(--light-gray);border-radius:12px;padding:14px;margin-bottom:12px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="font-weight:700;">💡 Sugerencias</div>
-                            <button onclick="toggleContacto('sugerencia')" id="btn-contacto-sugerencia" style="background:var(--warning);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más ▼</button>
+                            <div class="ayuda-titulo"><i class="ti ti-bulb"></i> Sugerencias</div>
+                            <button onclick="toggleContacto('sugerencia')" id="btn-contacto-sugerencia" style="background:var(--warning);color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.78em;font-weight:700;cursor:pointer;">Ver más <i class="ti ti-chevron-down"></i></button>
                         </div>
                         <div id="detalle-contacto-sugerencia" style="display:none;margin-top:12px;">
                             <p style="margin:0 0 12px 0;color:var(--text);font-size:0.85em;line-height:1.6;">¿Se te ocurre algo que podríamos mejorar o añadir? Nos encanta recibir ideas de los usuarios — muchas de las funciones actuales nacieron así.</p>
-                            <button onclick="abrirFormContacto('sugerencia')" style="width:100%;padding:10px;background:var(--warning);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;">✉️ Enviar sugerencia</button>
+                            <button onclick="abrirFormContacto('sugerencia')" style="width:100%;padding:10px;background:var(--warning);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.88em;cursor:pointer;"><i class="ti ti-send"></i> Enviar sugerencia</button>
                         </div>
                     </div>
 
                     <div style="text-align:center;padding:12px 0 4px 0;color:var(--text-light);font-size:0.8em;">
-                        mybikegestor@gmail.com
+                        <i class="ti ti-mail"></i> mybikegestor@gmail.com
                     </div>
 
                 </div>
@@ -3428,10 +3508,10 @@
         <div class="modal-contenido" style="max-width:400px;">
             <div class="modal-header" style="display:flex;align-items:center;gap:10px;">
                 <button onclick="cerrarFormContacto()" style="background:none;border:none;font-size:1.4em;cursor:pointer;padding:0;line-height:1;">←</button>
-                <h2 class="modal-title" style="margin:0;font-size:1em;" id="modal-contacto-titulo"></h2>
+                <h2 class="modal-title ayuda-titulo" style="margin:0;" id="modal-contacto-titulo"></h2>
             </div>
             <div style="padding:4px 0 12px 0;">
-                <div style="font-size:0.82em;color:var(--text-light);margin-bottom:16px;">✉️ Se enviará desde: <strong id="modal-contacto-email"></strong></div>
+                <div style="font-size:0.82em;color:var(--text-light);margin-bottom:16px;"><i class="ti ti-mail"></i> Se enviará desde: <strong id="modal-contacto-email"></strong></div>
                 <div id="modal-contacto-campos"></div>
                 <button id="btn-enviar-contacto" onclick="enviarContacto()" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.95em;cursor:pointer;margin-top:8px;">Enviar</button>
             </div>
@@ -3593,7 +3673,7 @@
                     biciActual = datosUsuario.garaje[biciIndex];
                     await guardarDatosUsuario();
                     cargarTaller();
-                    mostrarNotificacion(`✅ KM actualizados: ${kmStrava.toLocaleString()} km (antes: ${kmAnteriores.toLocaleString()} km)`, 'exito');
+                    mostrarNotificacion(` KM actualizados: ${kmStrava.toLocaleString()} km (antes: ${kmAnteriores.toLocaleString()} km)`, 'exito');
                 }
             } catch (error) {
                 console.error('Error sincronizando con Strava:', error);
@@ -3823,16 +3903,23 @@
             const notifAnterior = document.querySelector('.notificacion');
             if (notifAnterior) notifAnterior.remove();
 
+            // v5: iconos Tabler por tipo (success = exito; warning = aviso)
+            const alias = { 'success': 'exito', 'warning': 'aviso' };
+            tipo = alias[tipo] || tipo;
             const iconos = {
-                'exito': '✓',
-                'error': '✗',
-                'info': 'ℹ'
+                'exito': 'ti-circle-check',
+                'error': 'ti-alert-circle',
+                'info': 'ti-info-circle',
+                'aviso': 'ti-alert-triangle'
             };
+            if (!iconos[tipo]) tipo = 'info';
+            // v5: quitar emojis sueltos del texto (el icono ya lo pone el tipo)
+            mensaje = String(mensaje).replace(/[\u2705\u2713\u2714\u26A1\u21A9\uFE0F\u{1F300}-\u{1FAFF}]/gu, '').replace(/\s+([.,!])/g, '$1').replace(/\s{2,}/g, ' ').trim();
 
             const notif = document.createElement('div');
             notif.className = `notificacion notificacion-${tipo}`;
             notif.innerHTML = `
-                <div class="notificacion-icono">${iconos[tipo]}</div>
+                <div class="notificacion-icono"><i class="ti ${iconos[tipo]}"></i></div>
                 <div class="notificacion-texto">${mensaje}</div>
             `;
 
@@ -3870,9 +3957,27 @@
         // ========================================
         let seccionAnterior = 'sec-login';
 
+
+        // v5: historial de pantallas. La flecha ← (volver) siempre vuelve a la pantalla anterior.
+        let historialNav = [];
+        function volver() {
+            const previa = historialNav[historialNav.length - 1];
+            navegar(previa || 'sec-dashboard');
+        }
+
         function navegar(seccionId) {
             const secActiva = document.querySelector('.seccion.activa');
             if (secActiva) seccionAnterior = secActiva.id;
+            const idActual = secActiva ? secActiva.id : null;
+            if (seccionId !== idActual) {
+                if (['sec-dashboard', 'sec-login', 'sec-registro'].includes(seccionId)) {
+                    historialNav = [];                       // pantallas raíz: se empieza de cero
+                } else {
+                    const pos = historialNav.lastIndexOf(seccionId);
+                    if (pos >= 0) historialNav.length = pos; // volver a una pantalla ya visitada
+                    else if (idActual && idActual !== 'sec-login' && idActual !== 'sec-registro') historialNav.push(idActual);
+                }
+            }
 
             // Ocultar todas las secciones
             document.querySelectorAll('.seccion').forEach(sec => {
@@ -3971,7 +4076,7 @@
             datosUsuario.umbralAlertas = parseFloat(document.getElementById('ajuste-umbral-alertas').value) / 100;
             await guardarDatosUsuario();
             mostrarNotificacion('Ajuste guardado', 'exito');
-            navegar('sec-ajustes');
+            volver();
         }
 
         function cargarPerfil() {
@@ -4249,7 +4354,7 @@ MyBikeGestor`
 
                 mostrarNotificacion('¡Cuenta creada! Ya puedes iniciar sesión', 'exito');
                 if (aceptaComunicaciones) {
-                    setTimeout(() => mostrarNotificacion('📧 Te hemos enviado un email de bienvenida. Si no lo encuentras, revisa la carpeta de spam.', 'info'), 4000);
+                    setTimeout(() => mostrarNotificacion('Te hemos enviado un email de bienvenida. Si no lo encuentras, revisa la carpeta de spam.', 'info'), 4000);
                 }
             } catch (error) {
                 console.error('Error al registrar:', error);
@@ -4282,27 +4387,27 @@ MyBikeGestor`
             const btn = document.getElementById('btn-contacto-' + motivo);
             const abierto = detalle.style.display === 'block';
             detalle.style.display = abierto ? 'none' : 'block';
-            btn.textContent = abierto ? 'Ver más ▼' : 'Ver menos ▲';
+            btn.innerHTML = abierto ? 'Ver más <i class="ti ti-chevron-down"></i>' : 'Ver menos <i class="ti ti-chevron-up"></i>';
         }
 
         function abrirFormContacto(motivo) {
             const titulos = {
-                beta: '🚀 Descarga en Google Play',
-                dudas: '❓ Enviar una pregunta',
-                error: '🐛 Reportar un error',
-                sugerencia: '💡 Enviar una sugerencia'
+                beta: '<i class="ti ti-brand-google-play"></i> Descarga en Google Play',
+                dudas: '<i class="ti ti-help-circle"></i> Enviar una pregunta',
+                error: '<i class="ti ti-bug"></i> Reportar un error',
+                sugerencia: '<i class="ti ti-bulb"></i> Enviar una sugerencia'
             };
             const campos = {
                 beta: `<p style="font-size:0.85em;color:var(--text-light);margin-bottom:12px;">Tu email de acceso se enviará automáticamente.</p>
                        <div class="form-group"><label>Mensaje (opcional)</label><textarea id="contacto-mensaje" rows="3" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Cuéntanos algo más si quieres..."></textarea></div>
-                       <div style="background:rgba(240,165,0,0.15);border-radius:8px;padding:10px;margin-bottom:4px;border-left:3px solid #f0a500;"><div style="font-size:0.78em;color:var(--text);line-height:1.5;">🔒 Al enviar autorizas a MyBikeGestor a usar tu Gmail para añadirte a la lista de testers y enviarte información sobre las pruebas.</div></div>`,
+                       <div style="background:rgba(240,165,0,0.15);border-radius:8px;padding:10px;margin-bottom:4px;border-left:3px solid #f0a500;"><div style="font-size:0.78em;color:var(--text);line-height:1.5;"><i class="ti ti-lock"></i> Al enviar autorizas a MyBikeGestor a usar tu Gmail para añadirte a la lista de testers y enviarte información sobre las pruebas.</div></div>`,
                 dudas: `<div class="form-group"><label>¿En qué podemos ayudarte?</label><textarea id="contacto-mensaje" rows="5" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Escribe tu pregunta aquí..."></textarea></div>`,
                 error: `<div class="form-group"><label>¿En qué pantalla ocurrió?</label><input type="text" id="contacto-pantalla" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;" placeholder="Ej: Componentes, Taller..."></div>
                         <div class="form-group"><label>¿Qué ocurrió?</label><textarea id="contacto-mensaje" rows="4" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Describe el error con el mayor detalle posible..."></textarea></div>`,
                 sugerencia: `<div class="form-group"><label>Tu sugerencia</label><textarea id="contacto-mensaje" rows="5" style="width:100%;padding:10px;border:1px solid var(--light-gray);border-radius:8px;font-size:0.9em;resize:none;" placeholder="Cuéntanos tu idea..."></textarea></div>`
             };
 
-            document.getElementById('modal-contacto-titulo').textContent = titulos[motivo];
+            document.getElementById('modal-contacto-titulo').innerHTML = titulos[motivo];
             document.getElementById('modal-contacto-campos').innerHTML = campos[motivo];
             document.getElementById('modal-contacto-email').textContent = usuarioActual?.email || '';
             document.getElementById('modal-contacto').style.display = 'flex';
@@ -4347,12 +4452,12 @@ MyBikeGestor`
                 });
                 cerrarFormContacto();
                 const confirmaciones = {
-                    beta: 'En breve recibirás el enlace de descarga de Google Play en tu correo. ✓',
-                    dudas: 'Hemos recibido tu pregunta. Te responderemos lo antes posible. ✓',
-                    error: 'Gracias por reportarlo. Trabajaremos para solucionarlo cuanto antes. ✓',
-                    sugerencia: 'Gracias por tu idea. La tendremos en cuenta para futuras versiones. ✓'
+                    beta: 'En breve recibirás el enlace de descarga de Google Play en tu correo.',
+                    dudas: 'Hemos recibido tu pregunta. Te responderemos lo antes posible.',
+                    error: 'Gracias por reportarlo. Trabajaremos para solucionarlo cuanto antes.',
+                    sugerencia: 'Gracias por tu idea. La tendremos en cuenta para futuras versiones.'
                 };
-                mostrarNotificacion(confirmaciones[motivo] || 'Mensaje enviado correctamente ✓', 'success');
+                mostrarNotificacion(confirmaciones[motivo] || 'Mensaje enviado correctamente', 'success');
             } catch (err) {
                 console.error('EmailJS error:', err);
                 mostrarNotificacion('Error al enviar. Inténtalo de nuevo.', 'error');
@@ -4649,7 +4754,7 @@ MyBikeGestor`
                     bici.activa = true;
                     delete bici.fechaRetiro;
                     await guardarDatosUsuario();
-                    mostrarNotificacion(`"${bici.alias}" reactivada ✅`, 'exito');
+                    mostrarNotificacion(`"${bici.alias}" reactivada`, 'exito');
                     cargarBicisRetiradas();
                     mostrarNotificacion(`"${bici.alias}" reactivada en el garaje`, 'exito');
                 }
@@ -4736,8 +4841,8 @@ MyBikeGestor`
                 return;
             }
             if (irAlertas) {
-                navegar('sec-taller');
-                setTimeout(() => navegar('sec-alertas'), 50);
+                // v5: directo a Alertas (sin pasar por el taller) para que ← vuelva a la pantalla de origen
+                navegar('sec-alertas');
             } else {
                 navegar('sec-taller');
             }
@@ -4811,7 +4916,7 @@ MyBikeGestor`
         }
 
         function volverATaller() {
-            navegar('sec-taller');
+            volver();
         }
 
         function mostrarMenuBici() {
@@ -4827,7 +4932,7 @@ MyBikeGestor`
             modal.innerHTML = `
                 <div class="modal-contenido" style="max-width: 320px;">
                     <div class="modal-confirmar-titulo" style="font-size: 1.1em; margin-bottom: 5px; text-align: center;">${biciActual.alias}</div>
-                    <div class="text-muted" style="font-size: 0.85em; margin-bottom: 20px; text-align: center;">${biciActual.marca} ${biciActual.modelo}</div>
+                    <div class="bici-marca-modelo" style="margin-bottom: 20px; text-align: center;"><strong>${biciActual.marca}</strong> <span>${biciActual.modelo}</span></div>
                     
                     <button class="btn btn-primary" style="width:100%; margin-bottom: 10px;" onclick="cerrarMenuBici(); editarBici();">
                         <i class="ti ti-pencil"></i> Editar datos
@@ -4839,7 +4944,7 @@ MyBikeGestor`
                         <i class="ti ti-trash"></i> Eliminar bici
                     </button>
                     <button class="btn btn-secondary" onclick="cerrarMenuBici();">
-                        ← Cancelar
+                        <i class="ti ti-x"></i> Cancelar
                     </button>
                 </div>
             `;
@@ -5014,7 +5119,7 @@ MyBikeGestor`
                 await guardarDatosUsuario();
                 actualizarFondoTaller();
                 cargarGaraje();
-                mostrarNotificacion('Foto guardada ✅', 'exito');
+                mostrarNotificacion('Foto guardada', 'exito');
             } catch(e) {
                 console.error(e);
                 mostrarNotificacion('Error al subir la foto', 'error');
@@ -5081,7 +5186,7 @@ MyBikeGestor`
             // Resetear formulario
             document.getElementById('titulo-nueva-bici').textContent = 'Nueva Bici';
             document.getElementById('btn-guardar-bici').textContent = 'Crear Bicicleta';
-            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "navegar('sec-garaje')");
+            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "volver()");
 
             // Limpiar campos
             document.getElementById('nueva-alias').value = '';
@@ -5094,7 +5199,7 @@ MyBikeGestor`
             document.getElementById('nueva-es-electrica').checked = false;
             eliminarFotoBici();
 
-            navegar(editando ? 'sec-taller' : 'sec-garaje');
+            volver();
         }
 
         function guardarBici() {
@@ -5144,9 +5249,9 @@ MyBikeGestor`
             window._editandoBiciId = null;
             document.getElementById('titulo-nueva-bici').textContent = 'Nueva Bici';
             document.getElementById('btn-guardar-bici').textContent = 'Crear Bicicleta';
-            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "navegar('sec-garaje')");
+            document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "volver()");
 
-            mostrarNotificacion('✅ Bici actualizada correctamente', 'exito');
+            mostrarNotificacion('Bici actualizada correctamente', 'exito');
             navegar('sec-taller');
             cargarTaller();
         }
@@ -5519,7 +5624,7 @@ MyBikeGestor`
                 nuevoJuego.fechaActivacion = fecha + 'T00:00:00.000Z';
                 guardarDatosUsuario();
                 cargarGarajeRuedas();
-                mostrarNotificacion('✅ Juego añadido y activado', 'exito');
+                mostrarNotificacion('Juego añadido y activado', 'exito');
             };
 
             biciActual.juegosRuedas.push(nuevoJuego);
@@ -5585,7 +5690,7 @@ MyBikeGestor`
                 juego.fechaActivacion = new Date().toISOString();
                 await guardarDatosUsuario();
                 cargarGarajeRuedas();
-                mostrarNotificacion(`"${juego.marca} ${juego.modelo}" activado ✅`, 'exito');
+                mostrarNotificacion(`"${juego.marca} ${juego.modelo}" activado`, 'exito');
             };
 
             if (juegoActivo) {
@@ -5629,7 +5734,7 @@ MyBikeGestor`
                     juego.fechaRetiro = new Date().toISOString();
                     await guardarDatosUsuario();
                     cargarGarajeRuedas();
-                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" retirado 📦`, 'info');
+                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" retirado`, 'info');
                 }
             );
         }
@@ -5717,7 +5822,7 @@ MyBikeGestor`
                     await guardarDatosUsuario();
                     cargarRuedasRetiradas();
                     cargarGarajeRuedas();
-                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" disponible ↩️`, 'exito');
+                    mostrarNotificacion(`"${juego.marca} ${juego.modelo}" disponible`, 'exito');
                 }
             );
         }
@@ -5882,7 +5987,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             cerrarModal('modal-rueda');
             cargarDetalleJuegoRuedas();
-            mostrarNotificacion(`Rueda ${lado} guardada ✅`, 'exito');
+            mostrarNotificacion(`Rueda ${lado} guardada`, 'exito');
         }
 
         async function eliminarRueda(lado) {
@@ -6066,7 +6171,7 @@ MyBikeGestor`
             cerrarModal('modal-pieza-rueda');
             cargarDespieceRueda();
             cargarDetalleJuegoRuedas();
-            mostrarNotificacion('Pieza guardada ✅', 'exito');
+            mostrarNotificacion('Pieza guardada', 'exito');
         }
 
         function editarPiezaRueda(piezaId) { abrirModalPiezaRueda(piezaId); }
@@ -6262,7 +6367,7 @@ MyBikeGestor`
             biciActual.alertasPospuestas[nombreAlerta] = hasta.toISOString();
             guardarDatosUsuario();
             cargarAlertas();
-            mostrarNotificacion(`⏸️ Alerta pospuesta ${semanas} semanas`, 'info');
+            mostrarNotificacion(`Alerta pospuesta ${semanas} semanas`, 'info');
         }
 
         function mostrarPanelPosponer(nombreAlerta, btnEl) {
@@ -6273,16 +6378,16 @@ MyBikeGestor`
             panel.className = 'panel-posponer';
             panel.style.cssText = 'background:var(--light-gray); border-radius:10px; padding:12px; margin-top:10px;';
             panel.innerHTML = `
-                <div style="font-size:0.85em; font-weight:600; margin-bottom:8px; color:var(--dark);">⏸️ Posponer alerta</div>
+                <div style="font-size:0.85em; font-weight:600; margin-bottom:8px; color:var(--secondary);"><i class="ti ti-player-pause" style="color:var(--primary);"></i> Posponer alerta</div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button onclick="posponerAlerta('${nombreAlerta}', 2)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">2 sem</button>
-                    <button onclick="posponerAlerta('${nombreAlerta}', 4)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">4 sem</button>
-                    <button onclick="posponerAlerta('${nombreAlerta}', 8)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">8 sem</button>
-                    <button onclick="posponerAlerta('${nombreAlerta}', 12)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer;">12 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 2)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer; font-family:inherit; font-weight:600;">2 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 4)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer; font-family:inherit; font-weight:600;">4 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 8)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer; font-family:inherit; font-weight:600;">8 sem</button>
+                    <button onclick="posponerAlerta('${nombreAlerta}', 12)" style="padding:6px 12px; border-radius:8px; border:none; background:var(--secondary); color:white; font-size:0.8em; cursor:pointer; font-family:inherit; font-weight:600;">12 sem</button>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center;">
                     <input type="number" id="posponer-semanas-manual" placeholder="Semanas" min="1" max="52" style="width:100px; padding:6px 10px; border-radius:8px; border:1px solid var(--light-gray); font-size:0.85em;">
-                    <button onclick="const s=parseInt(document.getElementById('posponer-semanas-manual').value); if(s>0) posponerAlerta('${nombreAlerta}', s);" style="padding:6px 14px; border-radius:8px; border:none; background:var(--primary); color:white; font-size:0.8em; cursor:pointer;">Posponer</button>
+                    <button onclick="const s=parseInt(document.getElementById('posponer-semanas-manual').value); if(s>0) posponerAlerta('${nombreAlerta}', s);" style="padding:6px 14px; border-radius:8px; border:none; background:var(--primary); color:white; font-size:0.8em; cursor:pointer; font-family:inherit; font-weight:600;">Posponer</button>
                 </div>
             `;
             btnEl.closest('.card').appendChild(panel);
@@ -6310,27 +6415,23 @@ MyBikeGestor`
             configDiv.style.marginBottom = '16px';
             configDiv.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:600;">Umbral de alerta</div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="range" min="50" max="100" value="${Math.round(umbral*100)}" step="5"
-                            oninput="this.nextElementSibling.textContent=this.value+'%'; biciActual.umbralAlertas=this.value/100; guardarDatosUsuario(); cargarAlertas();"
-                            style="width:120px;">
-                        <span style="font-weight:700; color:var(--warning); min-width:38px;">${Math.round(umbral*100)}%</span>
-                    </div>
+                    <div style="font-weight:700;"><i class="ti ti-adjustments-horizontal" style="color:var(--primary);"></i> Umbral de alerta</div>
+                    <span style="font-weight:700; color:var(--warning); font-size:1.05rem;">${Math.round(umbral*100)}%</span>
                 </div>
-                <div style="font-size:0.8em; color:var(--text); margin-top:6px;">Basado en la vida media de tus sustituciones anteriores</div>
+                <div style="font-size:0.8em; color:var(--text); margin-top:6px;">Basado en la vida media de tus sustituciones anteriores. Es el mismo para todas las bicis.</div>
+                <button onclick="navegar('sec-ajuste-alertas')" style="margin-top:10px; padding:6px 14px; border-radius:8px; border:1px solid var(--secondary); background:#2D2D2D; color:var(--secondary); font-size:0.8em; cursor:pointer; font-weight:600; font-family:inherit;"><i class="ti ti-settings"></i> Cambiar en Ajustes</button>
             `;
             container.appendChild(configDiv);
 
             if (alertas.length === 0 && alertasPospuestas.length === 0) {
-                container.innerHTML += `<div class="card"><div class="lista-vacia"><div class="lista-vacia-icon">✅</div><p>Todo en orden, ningún componente cerca del límite</p></div></div>`;
+                container.innerHTML += `<div class="card"><div class="lista-vacia"><div class="lista-vacia-icon" style="color:var(--primary);"><i class="ti ti-circle-check"></i></div><p>Todo en orden, ningún componente cerca del límite</p></div></div>`;
             }
 
             // Alertas activas
             alertas.forEach(a => {
                 const kmRestantes = Math.round(a.vidaMedia - a.kmActuales);
                 const color = a.porcentaje >= 1 ? 'var(--danger)' : 'var(--warning)';
-                const estado = a.porcentaje >= 1 ? '⚠️ Revisar' : '🔔 Próxima sustitución';
+                const estado = a.porcentaje >= 1 ? '<i class="ti ti-alert-triangle"></i> Revisar' : '<i class="ti ti-bell"></i> Próxima sustitución';
                 const card = document.createElement('div');
                 card.className = 'card';
                 // borderLeft eliminado
@@ -6350,7 +6451,7 @@ MyBikeGestor`
                         <span>${a.kmActuales} km usados de ~${a.vidaMedia} km estimados</span>
                         <span style="color:${color}; font-weight:600;">${kmRestantes > 0 ? `~${kmRestantes} km restantes` : `+${Math.abs(kmRestantes)} km sobre estimado`}</span>
                     </div>
-                    <button onclick="mostrarPanelPosponer('${a.nombre}', this)" style="padding:6px 14px; border-radius:8px; border:1px solid var(--secondary); background:#2D2D2D; color:var(--secondary); font-size:0.8em; cursor:pointer; font-weight:600;">⏸️ Posponer</button>
+                    <button onclick="mostrarPanelPosponer('${a.nombre}', this)" style="padding:6px 14px; border-radius:8px; border:1px solid var(--secondary); background:#2D2D2D; color:var(--secondary); font-size:0.8em; cursor:pointer; font-weight:600; font-family:inherit;"><i class="ti ti-player-pause"></i> Posponer</button>
                 `;
                 container.appendChild(card);
             });
@@ -6358,8 +6459,8 @@ MyBikeGestor`
             // Alertas pospuestas
             if (alertasPospuestas.length > 0) {
                 const titulo = document.createElement('div');
-                titulo.style.cssText = 'font-size:0.85em; font-weight:600; color:var(--text); margin:16px 0 8px;';
-                titulo.textContent = '⏸️ Alertas pospuestas';
+                titulo.style.cssText = 'font-size:0.95rem; font-weight:700; color:var(--secondary); margin:16px 0 8px;';
+                titulo.innerHTML = '<i class="ti ti-player-pause" style="color:var(--primary);"></i> Alertas pospuestas';
                 container.appendChild(titulo);
 
                 alertasPospuestas.forEach(a => {
@@ -6379,7 +6480,7 @@ MyBikeGestor`
                                 <div style="font-size:0.8em; font-weight:600; color:var(--dark);">${fechaStr}</div>
                             </div>
                         </div>
-                        <button onclick="delete biciActual.alertasPospuestas['${a.nombre}']; guardarDatosUsuario(); cargarAlertas();" style="margin-top:8px; padding:5px 12px; border-radius:8px; border:1px solid var(--danger); background:#2D2D2D; color:var(--danger); font-size:0.75em; cursor:pointer;">✕ Cancelar posposición</button>
+                        <button onclick="delete biciActual.alertasPospuestas['${a.nombre}']; guardarDatosUsuario(); cargarAlertas();" style="margin-top:8px; padding:5px 12px; border-radius:8px; border:1px solid var(--danger); background:#2D2D2D; color:var(--danger); font-size:0.75em; cursor:pointer; font-family:inherit; font-weight:600;"><i class="ti ti-x"></i> Cancelar posposición</button>
                     `;
                     container.appendChild(card);
                 });
@@ -7386,7 +7487,7 @@ MyBikeGestor`
                 await guardarDatosUsuario();
                 cerrarModal('modal-sustituir');
                 cargarDespieceRueda();
-                mostrarNotificacion('Pieza sustituida ✅', 'exito');
+                mostrarNotificacion('Pieza sustituida', 'exito');
                 return;
             }
 
@@ -7570,7 +7671,7 @@ MyBikeGestor`
 
         function omitirValoracion() {
             cerrarModal('modal-valoracion');
-            mostrarNotificacion(window._valoracionMensajeExito || 'Sustituido ✅', 'exito');
+            mostrarNotificacion(window._valoracionMensajeExito || 'Sustituido', 'exito');
         }
 
         // ===== FIN VALORACIÓN =====
@@ -7598,12 +7699,7 @@ MyBikeGestor`
             const cajon = biciActual.cajonPiezas || [];
             const btn = document.getElementById('btn-ver-cajon');
             const count = document.getElementById('cajon-count');
-            const countTaller = document.getElementById('cajon-count-taller');
-            if (btn) {
-                btn.style.display = cajon.length > 0 ? 'block' : 'none';
-                if (count) count.textContent = cajon.length;
-            }
-            if (countTaller) countTaller.textContent = cajon.length;
+            if (btn && count) count.textContent = cajon.length;
         }
 
         function abrirModalAnadirCajon() {
@@ -7678,7 +7774,7 @@ MyBikeGestor`
             actualizarBotonCajon();
             cerrarModal('modal-anadir-cajon');
             cargarCajonPiezas();
-            mostrarNotificacion('Pieza añadida al cajón 📦', 'exito');
+            mostrarNotificacion('Pieza añadida al cajón', 'exito');
         }
 
         function editarPiezaCajon(piezaId) {
@@ -7743,7 +7839,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             cerrarModal('modal-anadir-cajon');
             cargarCajonPiezas();
-            mostrarNotificacion('Pieza actualizada ✅', 'exito');
+            mostrarNotificacion('Pieza actualizada', 'exito');
         }
 
         function cargarCajonPiezas() {
@@ -7842,7 +7938,7 @@ MyBikeGestor`
                     await guardarDatosUsuario();
                     cargarCajonPiezas();
                     actualizarBotonCajon();
-                    mostrarNotificacion(`"${pieza.marca} ${pieza.modelo || ''}" reinstalado ✅`, 'exito');
+                    mostrarNotificacion(`"${pieza.marca} ${pieza.modelo || ''}" reinstalado`, 'exito');
                 }
             );
         }
@@ -7863,7 +7959,7 @@ MyBikeGestor`
 
         // Volver
         function volverAListaComponentes() {
-            navegar('sec-lista-componentes-seccion');
+            volver();
         }
         
         // Subpiezas (placeholder)
@@ -7884,7 +7980,7 @@ MyBikeGestor`
             }
             await guardarDatosUsuario();
             cargarSubpiezas();
-            mostrarNotificacion(componenteActual.conMedidorPotencia ? 'Medidor de Potencia activado ⚡' : 'Medidor de Potencia desactivado', 'info');
+            mostrarNotificacion(componenteActual.conMedidorPotencia ? 'Medidor de Potencia activado' : 'Medidor de Potencia desactivado', 'info');
         }
 
         let modoSubpieza = 'añadir'; // 'añadir', 'editar', 'sustituir'
@@ -8013,7 +8109,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             document.getElementById('modal-cambiar-pila-medidor').remove();
             abrirDetalleComponente(componenteActual);
-            mostrarNotificacion('🔋 Pila cambiada correctamente', 'exito');
+            mostrarNotificacion('Pila cambiada correctamente', 'exito');
         }
 
         function registrarRecargaMedidor(tipo) {
@@ -8087,7 +8183,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             document.getElementById('modal-registrar-recarga').remove();
             abrirDetalleComponente(componenteActual);
-            mostrarNotificacion('⚡ Recarga registrada correctamente', 'exito');
+            mostrarNotificacion('Recarga registrada correctamente', 'exito');
         }
 
         function editarSubpieza(tipo) {
@@ -8701,7 +8797,7 @@ MyBikeGestor`
             cerrarModal('modal-editar-coste');
             cargarHistorial();
             cargarTaller();
-            mostrarNotificacion('Coste actualizado ✅', 'exito');
+            mostrarNotificacion('Coste actualizado', 'exito');
         }
 
         async function eliminarRegistroHistorial(id) {
@@ -9188,7 +9284,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             cerrarModal('modal-ciclocomputador');
             actualizarDisplayCiclocomputador();
-            mostrarNotificacion('Ciclocomputador guardado ✅', 'exito');
+            mostrarNotificacion('Ciclocomputador guardado', 'exito');
         }
 
 
@@ -9265,7 +9361,7 @@ MyBikeGestor`
             await guardarDatosUsuario();
             cerrarModal('modal-sustituir-ciclocomputador');
             actualizarDisplayCiclocomputador();
-            mostrarNotificacion('GPS sustituido ✅', 'exito');
+            mostrarNotificacion('GPS sustituido', 'exito');
         }
 
         async function eliminarCiclocomputador() {
