@@ -599,6 +599,33 @@
             font-size: 1.1rem;
         }
 
+        /* v5: distintivo de bici eléctrica en las tarjetas del Garaje (círculo ámbar con rayo) */
+        .badge-electrica {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f0a500;
+            color: #2A1212;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        /* v5: nombre de sección sobre su foto (Componentes): verde como los demás botones, lo más grande que cabe ("Suspensiones" es la palabra más ancha) */
+        .seccion-foto-titulo {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 0;
+            line-height: 1.15;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+        }
+        @media (max-width: 340px) {
+            .seccion-foto-titulo { font-size: 1.05rem; }
+        }
+
         /* v5: tarjeta ancha con foto de fondo (Componentes en el taller) */
         .btn-foto-ancho {
             display: flex;
@@ -4643,7 +4670,7 @@ MyBikeGestor`
                                     <div class="bici-marca-modelo"><strong>${bici.marca}</strong> <span>${bici.modelo}</span></div>
                                 </div>
                                 <div style="display:flex;gap:6px;align-items:center;">
-                                    ${bici.esElectrica ? '<span style="font-size:1em;color:rgba(255,255,255,0.9);" title="Bici eléctrica"><i class="ti ti-bolt"></i></span>' : ''}
+                                    ${bici.esElectrica ? '<span class="badge-electrica" title="Bici eléctrica"><i class="ti ti-bolt"></i></span>' : ''}
                                     <span class="badge" style="${badgeStyle} cursor:pointer;" title="${badgeTitle}" ${badgeClick}>${bici.disciplina}</span>
                                 </div>
                             </div>
@@ -5401,8 +5428,20 @@ MyBikeGestor`
                 'Transmisión': '../icons/componentes/transmision.jpg',
                 'Frenos': '../icons/componentes/frenos.jpg',
                 'Ruedas': '../icons/componentes/ruedas.jpg',
-                'Periféricos': '../icons/componentes/perifericos.jpg'
+                'Periféricos': '../icons/componentes/perifericos.jpg',
+                'Sistema Eléctrico': '../icons/componentes/sistema-electrico.jpg'
             };
+            // v5: las MTB tienen su propio juego de fotos (amortiguación, tacos, tija telescópica…)
+            if (biciActual.disciplina === 'MTB') {
+                Object.assign(imagenesSeccion, {
+                    'Cuadro': '../icons/componentes/mtb-cuadro.jpg',
+                    'Transmisión': '../icons/componentes/mtb-transmision.jpg',
+                    'Frenos': '../icons/componentes/mtb-frenos.jpg',
+                    'Ruedas': '../icons/componentes/mtb-ruedas.jpg',
+                    'Periféricos': '../icons/componentes/mtb-perifericos.jpg',
+                    'Suspensiones': '../icons/componentes/suspensiones.jpg'
+                });
+            }
             
             secciones.forEach(seccion => {
                 const card = document.createElement('div');
@@ -5417,15 +5456,15 @@ MyBikeGestor`
                     card.style.position = 'relative';
                     card.innerHTML = `
                         <img src="${imgSrc}" alt="${seccion}" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0)); padding: 18px 10px 10px;">
-                            <div class="card-title" style="font-size: 1em; text-align: center; margin: 0;">${seccion}</div>
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0)); padding: 22px 6px 10px;">
+                            <div class="titulo-redondo seccion-foto-titulo">${seccion}</div>
                         </div>
                     `;
                 } else {
                     card.innerHTML = `
                         <div style="text-align: center;">
                             <div style="font-size: 2.5em; margin-bottom: 10px;">${iconos[seccion]}</div>
-                            <div class="card-title" style="font-size: 1em;">${seccion}</div>
+                            <div class="titulo-redondo seccion-foto-titulo">${seccion}</div>
                         </div>
                     `;
                 }
