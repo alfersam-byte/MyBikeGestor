@@ -340,6 +340,9 @@
             color: var(--text);
         }
 
+        /* v5: sección sin componentes: el botón de añadir queda centrado en la pantalla */
+        .seccion-vacia #btn-anadir-componente { margin-top: 28vh !important; }
+        .seccion-vacia .lista-vacia { padding-top: 16px; }
         .lista-vacia-icon {
             font-size: 4em;
             margin-bottom: 10px;
@@ -497,6 +500,9 @@
             font-size: 2em;
             margin-bottom: 8px;
         }
+        /* v5: botones de acción con icono (Editar, Sustituir, Reparar, Eliminar): verde, y rojo en Eliminar */
+        .btn-grid-item-icon .ti { color: var(--primary); }
+        .btn-grid-item[style*="--danger"] .btn-grid-item-icon .ti { color: var(--danger); }
 
         .btn-grid-item-text {
             font-weight: 600;
@@ -575,6 +581,9 @@
 
         /* v5: flecha de salida fija en la parte inferior de la pantalla: siempre visible aunque la lista sea larga.
            Reutilizable en cualquier pantalla con scroll (debe ser el último elemento de la sección). */
+        .btn-back-fijo.sin-scroll { display: none !important; }
+        .btn-back-fijo { transition: opacity 0.2s, transform 0.2s; }
+        .btn-back-fijo.arriba-visible { opacity: 0; transform: translateY(10px); pointer-events: none; }
         .btn-back-fijo {
             position: sticky;
             bottom: 16px;
@@ -1477,7 +1486,7 @@
             </div>
 
             <button class="btn btn-primary mt-20" onclick="guardarPerfil()">Guardar Cambios</button>
-            <button class="btn-back mt-20" onclick="volver()" style="align-self:flex-start;">←</button>
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1916,11 +1925,13 @@
                 <div style="width: 40px;"></div>
             </div>
 
+            <button id="btn-anadir-componente" class="btn btn-primary" style="margin-top:20px;" onclick="abrirModalNuevoComponente()">Añadir componente</button>
+
             <div id="lista-componentes-seccion" class="mt-20">
                 <!-- Se generará dinámicamente -->
             </div>
 
-            <button class="btn btn-primary mt-20" onclick="abrirModalNuevoComponente()">➕ Añadir Componente</button>
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1977,16 +1988,16 @@
             <!-- Botones de acción -->
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn-grid-item" style="flex:1;" title="Editar datos del componente" onclick="editarComponenteActual()">
-                    <div class="btn-grid-item-icon">✏️</div>
+                    <div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div>
                 </button>
                 <button class="btn-grid-item" style="flex:1;" title="Sustituir por otro componente" onclick="sustituirComponenteActual()">
-                    <div class="btn-grid-item-icon">🔄</div>
+                    <div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div>
                 </button>
                 <button class="btn-grid-item" style="flex:1;" title="Registrar reparación" onclick="repararComponenteActual()">
-                    <div class="btn-grid-item-icon">🔧</div>
+                    <div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div>
                 </button>
                 <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar este componente" onclick="eliminarComponenteActual()">
-                    <div class="btn-grid-item-icon">🗑️</div>
+                    <div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div>
                 </button>
             </div>
 
@@ -1996,12 +2007,14 @@
             <!-- Subpiezas (si las tiene) -->
             <div id="subpiezas-container" style="display: none; margin-top: 20px;">
                 <div class="card">
-                    <div class="card-title">Subpiezas</div>
+                    <div class="card-title nombre-comp">Subpiezas</div>
                     <div id="lista-subpiezas" style="margin-top: 15px;">
                         <!-- Se genera dinámicamente -->
                     </div>
                 </div>
             </div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -4012,6 +4025,37 @@
             navegar(previa || 'sec-dashboard');
         }
 
+        // v5: la flecha flotante solo aparece si el contenido ocupa pantalla y media o más
+        function actualizarFlechasFijas() {
+            const sec = document.querySelector('.seccion.activa');
+            if (!sec) return;
+            sec.querySelectorAll('.btn-back-fijo').forEach(b => {
+                b.classList.add('sin-scroll');                       // medir sin el botón
+                const hayScroll = sec.scrollHeight > sec.clientHeight * 1.5;   // solo si la pantalla mide pantalla y media o más
+                b.classList.toggle('sin-scroll', !hayScroll);
+                // la flecha flotante solo se muestra cuando la de arriba ya se ha perdido de vista
+                b.classList.toggle('arriba-visible', sec.scrollTop < 90);
+            });
+        }
+        let _flechaPendiente = false;
+        function programarFlechas() {
+            if (_flechaPendiente) return;
+            _flechaPendiente = true;
+            requestAnimationFrame(() => { _flechaPendiente = false; actualizarFlechasFijas(); });
+        }
+        window.addEventListener('resize', programarFlechas);
+        document.addEventListener('scroll', e => {
+            const sec = e.target;
+            if (!sec || !sec.classList || !sec.classList.contains('seccion')) return;
+            const b = sec.querySelector('.btn-back-fijo');
+            if (b) b.classList.toggle('arriba-visible', sec.scrollTop < 90);
+        }, true);
+        window.addEventListener('load', () => {
+            const app = document.getElementById('app-container');
+            if (app) new MutationObserver(ms => { if (ms.some(m => !m.target.classList || !m.target.classList.contains('btn-back-fijo'))) programarFlechas(); }).observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+            programarFlechas();
+        });
+
         function navegar(seccionId) {
             const secActiva = document.querySelector('.seccion.activa');
             if (secActiva) seccionAnterior = secActiva.id;
@@ -5955,10 +5999,10 @@ MyBikeGestor`
                             Desde: ${formatearFecha(rueda.fechaInstalacion)} · ${formatearDuracion(diasUso)}
                         </div>
                         <div style="display:flex; gap:8px; margin-top:12px;">
-                            <button class="btn-grid-item" style="flex:1;" title="Editar rueda" onclick="abrirModalRueda('${lado}', true)"><div class="btn-grid-item-icon">✏️</div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Reparar rueda" onclick="repararRueda('${lado}')"><div class="btn-grid-item-icon">🔧</div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Sustituir rueda" onclick="sustituirRueda('${lado}')"><div class="btn-grid-item-icon">🔄</div></button>
-                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar rueda" onclick="eliminarRueda('${lado}')"><div class="btn-grid-item-icon">🗑️</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Editar rueda" onclick="abrirModalRueda('${lado}', true)"><div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Reparar rueda" onclick="repararRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Sustituir rueda" onclick="sustituirRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar rueda" onclick="eliminarRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
                         <button class="btn btn-secondary" style="width:100%; margin-top:10px; font-size:0.85em;" onclick="abrirDespieceRueda('${lado}')">
                             🔩 Despiece ${numPiezas > 0 ? `(${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'})` : ''}
@@ -6131,10 +6175,10 @@ MyBikeGestor`
                             </div>
                         </div>
                         <div style="display:flex; gap:8px; margin-top:10px;">
-                            <button class="btn-grid-item" style="flex:1;" title="Editar pieza" onclick="editarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">✏️</div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Reparar pieza" onclick="repararPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🔧</div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Sustituir pieza" onclick="sustituirPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🔄</div></button>
-                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon">🗑️</div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Editar pieza" onclick="editarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Reparar pieza" onclick="repararPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1;" title="Sustituir pieza" onclick="sustituirPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div></button>
+                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
                     `;
                     container.appendChild(card);
@@ -6765,8 +6809,10 @@ MyBikeGestor`
                 });
             }
             
+            const secLista = document.getElementById('sec-lista-componentes-seccion');
+            secLista.classList.toggle('seccion-vacia', componentes.length === 0);
             if (componentes.length === 0) {
-                container.innerHTML = '<div class="lista-vacia"><div class="lista-vacia-icon">🔧</div><p>No hay componentes</p></div>';
+                container.innerHTML = '<div class="lista-vacia"><p>No hay componentes</p></div>';
                 return;
             }
             
