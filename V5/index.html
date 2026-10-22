@@ -543,6 +543,19 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
         }
         /* v5: marca (ámbar, mayúsculas) + modelo (blanco): mismo criterio en toda la app */
+        /* v5: nombre del componente en azul (regla de toda la app: nombre azul, marca ámbar, modelo blanco) */
+        /* v5: cabecera de TODOS los modales como la de las pantallas: flecha verde redonda, título azul centrado */
+        .modal-title { color: var(--secondary) !important; font-weight: 700; font-size: 1.3em; }
+        .modal-title .ti { color: var(--primary); font-size: 1.15em; vertical-align: -2px; margin-right: 4px; }
+        .modal-header:has(> button) { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; }
+        .modal-header:has(> button)::after { content: ''; width: 40px; flex-shrink: 0; }
+        .modal-header:has(> button) > :not(button) { flex: 1; text-align: center; }
+        .modal-header:has(> button) > button:first-child {
+            background: #2D2D2D !important; border: none !important; width: 40px !important; height: 40px !important; flex-shrink: 0;
+            border-radius: 50% !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center;
+            font-size: 1.2em !important; color: var(--primary) !important; padding: 0 !important; font-family: inherit;
+        }
+        .nombre-comp { color: var(--secondary) !important; }
         .marca-modelo { font-size:0.8rem; font-weight:500; color:#ffffff; }
         .marca-modelo strong { font-size:0.9rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#f0a500; }
         .bici-marca-modelo strong {
@@ -1718,7 +1731,7 @@
             <div class="text-center mb-20 subtitulo-verde" style="margin-top:15px;">
                 <p>Piezas guardadas · Puedes reinstalarlas cuando quieras</p>
             </div>
-            <button class="btn btn-primary" style="margin-bottom:16px;" onclick="abrirModalAnadirCajon()"><i class="ti ti-plus"></i> Añadir pieza al cajón</button>
+            <button class="btn btn-primary" style="margin-bottom:16px;" onclick="abrirModalAnadirCajon()">Añadir pieza</button>
             <div id="lista-cajon-piezas" class="mt-20"></div>
 
             <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
@@ -1922,16 +1935,16 @@
 
             <!-- Datos del componente -->
             <div class="card">
-                <div class="card-title" id="detalle-comp-nombre">-</div>
+                <div class="card-title nombre-comp" id="detalle-comp-nombre">-</div>
                 <div style="margin-top: 15px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
                         <div>
                             <span style="color: var(--text);">Marca:</span>
-                            <div style="font-weight: bold; color: #F0EBEB;" id="detalle-comp-marca">-</div>
+                            <div class="marca-modelo" style="font-size:0.9em;" id="detalle-comp-marca">-</div>
                         </div>
                         <div>
                             <span style="color: var(--text);">Modelo:</span>
-                            <div style="color: #B0A0A0;" id="detalle-comp-modelo">-</div>
+                            <div style="color:#ffffff;" id="detalle-comp-modelo">-</div>
                         </div>
                         <div>
                             <span style="color: var(--text);">Material:</span>
@@ -1998,17 +2011,19 @@
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
                 <div class="topbar-title">Historial</div>
-                <button onclick="abrirModalNuevoMantenimiento()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.82em;font-weight:700;cursor:pointer;">➕ Añadir</button>
+                <div style="width: 40px;"></div>
             </div>
+
+            <button class="btn btn-primary" style="margin-top:20px;" onclick="abrirModalNuevoMantenimiento()">Registrar mantenimiento</button>
 
             <div id="lista-historial" class="mt-20">
                 <div class="lista-vacia">
-                    <div class="lista-vacia-icon">📋</div>
+                    <div class="lista-vacia-icon"><i class="ti ti-clipboard-list"></i></div>
                     <p>No hay registros de mantenimiento</p>
                 </div>
             </div>
 
-            <button class="btn btn-primary mt-20" onclick="abrirModalNuevoMantenimiento()">➕ Registrar Mantenimiento</button>
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <section id="sec-ayuda" class="seccion" style="padding:0 0 20px 0;">
@@ -2764,7 +2779,7 @@
         <div class="modal-contenido">
             <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
                 <button onclick="cerrarModal('modal-mantenimiento')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title" style="margin:0;">Registrar Mantenimiento</h2>
+                <h2 class="modal-title" style="margin:0;">Registrar mantenimiento</h2>
             </div>
             <div class="form-group">
                 <label>Tipo</label>
@@ -2826,7 +2841,7 @@
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
             <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
                 <button onclick="cerrarModal('modal-ciclocomputador')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title" style="margin:0;">🖥️ Ciclocomputador GPS</h2>
+                <h2 class="modal-title" style="margin:0;"><i class="ti ti-device-watch"></i> Ciclocomputador GPS</h2>
             </div>
             <div class="form-group">
                 <label>Marca</label>
@@ -2930,7 +2945,7 @@
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
             <div class="modal-header" style="display:flex; align-items:center; gap:10px;">
                 <button onclick="cerrarModal('modal-sustituir-ciclocomputador')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title" style="margin:0;">🔄 Sustituir Ciclocomputador</h2>
+                <h2 class="modal-title" style="margin:0;"><i class="ti ti-refresh"></i> Sustituir Ciclocomputador</h2>
             </div>
             <div class="card" style="background:var(--light-gray); margin-bottom:20px;">
                 <div style="font-size:0.85em; color:var(--text); margin-bottom:6px;">GPS actual</div>
@@ -3039,7 +3054,7 @@
     <div id="modal-editar-coste" class="modal">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2 class="modal-title">✏️ Editar coste</h2>
+                <h2 class="modal-title"><i class="ti ti-pencil"></i> Editar coste</h2>
             </div>
             <div id="editar-coste-info" style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px; font-size:0.85em; color:var(--dark);"></div>
             <div class="form-group">
@@ -3059,7 +3074,7 @@
     <div id="modal-valoracion" class="modal">
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto; overflow-x:hidden; padding:20px;">
             <div class="modal-header" style="margin-bottom:12px;">
-                <h2 class="modal-title" style="font-size:1.2em;">⭐ Valorar componente</h2>
+                <h2 class="modal-title"><i class="ti ti-star"></i> Valorar componente</h2>
             </div>
             <div id="valoracion-info" style="background:var(--light-gray); border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85em; color:var(--dark);"></div>
 
@@ -3067,13 +3082,13 @@
                 <label style="font-weight:600; font-size:0.9em;">Motivo <span style="font-weight:400; color:var(--text);">(opcional)</span></label>
                 <select id="valoracion-motivo" style="width:100%; padding:8px; border-radius:8px; border:1px solid #555; background:#383838; color:#F0EBEB; font-size:0.9em;">
                     <option value="">-- Sin especificar --</option>
-                    <option value="Desgaste">⚙️ Desgaste</option>
-                    <option value="Avería">🔧 Avería</option>
-                    <option value="Rendimiento">📉 Rendimiento insuficiente</option>
-                    <option value="Estética">🎨 Estética</option>
-                    <option value="Preventivo">🛡️ Preventivo</option>
-                    <option value="Actualización">⬆️ Actualización / Mejora</option>
-                    <option value="Otro">💬 Otro</option>
+                    <option value="Desgaste">Desgaste</option>
+                    <option value="Avería">Avería</option>
+                    <option value="Rendimiento">Rendimiento insuficiente</option>
+                    <option value="Estética">Estética</option>
+                    <option value="Preventivo">Preventivo</option>
+                    <option value="Actualización">Actualización / Mejora</option>
+                    <option value="Otro">Otro</option>
                 </select>
             </div>
 
@@ -3088,25 +3103,25 @@
                 <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.9em;">Criterios <span style="font-weight:400; color:var(--text);">(opcional)</span></label>
                 <div id="criterios-valoracion" style="display:flex; flex-direction:column; gap:6px;">
                     <div class="criterio-row" data-criterio="duracion" style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">⏱ Duración</span>
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;"><i class="ti ti-clock"></i> Duración</span>
                         <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
                             <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
                         </div>
                     </div>
                     <div class="criterio-row" data-criterio="estetica" style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">🎨 Estética</span>
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;"><i class="ti ti-palette"></i> Estética</span>
                         <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
                             <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
                         </div>
                     </div>
                     <div class="criterio-row" data-criterio="peso" style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">⚖️ Peso</span>
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;"><i class="ti ti-scale"></i> Peso</span>
                         <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
                             <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
                         </div>
                     </div>
                     <div class="criterio-row" data-criterio="precio" style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;">💶 Precio</span>
+                        <span style="font-size:0.85em; color:var(--text); width:85px; flex-shrink:0;"><i class="ti ti-currency-euro"></i> Precio</span>
                         <div class="estrellas-criterio" style="display:inline-flex; gap:4px; font-size:1.3em; cursor:pointer;">
                             <span data-val="1">☆</span><span data-val="2">☆</span><span data-val="3">☆</span><span data-val="4">☆</span><span data-val="5">☆</span>
                         </div>
@@ -3120,7 +3135,7 @@
             </div>
 
             <div style="background:#1a2a1a; border:1px solid #2ECC71; border-radius:8px; padding:8px; margin-bottom:12px; font-size:0.75em; color:#aaa;">
-                🔒 Datos totalmente privados, de uso exclusivo tuyo.
+                <i class="ti ti-lock"></i> Datos totalmente privados, de uso exclusivo tuyo.
             </div>
 
             <div class="modal-buttons">
@@ -3135,9 +3150,9 @@
     ======================================== -->
     <div id="modal-anadir-cajon" class="modal">
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
-            <div class="modal-header">
-                <button onclick="cerrarModal('modal-anadir-cajon')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title ayuda-titulo"><i class="ti ti-plus"></i> Añadir pieza al cajón</h2>
+            <div class="modal-header" style="display:flex; align-items:center; justify-content:space-between;">
+                <button class="btn-back" onclick="cerrarModal('modal-anadir-cajon')" title="Volver">←</button>
+                <h2 class="modal-title topbar-title" style="margin:0; text-align:center; color:var(--secondary);">Añadir pieza</h2>
             </div>
             <div class="form-group">
                 <label>Tipo de componente</label>
@@ -5914,7 +5929,7 @@ MyBikeGestor`
                     // Sin rueda — mostrar botón añadir
                     div.innerHTML = `
                         <div class="card-header">
-                            <div class="card-title">${titulo}</div>
+                            <div class="card-title nombre-comp">${titulo}</div>
                         </div>
                         <div style="text-align:center; padding:15px 0;">
                             <div style="color:var(--text); font-size:0.9em; margin-bottom:12px;">Sin rueda registrada</div>
@@ -5928,11 +5943,11 @@ MyBikeGestor`
                     const numPiezas = (rueda.piezas || []).length;
                     div.innerHTML = `
                         <div class="card-header">
-                            <div class="card-title">${titulo}</div>
+                            <div class="card-title nombre-comp">${titulo}</div>
                             <span class="badge badge-primary">${Math.max(0, kmUso)} km</span>
                         </div>
                         <div style="font-size:0.9em; margin-top:8px;">
-                            <strong>${rueda.marca} ${rueda.modelo || ''}</strong>
+                            <span class="marca-modelo"><strong>${rueda.marca}</strong> <span>${rueda.modelo || ''}</span></span>
                             ${rueda.material ? `<span style="color:var(--text); margin-left:8px;">${rueda.material}</span>` : ''}
                             ${rueda.peso ? `<span style="color:var(--text); margin-left:8px;">· ${rueda.peso}g</span>` : ''}
                         </div>
@@ -6104,8 +6119,8 @@ MyBikeGestor`
                     card.innerHTML = `
                         <div class="card-header">
                             <div>
-                                <div style="font-weight:700;">${pieza.tipo}</div>
-                                <div style="font-size:0.85em; color:var(--text);">${pieza.marca || '-'} ${pieza.modelo || ''}</div>
+                                <div class="nombre-comp" style="font-weight:700;">${pieza.tipo}</div>
+                                <div class="marca-modelo"><strong>${pieza.marca || '-'}</strong> <span>${pieza.modelo || ''}</span></div>
                                 ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
                             ${pieza.numRadios ? `<div style="font-size:0.8em; color:var(--text);">${pieza.numRadios} radios</div>` : ''}
                             </div>
@@ -6767,8 +6782,8 @@ MyBikeGestor`
                     card.innerHTML = `
                         <div class="card-header">
                             <div>
-                                <div class="card-title">${comp.tipo}</div>
-                                <div class="card-subtitle"><strong style="color:#F0EBEB;">${comp.marca}</strong> <span style="color:#B0A0A0;">${comp.modelo}</span></div>
+                                <div class="card-title nombre-comp">${comp.tipo}</div>
+                                <div class="card-subtitle marca-modelo"><strong>${comp.marca}</strong> <span>${comp.modelo}</span></div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="badge badge-primary">${comp._kmTotales} km</div>
@@ -6784,8 +6799,8 @@ MyBikeGestor`
                     card.innerHTML = `
                         <div class="card-header">
                             <div>
-                                <div class="card-title">${comp.tipo}</div>
-                                <div class="card-subtitle"><strong style="color:#F0EBEB;">${comp.marca || '-'}</strong> <span style="color:#B0A0A0;">${comp.modelo || '-'}</span></div>
+                                <div class="card-title nombre-comp">${comp.tipo}</div>
+                                <div class="card-subtitle marca-modelo"><strong>${comp.marca || '-'}</strong> <span>${comp.modelo || '-'}</span></div>
                             </div>
                             <div style="text-align: right;">
                                 <div class="badge badge-primary">${kmUso} km</div>
@@ -6804,7 +6819,7 @@ MyBikeGestor`
             
             document.getElementById('titulo-detalle-componente').textContent = comp.tipo;
             document.getElementById('detalle-comp-nombre').textContent = comp.tipo;
-            document.getElementById('detalle-comp-marca').textContent = comp.marca || '-';
+            document.getElementById('detalle-comp-marca').innerHTML = `<strong>${comp.marca || '-'}</strong>`;
             document.getElementById('detalle-comp-modelo').textContent = comp.modelo || '-';
             document.getElementById('detalle-comp-material').textContent = comp.material || '-';
             document.getElementById('detalle-comp-peso').textContent = comp.peso ? `${comp.peso}g` : '-';
@@ -6903,8 +6918,8 @@ MyBikeGestor`
                         extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.tipoPila}</div>`;
                     }
                     const subtituloCard = tipo === 'Pila'
-                        ? `${sub.marca || ''} ${sub.tipoPila || ''} · ${kmUso} km`.trim()
-                        : `${sub.marca} ${sub.modelo} - ${kmUso} km`;
+                        ? `<strong>${sub.marca || ''}</strong> <span>${sub.tipoPila || ''}</span> <span style="color:var(--text);">· ${kmUso} km</span>`
+                        : `<strong>${sub.marca}</strong> <span>${sub.modelo}</span> <span style="color:var(--text);">· ${kmUso} km</span>`;
                     const extraInfoFinal = tipo === 'Pila' ? '' : extraInfo;
 
                     // Botón pila/recarga para medidores
@@ -6922,8 +6937,8 @@ MyBikeGestor`
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div style="font-weight:bold;">${tipo}</div>
-                                <div style="font-size:0.85em;color:var(--text);">${subtituloCard}</div>
+                                <div class="nombre-comp" style="font-weight:bold;">${tipo}</div>
+                                <div class="marca-modelo">${subtituloCard}</div>
                                 ${extraInfoFinal}
                             </div>
                             <div style="display:flex;gap:6px;">
@@ -7627,17 +7642,17 @@ MyBikeGestor`
             // Abrir modal de valoración con pequeño delay para que cierre el anterior
             const entradaHistorial = biciActual.historial[0]; // la que acabamos de añadir
             setTimeout(() => {
-                abrirModalValoracion(entradaHistorial, desdeСajon ? 'Instalado desde el cajón 📦✅' : destinoViejo === 'cajon' ? 'Pieza guardada en el cajón 📦' : 'Sustituido ✅');
+                abrirModalValoracion(entradaHistorial, desdeСajon ? 'Instalado desde el cajón' : destinoViejo === 'cajon' ? 'Pieza guardada en el cajón' : 'Sustituido');
             }, 300);
         }
         
         // ===== VALORACIÓN DE COMPONENTE SUSTITUIDO =====
         function abrirModalValoracion(entradaHistorial, mensajeExito) {
             window._valoracionHistorialId = entradaHistorial.id;
-            window._valoracionMensajeExito = mensajeExito || 'Sustituido ✅';
+            window._valoracionMensajeExito = mensajeExito || 'Sustituido';
 
             document.getElementById('valoracion-info').innerHTML =
-                `<strong>${entradaHistorial.componente || '-'}</strong><br>
+                `<strong class="nombre-comp">${entradaHistorial.componente || '-'}</strong><br>
                  <span style="color:#aaa;">${entradaHistorial.descripcion || ''}</span>`;
 
             // Reset estrellas globales
@@ -7752,7 +7767,7 @@ MyBikeGestor`
             const disciplina = biciActual.disciplina;   // v5: faltaba definirla y el botón no hacía nada
 
             // El modal se reutiliza para editar: al abrirlo para añadir, volver al modo "añadir"
-            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = '<i class="ti ti-plus"></i> Añadir pieza al cajón';
+            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = 'Añadir pieza';
             document.querySelector('#modal-anadir-cajon .btn-primary').onclick = guardarPiezaCajon;
 
             const sel = document.getElementById('cajon-nuevo-tipo');
@@ -7836,7 +7851,7 @@ MyBikeGestor`
 
             // Reutilizar modal de añadir pero en modo edición
             abrirModalAnadirCajon();
-            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Editar pieza';
+            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = 'Editar pieza';
             document.querySelector('#modal-anadir-cajon .btn-primary').onclick = () => guardarEdicionPiezaCajon(piezaId);
 
             // Rellenar con datos existentes
@@ -7915,7 +7930,7 @@ MyBikeGestor`
                 card.innerHTML = `
                     <div class="card-header">
                         <div>
-                            <div class="card-title">${pieza.tipo}</div>
+                            <div class="card-title nombre-comp">${pieza.tipo}</div>
                             <div class="card-subtitle marca-modelo"><strong>${pieza.marca}</strong> <span>${pieza.modelo || ''}</span></div>
                             <div class="text-muted" style="font-size:0.75em; margin-top:3px;">${pieza.seccion ? `${pieza.seccion} · ` : ''}${pieza.manual ? `Añadida: ${formatearFecha(pieza.fechaEntrada)}` : `Retirada: ${formatearFecha(pieza.fechaRetiro)}`}</div>
                         </div>
@@ -8735,7 +8750,7 @@ MyBikeGestor`
             if (!biciActual.historial || biciActual.historial.length === 0) {
                 container.innerHTML = `
                     <div class="lista-vacia">
-                        <div class="lista-vacia-icon">📋</div>
+                        <div class="lista-vacia-icon"><i class="ti ti-clipboard-list"></i></div>
                         <p>No hay registros de mantenimiento</p>
                     </div>
                 `;
@@ -8771,14 +8786,13 @@ MyBikeGestor`
                         '<span style="color:#555;">★</span>'.repeat(5 - (n || 0));
                     const criteriosHtml = v.criterios && Object.keys(v.criterios).length > 0
                         ? Object.entries(v.criterios).map(([k, val]) => {
-                            const labels = {duracion: '⏱ Duración', estetica: '🎨 Estética', peso: '⚖️ Peso', precio: '💶 Precio'};
+                            const labels = {duracion: '<i class="ti ti-clock"></i> Duración', estetica: '<i class="ti ti-palette"></i> Estética', peso: '<i class="ti ti-scale"></i> Peso', precio: '<i class="ti ti-currency-euro"></i> Precio'};
                             return `<div style="display:flex; justify-content:space-between; font-size:0.82em; color:var(--text); margin-bottom:3px;"><span>${labels[k] || k}</span><span style="color:#f0a500;">${estrellas(val)}</span></div>`;
                           }).join('') : '';
                     const comentarioHtml = v.comentario ? `<div style="font-size:0.82em; color:var(--text); margin-top:8px; font-style:italic;">"${v.comentario}"</div>` : '';
                     valoracionHtml = `
                         <div style="margin-top:10px; border-top:1px solid #444; padding-top:8px;">
-                            <button onclick="var d=this.nextElementSibling; var open=d.style.display!=='none'; d.style.display=open?'none':'block'; this.textContent=open?'⭐ Ver valoración ▼':'⭐ Ver valoración ▲';"
-                                style="background:none; border:none; color:#f0a500; cursor:pointer; font-size:0.82em; padding:0;">⭐ Ver valoración ▼</button>
+                            <button onclick="toggleValoracionHistorial(this)" style="background:none; border:none; color:#f0a500; cursor:pointer; font-size:0.9em; padding:0; font-family:inherit; display:inline-flex; align-items:center; gap:8px;"><span style="letter-spacing:2px;">${estrellas(v.global || 0)}</span> <span style="color:var(--primary); font-weight:700;">ver <i class="ti ti-chevron-down"></i></span></button>
                             <div style="display:none; margin-top:8px; background:#1e1e1e; border-radius:8px; padding:10px;">
                                 ${v.motivo ? `<div style="font-size:0.85em; color:var(--text); margin-bottom:8px;">Motivo: <strong style="color:#F0EBEB;">${v.motivo}</strong></div>` : ''}
                                 <div style="text-align:center; font-size:1.5em; color:#f0a500; margin-bottom:6px;">${estrellas(v.global || 0)}</div>
@@ -8795,23 +8809,30 @@ MyBikeGestor`
                         </span>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <span class="text-muted" style="font-weight: 600;">${formatearFecha(reg.fecha)}</span>
-                            <button onclick="eliminarRegistroHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:1em; color:var(--danger); padding:0;" title="Eliminar">🗑️</button>
+                            <button onclick="eliminarRegistroHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:1em; color:var(--danger); padding:0; font-size:1.2em;" title="Eliminar"><i class="ti ti-trash"></i></button>
                         </div>
                     </div>
-                    <div class="card-title" style="font-size: 1em;">${reg.componente || reg.pieza || '-'}</div>
+                    <div class="card-title nombre-comp" style="font-size: 1em;">${reg.componente || reg.pieza || '-'}</div>
                     <div class="card-subtitle">${reg.descripcion}</div>
-                    ${reg.donde ? `<div class="text-muted" style="font-size:0.82em;margin-top:2px;">📍 ${reg.donde}</div>` : ''}
+                    ${reg.donde ? `<div class="text-muted" style="font-size:0.82em;margin-top:2px;"><i class="ti ti-map-pin"></i> ${reg.donde}</div>` : ''}
                     <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items:center;">
                         ${detalleExtra}
                         <div style="display:flex; align-items:center; gap:8px;">
                             <div class="text-muted">Coste: <strong style="color: var(--warning);">${reg.coste || 0}€</strong></div>
-                            <button onclick="editarCosteHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:0.9em; color:var(--secondary); padding:0;" title="Editar coste">✏️</button>
+                            <button onclick="editarCosteHistorial('${reg.id}')" style="background:none; border:none; cursor:pointer; font-size:0.9em; color:var(--secondary); padding:0; font-size:1.2em;" title="Editar coste"><i class="ti ti-pencil"></i></button>
                         </div>
                     </div>
                     ${valoracionHtml}
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function toggleValoracionHistorial(btn) {
+            const d = btn.nextElementSibling;
+            const abierto = d.style.display !== 'none';
+            d.style.display = abierto ? 'none' : 'block';
+            btn.querySelector('.ti').className = abierto ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
         }
 
         async function editarCosteHistorial(id) {
