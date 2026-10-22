@@ -542,6 +542,9 @@
             color: #ffffff;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
         }
+        /* v5: marca (ámbar, mayúsculas) + modelo (blanco): mismo criterio en toda la app */
+        .marca-modelo { font-size:0.8rem; font-weight:500; color:#ffffff; }
+        .marca-modelo strong { font-size:0.9rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#f0a500; }
         .bici-marca-modelo strong {
             font-size: 0.95rem;
             font-weight: 700;
@@ -1709,14 +1712,16 @@
         <section id="sec-cajon-piezas" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title">📦 Cajón de Piezas</div>
+                <div class="topbar-title">Cajón de Piezas</div>
                 <div style="width: 40px;"></div>
             </div>
-            <div class="text-muted text-center mb-20" style="margin-top:15px;">
+            <div class="text-center mb-20 subtitulo-verde" style="margin-top:15px;">
                 <p>Piezas guardadas · Puedes reinstalarlas cuando quieras</p>
             </div>
-            <button class="btn btn-primary" style="margin-bottom:16px;" onclick="abrirModalAnadirCajon()">➕ Añadir pieza al cajón</button>
+            <button class="btn btn-primary" style="margin-bottom:16px;" onclick="abrirModalAnadirCajon()"><i class="ti ti-plus"></i> Añadir pieza al cajón</button>
             <div id="lista-cajon-piezas" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -3132,7 +3137,7 @@
         <div class="modal-contenido" style="max-height:85vh; overflow-y:auto;">
             <div class="modal-header">
                 <button onclick="cerrarModal('modal-anadir-cajon')" style="background:none; border:none; font-size:1.4em; cursor:pointer; padding:0; line-height:1;">←</button>
-                <h2 class="modal-title">➕ Añadir pieza al cajón</h2>
+                <h2 class="modal-title ayuda-titulo"><i class="ti ti-plus"></i> Añadir pieza al cajón</h2>
             </div>
             <div class="form-group">
                 <label>Tipo de componente</label>
@@ -5535,7 +5540,7 @@ MyBikeGestor`
                 card.innerHTML = `
                     <div class="card-header">
                         <div>
-                            <div class="card-title">${juego.marca} ${juego.modelo}</div>
+                            <div class="card-title marca-modelo"><strong>${juego.marca}</strong> <span>${juego.modelo}</span></div>
                             <div class="card-subtitle">Desde: ${formatearFecha(juego.fechaInstalacion)} · ${juego.kmInstalacion || 0} km</div>
                         </div>
                         <span class="badge ${juego.activo ? 'badge-primary' : ''}" style="${juego.activo ? '' : 'background:#383838;color:#B0A0A0;'}">${juego.activo ? '🟢 Activo' : '⚪ Disponible'}</span>
@@ -5824,7 +5829,7 @@ MyBikeGestor`
                 card.innerHTML = `
                     <div class="card-header">
                         <div>
-                            <div class="card-title">${juego.marca} ${juego.modelo}</div>
+                            <div class="card-title marca-modelo"><strong>${juego.marca}</strong> <span>${juego.modelo}</span></div>
                             <div class="card-subtitle">Instalado: ${formatearFecha(juego.fechaInstalacion)}</div>
                             <div class="text-muted" style="font-size:0.75em; margin-top:3px;">Retirado: ${formatearFecha(juego.fechaRetiro)}</div>
                         </div>
@@ -7744,6 +7749,11 @@ MyBikeGestor`
         function abrirModalAnadirCajon() {
             if (!biciActual) return;
             const secciones = getSeccionesBici(biciActual);
+            const disciplina = biciActual.disciplina;   // v5: faltaba definirla y el botón no hacía nada
+
+            // El modal se reutiliza para editar: al abrirlo para añadir, volver al modo "añadir"
+            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = '<i class="ti ti-plus"></i> Añadir pieza al cajón';
+            document.querySelector('#modal-anadir-cajon .btn-primary').onclick = guardarPiezaCajon;
 
             const sel = document.getElementById('cajon-nuevo-tipo');
             sel.innerHTML = '<option value="">-- Selecciona --</option>';
@@ -7802,9 +7812,12 @@ MyBikeGestor`
             }
 
             if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
+            const optSel = document.getElementById('cajon-nuevo-tipo').selectedOptions[0];
+            const seccion = optSel && optSel.parentElement.tagName === 'OPTGROUP' ? optSel.parentElement.label : null;
             biciActual.cajonPiezas.push({
                 id: Date.now().toString(),
                 tipo, marca, modelo, material, peso, kmAcumulados, precio, notas,
+                seccion,
                 manual: true,
                 fechaEntrada: new Date().toISOString()
             });
@@ -7823,7 +7836,7 @@ MyBikeGestor`
 
             // Reutilizar modal de añadir pero en modo edición
             abrirModalAnadirCajon();
-            document.querySelector('#modal-anadir-cajon .modal-title').textContent = '✏️ Editar pieza';
+            document.querySelector('#modal-anadir-cajon .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Editar pieza';
             document.querySelector('#modal-anadir-cajon .btn-primary').onclick = () => guardarEdicionPiezaCajon(piezaId);
 
             // Rellenar con datos existentes
@@ -7873,6 +7886,8 @@ MyBikeGestor`
             const pieza = biciActual.cajonPiezas.find(p => p.id === piezaId);
             if (pieza) {
                 Object.assign(pieza, { tipo, marca, modelo, material, peso, kmAcumulados, precio, notas });
+                const optSel = document.getElementById('cajon-nuevo-tipo').selectedOptions[0];
+                if (optSel && optSel.parentElement.tagName === 'OPTGROUP') pieza.seccion = optSel.parentElement.label;
             }
 
             await guardarDatosUsuario();
@@ -7886,7 +7901,7 @@ MyBikeGestor`
             if (!biciActual.cajonPiezas) biciActual.cajonPiezas = [];
             const container = document.getElementById('lista-cajon-piezas');
             if (biciActual.cajonPiezas.length === 0) {
-                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">📦</div><p>El cajón está vacío</p></div>`;
+                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon"><i class="ti ti-package"></i></div><p>El cajón está vacío</p></div>`;
                 return;
             }
             container.innerHTML = '';
@@ -7901,10 +7916,10 @@ MyBikeGestor`
                     <div class="card-header">
                         <div>
                             <div class="card-title">${pieza.tipo}</div>
-                            <div class="card-subtitle"><strong style="color:#F0EBEB;">${pieza.marca}</strong> <span style="color:#B0A0A0;">${pieza.modelo || ''}</span></div>
-                            <div class="text-muted" style="font-size:0.75em; margin-top:3px;">Sección: ${pieza.seccion} · Retirado: ${formatearFecha(pieza.fechaRetiro)}</div>
+                            <div class="card-subtitle marca-modelo"><strong>${pieza.marca}</strong> <span>${pieza.modelo || ''}</span></div>
+                            <div class="text-muted" style="font-size:0.75em; margin-top:3px;">${pieza.seccion ? `${pieza.seccion} · ` : ''}${pieza.manual ? `Añadida: ${formatearFecha(pieza.fechaEntrada)}` : `Retirada: ${formatearFecha(pieza.fechaRetiro)}`}</div>
                         </div>
-                        <span class="badge" style="background:#383838;color:#B0A0A0;">📦</span>
+                        <span class="badge" style="background:#383838;color:#B0A0A0;"><i class="ti ti-package"></i></span>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
                         <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
@@ -7913,12 +7928,12 @@ MyBikeGestor`
                         </div>
                         <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
                             <div style="font-size:0.75em; color:var(--text); font-weight:600;">TIEMPO USO</div>
-                            <div style="font-size:1.2em; font-weight:700; color:var(--secondary);">${formatearDuracion(pieza.diasUso || 0)}</div>
+                            <div style="font-size:1.2em; font-weight:700; color:var(--secondary);">${pieza.manual && !pieza.diasUso ? '—' : formatearDuracion(pieza.diasUso || 0)}</div>
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-top:12px;">
-                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" onclick="editarPiezaCajon('${pieza.id}')">✏️ Editar</button>
-                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" onclick="eliminarPiezaCajon('${pieza.id}')">🗑️ Eliminar</button>
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em; font-family:inherit;" onclick="editarPiezaCajon('${pieza.id}')"><i class="ti ti-pencil"></i> Editar</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em; font-family:inherit;" onclick="eliminarPiezaCajon('${pieza.id}')"><i class="ti ti-trash"></i> Eliminar</button>
                     </div>
                 `;
                 container.appendChild(card);
