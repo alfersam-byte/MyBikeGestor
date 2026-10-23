@@ -341,7 +341,7 @@
         }
 
         /* v5: sección sin componentes: el botón de añadir queda centrado en la pantalla */
-        .seccion-vacia #btn-anadir-componente { margin-top: 28vh !important; }
+        .seccion-vacia #btn-anadir-componente, .seccion-vacia .btn-anadir-top { margin-top: 28vh !important; }
         .seccion-vacia .lista-vacia { padding-top: 16px; }
         .lista-vacia-icon {
             font-size: 4em;
@@ -1641,16 +1641,19 @@
         <section id="sec-garaje-ruedas" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title" style="font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">⭕ Ruedas · <span id="garaje-ruedas-nombre-bici"></span></div>
+                <div class="topbar-title" style="font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ruedas · <span id="garaje-ruedas-nombre-bici"></span></div>
                 <div style="width: 40px;"></div>
             </div>
+
+            <button class="btn btn-primary btn-anadir-top" style="margin-top:20px;" onclick="abrirModalNuevoJuegoRuedas()">Añadir juego de ruedas</button>
 
             <div id="lista-juegos-ruedas" class="mt-20">
                 <!-- Generado dinámicamente -->
             </div>
 
-            <button class="btn btn-primary mt-20" onclick="abrirModalNuevoJuegoRuedas()">➕ Añadir Juego de Ruedas</button>
-            <button id="btn-ver-ruedas-retiradas" class="btn btn-secondary mt-20" style="display:none;" onclick="navegar('sec-ruedas-retiradas')">📦 Ver Ruedas Retiradas</button>
+            <button id="btn-ver-ruedas-retiradas" class="btn btn-secondary mt-20" style="display:none;" onclick="navegar('sec-ruedas-retiradas')">Ver ruedas retiradas</button>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1659,13 +1662,15 @@
         <section id="sec-ruedas-retiradas" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title">📦 Ruedas Retiradas</div>
+                <div class="topbar-title">Ruedas Retiradas</div>
                 <div style="width: 40px;"></div>
             </div>
-            <div class="text-muted text-center mb-20" style="margin-top:15px;">
+            <div class="text-center mb-20 subtitulo-verde" style="margin-top:15px;">
                 <p>Juegos de ruedas retirados · Puedes reactivarlos cuando quieras</p>
             </div>
             <div id="lista-ruedas-retiradas" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1678,6 +1683,8 @@
                 <div style="width: 40px;"></div>
             </div>
             <div id="contenido-detalle-ruedas" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1690,6 +1697,8 @@
                 <div style="width: 40px;"></div>
             </div>
             <div id="contenido-despiece-rueda" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -5561,13 +5570,13 @@ MyBikeGestor`
             if (btnRetiradas) {
                 const numRetiradas = biciActual.juegosRuedas.filter(j => j.retirado).length;
                 btnRetiradas.style.display = numRetiradas > 0 ? 'block' : 'none';
-                btnRetiradas.textContent = `📦 Ver Ruedas Retiradas (${numRetiradas})`;
+                btnRetiradas.textContent = `Ver ruedas retiradas (${numRetiradas})`;
             }
 
+            document.getElementById('sec-garaje-ruedas').classList.toggle('seccion-vacia', juegosActivos.length === 0);
             if (juegosActivos.length === 0) {
                 container.innerHTML = `
                     <div class="lista-vacia">
-                        <div class="lista-vacia-icon">⭕</div>
                         <p>No hay juegos de ruedas registrados</p>
                     </div>`;
                 return;
@@ -5602,7 +5611,7 @@ MyBikeGestor`
                             <div class="card-title marca-modelo"><strong>${juego.marca}</strong> <span>${juego.modelo}</span></div>
                             <div class="card-subtitle">Desde: ${formatearFecha(juego.fechaInstalacion)} · ${juego.kmInstalacion || 0} km</div>
                         </div>
-                        <span class="badge ${juego.activo ? 'badge-primary' : ''}" style="${juego.activo ? '' : 'background:#383838;color:#B0A0A0;'}">${juego.activo ? '🟢 Activo' : '⚪ Disponible'}</span>
+                        <span class="badge ${juego.activo ? 'badge-primary' : ''}" style="${juego.activo ? '' : 'background:#383838;color:#B0A0A0;'}">${juego.activo ? '<i class="ti ti-circle-filled" style="color:var(--primary);"></i> Activo' : '<i class="ti ti-circle"></i> Disponible'}</span>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
                         <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
@@ -5615,13 +5624,11 @@ MyBikeGestor`
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Ver ruedas de este juego" onclick="abrirDetalleJuegoRuedas('${juego.id}')">
-                            🚲
-                        </button>
-                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" title="Editar datos del juego" onclick="editarJuegoRuedas('${juego.id}')">✏️</button>
-                        ${!juego.activo ? `<button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em; background:var(--secondary);" title="Activar este juego" onclick="activarJuegoRuedas('${juego.id}')">⚡</button>` : ''}
-                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em; background:var(--warning); color:white;" title="Retirar a ruedas retiradas" onclick="retirarJuegoRuedas('${juego.id}')">📦</button>
-                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRuedas('${juego.id}')">🗑️</button>
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Ver ruedas de este juego" onclick="abrirDetalleJuegoRuedas('${juego.id}')"><i class="ti ti-bike"></i></button>
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" title="Editar datos del juego" onclick="editarJuegoRuedas('${juego.id}')"><i class="ti ti-pencil"></i></button>
+                        ${!juego.activo ? `<button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em; background:var(--secondary);" title="Activar este juego" onclick="activarJuegoRuedas('${juego.id}')"><i class="ti ti-bolt"></i></button>` : ''}
+                        <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em; background:var(--warning); color:white;" title="Retirar a ruedas retiradas" onclick="retirarJuegoRuedas('${juego.id}')"><i class="ti ti-package"></i></button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRuedas('${juego.id}')"><i class="ti ti-trash"></i></button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -5874,7 +5881,7 @@ MyBikeGestor`
             const retiradas = (biciActual.juegosRuedas || []).filter(j => j.retirado);
             const container = document.getElementById('lista-ruedas-retiradas');
             if (retiradas.length === 0) {
-                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">📦</div><p>No hay ruedas retiradas</p></div>`;
+                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon"><i class="ti ti-package"></i></div><p>No hay ruedas retiradas</p></div>`;
                 return;
             }
             container.innerHTML = '';
@@ -5892,7 +5899,7 @@ MyBikeGestor`
                             <div class="card-subtitle">Instalado: ${formatearFecha(juego.fechaInstalacion)}</div>
                             <div class="text-muted" style="font-size:0.75em; margin-top:3px;">Retirado: ${formatearFecha(juego.fechaRetiro)}</div>
                         </div>
-                        <span class="badge" style="background:#383838;color:#B0A0A0;">📦 Retirado</span>
+                        <span class="badge" style="background:#383838;color:#B0A0A0;"><i class="ti ti-package"></i> Retirado</span>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
                         <div style="text-align:center; padding:8px; background:var(--light-gray); border-radius:8px;">
@@ -5905,8 +5912,8 @@ MyBikeGestor`
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-top:12px;">
-                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Volver a disponible" onclick="reactivarJuegoRuedas('${juego.id}')">↩️ Reactivar</button>
-                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRetirado('${juego.id}')">🗑️ Eliminar</button>
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Volver a disponible" onclick="reactivarJuegoRuedas('${juego.id}')"><i class="ti ti-arrow-back-up"></i> Reactivar</button>
+                        <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRetirado('${juego.id}')"><i class="ti ti-trash"></i> Eliminar</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -5963,7 +5970,7 @@ MyBikeGestor`
 
             ['delantera', 'trasera'].forEach(lado => {
                 const rueda = juegosRuedasActual.ruedas[lado];
-                const titulo = lado === 'delantera' ? '⬆️ Rueda Delantera' : '⬇️ Rueda Trasera';
+                const titulo = lado === 'delantera' ? '<i class="ti ti-arrow-up"></i> Rueda delantera' : '<i class="ti ti-arrow-down"></i> Rueda trasera';
 
                 const div = document.createElement('div');
                 div.className = 'card';
@@ -5977,7 +5984,7 @@ MyBikeGestor`
                         </div>
                         <div style="text-align:center; padding:15px 0;">
                             <div style="color:var(--text); font-size:0.9em; margin-bottom:12px;">Sin rueda registrada</div>
-                            <button class="btn btn-primary" style="width:auto; padding:8px 20px;" onclick="abrirModalRueda('${lado}')">➕ Añadir rueda</button>
+                            <button class="btn btn-primary" style="width:auto; padding:8px 20px;" onclick="abrirModalRueda('${lado}')">Añadir rueda</button>
                         </div>
                     `;
                 } else {
@@ -6005,7 +6012,7 @@ MyBikeGestor`
                             <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar rueda" onclick="eliminarRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
                         <button class="btn btn-secondary" style="width:100%; margin-top:10px; font-size:0.85em;" onclick="abrirDespieceRueda('${lado}')">
-                            🔩 Despiece ${numPiezas > 0 ? `(${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'})` : ''}
+                            <i class="ti ti-list-details"></i> Despiece ${numPiezas > 0 ? `(${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'})` : ''}
                         </button>
                     `;
                 }
@@ -6137,7 +6144,7 @@ MyBikeGestor`
             window._ladoRuedaActual = lado;
             const rueda = juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
             if (!rueda) return;
-            document.getElementById('despiece-rueda-titulo').textContent = `🔩 ${rueda.marca} ${rueda.modelo || ''} · ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
+            document.getElementById('despiece-rueda-titulo').textContent = `${rueda.marca} ${rueda.modelo || ''} · ${lado === 'delantera' ? 'Delantera' : 'Trasera'}`;
             navegar('sec-despiece-rueda');
         }
 
@@ -6150,9 +6157,21 @@ MyBikeGestor`
 
             const container = document.getElementById('contenido-despiece-rueda');
             container.innerHTML = '';
+            document.getElementById('sec-despiece-rueda').classList.toggle('seccion-vacia', rueda.piezas.length === 0);
+
+            // Botón añadir pieza arriba, como en el resto de la app
+            const btnAdd = document.createElement('button');
+            btnAdd.className = 'btn btn-primary btn-anadir-top';
+            btnAdd.style.width = '100%';
+            btnAdd.textContent = 'Añadir pieza';
+            btnAdd.onclick = () => abrirModalPiezaRueda();
+            container.appendChild(btnAdd);
+            const lista = document.createElement('div');
+            lista.className = 'mt-20';
+            container.appendChild(lista);
 
             if (rueda.piezas.length === 0) {
-                container.innerHTML = `<div class="lista-vacia"><div class="lista-vacia-icon">🔩</div><p>Sin piezas registradas</p></div>`;
+                lista.innerHTML = `<div class="lista-vacia"><p>Sin piezas registradas</p></div>`;
             } else {
                 rueda.piezas.forEach(pieza => {
                     const kmUso = (biciActual.kmTotales || 0) - (pieza.kmInstalacion || 0);
@@ -6181,17 +6200,9 @@ MyBikeGestor`
                             <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
                     `;
-                    container.appendChild(card);
+                    lista.appendChild(card);
                 });
             }
-
-            // Botón añadir pieza
-            const btnAdd = document.createElement('button');
-            btnAdd.className = 'btn btn-primary mt-20';
-            btnAdd.style.width = '100%';
-            btnAdd.textContent = '➕ Añadir pieza';
-            btnAdd.onclick = () => abrirModalPiezaRueda();
-            container.appendChild(btnAdd);
         }
 
         function abrirModalPiezaRueda(piezaId = null) {
