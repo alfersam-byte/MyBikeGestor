@@ -5504,6 +5504,12 @@ MyBikeGestor`
                 'Periféricos': '../icons/componentes/perifericos.jpg',
                 'Sistema Eléctrico': '../icons/componentes/sistema-electrico.jpg'
             };
+            // v5: foto de Periféricos propia para Carretera y para Gravel (el resto de secciones se comparten)
+            if (biciActual.disciplina === 'Carretera') {
+                imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-carretera.jpg';
+                imagenesSeccion['Transmisión'] = '../icons/componentes/transmision-carretera.jpg';
+            }
+            if (biciActual.disciplina === 'Gravel') imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-gravel.jpg';
             // v5: las MTB tienen su propio juego de fotos (amortiguación, tacos, tija telescópica…)
             if (biciActual.disciplina === 'MTB') {
                 Object.assign(imagenesSeccion, {
