@@ -561,6 +561,17 @@
             border-radius: 50% !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center;
             font-size: 1.2em !important; color: var(--primary) !important; padding: 0 !important; font-family: inherit;
         }
+        /* v5: botones de opción (chips) para los ajustes con varias opciones */
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { padding: 8px 14px; border-radius: 20px; border: 1px solid #555; background: #2D2D2D; color: #F0EBEB;
+                font-family: inherit; font-size: 0.85em; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .chip .ti { color: #f0a500; }
+        .chip.activo { background: var(--primary); border-color: var(--primary); color: #1a1a1a; font-weight: 700; }
+        .chip.activo .ti { color: #1a1a1a; }
+        /* v5: foto de cada componente: miniatura en la lista y fondo en la tarjeta de detalle */
+        .comp-thumb { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #1e1e1e; }
+        .comp-fila { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .card.con-foto-fondo { background-size: cover; background-position: center; position: relative; }
         .nombre-comp { color: var(--secondary) !important; }
         .marca-modelo { font-size:0.8rem; font-weight:500; color:#ffffff; }
         .marca-modelo strong { font-size:0.9rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#f0a500; }
@@ -1257,7 +1268,112 @@
                         </div>
                     </div>
                 </div>
+                <div class="card" onclick="navegar('sec-ajuste-historial')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.9rem; line-height:1; color:var(--primary);"><i class="ti ti-history"></i></span>
+                        <div>
+                            <div class="titulo-redondo">Historial</div>
+                            <div style="font-size:0.82em; color:var(--text);">Qué registros quieres ver</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" onclick="navegar('sec-ajuste-cajon')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.9rem; line-height:1; color:var(--primary);"><i class="ti ti-package"></i></span>
+                        <div>
+                            <div class="titulo-redondo">Cajón de piezas</div>
+                            <div style="font-size:0.82em; color:var(--text);">Orden y agrupación de la lista</div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: AJUSTE — CAJÓN
+        ======================================== -->
+        <section id="sec-ajuste-cajon" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="volver()">←</button>
+                <div class="topbar-title">Cajón de piezas</div>
+                <div style="width:40px;"></div>
+            </div>
+
+            <div class="card mt-20">
+                <div class="subtitulo-verde" style="font-weight:700; margin-bottom:10px;">Ordenar por</div>
+                <div class="chips" data-grupo="orden">
+                    <button class="chip" data-valor="fecha">Fecha</button>
+                    <button class="chip" data-valor="km-desc">Km de más a menos</button>
+                    <button class="chip" data-valor="km-asc">Km de menos a más</button>
+                </div>
+                <p style="font-size:0.8em; color:var(--text); margin-top:10px;">Fecha: primero las piezas que entraron en el cajón más recientemente.</p>
+            </div>
+
+            <div class="card mt-20">
+                <div class="subtitulo-verde" style="font-weight:700; margin-bottom:10px;">Piezas del mismo tipo</div>
+                <div class="chips" data-grupo="agrupar">
+                    <button class="chip" data-valor="no">Mostrar todas</button>
+                    <button class="chip" data-valor="si">Una por tipo</button>
+                </div>
+                <p style="font-size:0.8em; color:var(--text); margin-top:10px;">Con "Una por tipo" se ve solo la primera pieza de cada tipo, según el orden elegido, y un aviso te indica cuántas más hay del mismo tipo. Pulsando el aviso se despliegan.</p>
+            </div>
+
+            <button class="btn btn-primary mt-20" onclick="guardarAjusteCajon()">Guardar</button>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
+        </section>
+
+        <!-- ========================================
+             SECCIÓN: AJUSTE — HISTORIAL
+        ======================================== -->
+        <section id="sec-ajuste-historial" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="volver()">←</button>
+                <div class="topbar-title">Historial</div>
+                <div style="width:40px;"></div>
+            </div>
+            <div class="card mt-20">
+                <p style="font-size:0.9em; color:var(--text); margin-bottom:6px;">Elige qué registros se muestran en el Historial de tus bicis. Los registros antiguos no se borran: solo se ocultan de la lista y siguen contando en los totales.</p>
+            </div>
+
+            <div class="card mt-20">
+                <div class="subtitulo-verde" style="font-weight:700; margin-bottom:10px;">Período</div>
+                <div class="chips" data-grupo="periodo">
+                    <button class="chip" data-valor="todo">Todo</button>
+                    <button class="chip" data-valor="12m">Último año</button>
+                    <button class="chip" data-valor="6m">6 meses</button>
+                    <button class="chip" data-valor="3m">3 meses</button>
+                </div>
+            </div>
+
+            <div class="card mt-20">
+                <div class="subtitulo-verde" style="font-weight:700; margin-bottom:10px;">Tipo de registro</div>
+                <div class="chips" data-grupo="tipo">
+                    <button class="chip" data-valor="todos">Todos</button>
+                    <button class="chip" data-valor="sustitucion">Sustitución</button>
+                    <button class="chip" data-valor="reparacion">Reparación</button>
+                    <button class="chip" data-valor="mantenimiento">Mantenimiento</button>
+                    <button class="chip" data-valor="pilas">Pilas</button>
+                </div>
+            </div>
+
+            <div class="card mt-20">
+                <div class="subtitulo-verde" style="font-weight:700; margin-bottom:10px;">Valoración</div>
+                <div class="chips" data-grupo="estrellas">
+                    <button class="chip" data-valor="todas">Todas</button>
+                    <button class="chip" data-valor="5">5 <i class="ti ti-star-filled"></i></button>
+                    <button class="chip" data-valor="4-5">4-5 <i class="ti ti-star-filled"></i></button>
+                    <button class="chip" data-valor="1-2">1-2 <i class="ti ti-star-filled"></i></button>
+                    <button class="chip" data-valor="1">1 <i class="ti ti-star-filled"></i></button>
+                    <button class="chip" data-valor="sin">Sin valorar</button>
+                </div>
+                <p style="font-size:0.8em; color:var(--text); margin-top:10px;">Para ver lo mejor que has montado (5) o lo que no te convenció (1-2). Los registros sin valoración quedan fuera cuando eliges un número de estrellas.</p>
+            </div>
+
+            <button class="btn btn-primary mt-20" onclick="guardarAjusteHistorial()">Guardar</button>
+            <button class="btn btn-secondary mt-20" onclick="restablecerAjusteHistorial()">Mostrar todo</button>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1954,7 +2070,7 @@
             </div>
 
             <!-- Datos del componente -->
-            <div class="card">
+            <div class="card" id="detalle-comp-card">
                 <div class="card-title nombre-comp" id="detalle-comp-nombre">-</div>
                 <div style="margin-top: 15px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
@@ -2037,6 +2153,8 @@
             </div>
 
             <button class="btn btn-primary" style="margin-top:20px;" onclick="abrirModalNuevoMantenimiento()">Registrar mantenimiento</button>
+
+            <div id="historial-filtro-resumen" style="display:none;"></div>
 
             <div id="lista-historial" class="mt-20">
                 <div class="lista-vacia">
@@ -4109,6 +4227,10 @@
                 const umbral = Math.round((datosUsuario.umbralAlertas || 0.9) * 100);
                 document.getElementById('ajuste-umbral-alertas').value = umbral;
                 document.getElementById('ajuste-umbral-valor').textContent = umbral + '%';
+            } else if (seccionId === 'sec-ajuste-historial') {
+                cargarAjusteHistorial();
+            } else if (seccionId === 'sec-ajuste-cajon') {
+                cargarAjusteCajon();
             } else if (seccionId === 'sec-alertas') {
                 cargarAlertas();
             } else if (seccionId === 'sec-desglose-peso') {
@@ -4172,6 +4294,113 @@
         // ========================================
         // PERFIL DE USUARIO
         // ========================================
+        // ===== AJUSTES DEL HISTORIAL: qué registros se ven (período, tipo y valoración) =====
+        const FILTRO_HISTORIAL_BASE = { periodo: 'todo', tipo: 'todos', estrellas: 'todas' };
+        let _filtroHistorialTmp = { ...FILTRO_HISTORIAL_BASE };
+
+        function getFiltroHistorial() {
+            return { ...FILTRO_HISTORIAL_BASE, ...((datosUsuario && datosUsuario.filtroHistorial) || {}) };
+        }
+
+        function pintarChipsHistorial() {
+            document.querySelectorAll('#sec-ajuste-historial .chips').forEach(grupo => {
+                const g = grupo.dataset.grupo;
+                grupo.querySelectorAll('.chip').forEach(c => c.classList.toggle('activo', c.dataset.valor === _filtroHistorialTmp[g]));
+            });
+        }
+
+        function cargarAjusteHistorial() {
+            _filtroHistorialTmp = getFiltroHistorial();
+            pintarChipsHistorial();
+        }
+
+        document.addEventListener('click', e => {
+            const chip = e.target.closest('#sec-ajuste-historial .chip');
+            if (!chip) return;
+            _filtroHistorialTmp[chip.parentElement.dataset.grupo] = chip.dataset.valor;
+            pintarChipsHistorial();
+        });
+
+        async function guardarAjusteHistorial() {
+            datosUsuario.filtroHistorial = { ..._filtroHistorialTmp };
+            await guardarDatosUsuario();
+            mostrarNotificacion('Ajuste guardado', 'exito');
+            volver();
+        }
+
+        function restablecerAjusteHistorial() {
+            _filtroHistorialTmp = { ...FILTRO_HISTORIAL_BASE };
+            pintarChipsHistorial();
+        }
+
+        // ===== AJUSTES DEL CAJÓN: orden de la lista y agrupación por tipo =====
+        const AJUSTE_CAJON_BASE = { orden: 'fecha', agrupar: 'no' };
+        let _ajusteCajonTmp = { ...AJUSTE_CAJON_BASE };
+
+        function getAjusteCajon() {
+            return { ...AJUSTE_CAJON_BASE, ...((datosUsuario && datosUsuario.ajusteCajon) || {}) };
+        }
+
+        function pintarChipsCajon() {
+            document.querySelectorAll('#sec-ajuste-cajon .chips').forEach(grupo => {
+                const g = grupo.dataset.grupo;
+                grupo.querySelectorAll('.chip').forEach(c => c.classList.toggle('activo', c.dataset.valor === _ajusteCajonTmp[g]));
+            });
+        }
+
+        function cargarAjusteCajon() {
+            _ajusteCajonTmp = getAjusteCajon();
+            pintarChipsCajon();
+        }
+
+        document.addEventListener('click', e => {
+            const chip = e.target.closest('#sec-ajuste-cajon .chip');
+            if (!chip) return;
+            _ajusteCajonTmp[chip.parentElement.dataset.grupo] = chip.dataset.valor;
+            pintarChipsCajon();
+        });
+
+        async function guardarAjusteCajon() {
+            datosUsuario.ajusteCajon = { ..._ajusteCajonTmp };
+            await guardarDatosUsuario();
+            mostrarNotificacion('Ajuste guardado', 'exito');
+            volver();
+        }
+
+        function registroPasaFiltro(reg, f) {
+            if (f.periodo !== 'todo') {
+                const meses = { '12m': 12, '6m': 6, '3m': 3 }[f.periodo];
+                const desde = new Date(); desde.setMonth(desde.getMonth() - meses);
+                if (new Date(reg.fecha) < desde) return false;
+            }
+            if (f.tipo !== 'todos') {
+                const t = reg.tipo || '';
+                const ok = f.tipo === 'sustitucion' ? t.startsWith('Sustitución')
+                         : f.tipo === 'reparacion' ? t === 'Reparación'
+                         : f.tipo === 'mantenimiento' ? (t === 'Mantenimiento' || t === 'Mejora')
+                         : f.tipo === 'pilas' ? (t === 'Cambio de pila' || t === 'Recarga') : true;
+                if (!ok) return false;
+            }
+            if (f.estrellas !== 'todas') {
+                const e = (reg.valoracion && reg.valoracion.global) || 0;
+                const ok = f.estrellas === 'sin' ? e === 0
+                         : f.estrellas === '5' ? e === 5
+                         : f.estrellas === '4-5' ? e >= 4
+                         : f.estrellas === '1-2' ? (e >= 1 && e <= 2)
+                         : f.estrellas === '1' ? e === 1 : true;
+                if (!ok) return false;
+            }
+            return true;
+        }
+
+        function textoFiltroHistorial(f) {
+            const partes = [];
+            if (f.periodo !== 'todo') partes.push({ '12m': 'Último año', '6m': '6 meses', '3m': '3 meses' }[f.periodo]);
+            if (f.tipo !== 'todos') partes.push({ sustitucion: 'Sustitución', reparacion: 'Reparación', mantenimiento: 'Mantenimiento', pilas: 'Pilas' }[f.tipo]);
+            if (f.estrellas !== 'todas') partes.push(f.estrellas === 'sin' ? 'Sin valorar' : f.estrellas + ' estrellas');
+            return partes.join(' · ');
+        }
+
         async function guardarAjusteAlertas() {
             datosUsuario.umbralAlertas = parseFloat(document.getElementById('ajuste-umbral-alertas').value) / 100;
             await guardarDatosUsuario();
@@ -5616,9 +5845,12 @@ MyBikeGestor`
                 card.style.opacity = juego.activo ? '1' : '0.75';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div>
-                            <div class="card-title marca-modelo"><strong>${juego.marca}</strong> <span>${juego.modelo}</span></div>
-                            <div class="card-subtitle">Desde: ${formatearFecha(juego.fechaInstalacion)} · ${juego.kmInstalacion || 0} km</div>
+                        <div class="comp-fila">
+                            <img class="comp-thumb" src="${biciActual.disciplina === 'MTB' ? '../icons/componentes/mtb-ruedas.jpg' : '../icons/componentes/ruedas.jpg'}" alt="" onerror="this.remove()">
+                            <div>
+                                <div class="card-title marca-modelo"><strong>${juego.marca}</strong> <span>${juego.modelo}</span></div>
+                                <div class="card-subtitle">Desde: ${formatearFecha(juego.fechaInstalacion)} · ${juego.kmInstalacion || 0} km</div>
+                            </div>
                         </div>
                         <span class="badge ${juego.activo ? 'badge-primary' : ''}" style="${juego.activo ? '' : 'background:#383838;color:#B0A0A0;'}">${juego.activo ? '<i class="ti ti-circle-filled" style="color:var(--primary);"></i> Activo' : '<i class="ti ti-circle"></i> Disponible'}</span>
                     </div>
@@ -6190,11 +6422,14 @@ MyBikeGestor`
                     card.style.marginBottom = '12px';
                     card.innerHTML = `
                         <div class="card-header">
-                            <div>
+                            <div class="comp-fila">
+                                ${miniaturaPiezaHTML(pieza.tipo)}
+                                <div>
                                 <div class="nombre-comp" style="font-weight:700;">${pieza.tipo}</div>
                                 <div class="marca-modelo"><strong>${pieza.marca || '-'}</strong> <span>${pieza.modelo || ''}</span></div>
                                 ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
                             ${pieza.numRadios ? `<div style="font-size:0.8em; color:var(--text);">${pieza.numRadios} radios</div>` : ''}
+                                </div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="badge badge-primary">${Math.max(0, kmUso)} km</div>
@@ -6862,11 +7097,16 @@ MyBikeGestor`
                     card.onclick = () => abrirDetalleComponente(comp);
                     const kmUso = calcularKmComponente(comp.kmInstalacion, comp.fechaInstalacion, biciActual);
                     const diasUso = comp.fechaInstalacion ? Math.floor((new Date() - new Date(comp.fechaInstalacion)) / (1000*60*60*24)) : 0;
+                    const candFoto = candidatasFotoComponente(comp.tipo);
+                    const fotoPieza = candFoto.length ? candFoto[0] : null;
                     card.innerHTML = `
                         <div class="card-header">
-                            <div>
-                                <div class="card-title nombre-comp">${comp.tipo}</div>
-                                <div class="card-subtitle marca-modelo"><strong>${comp.marca || '-'}</strong> <span>${comp.modelo || '-'}</span></div>
+                            <div class="comp-fila">
+                                ${fotoPieza ? `<img class="comp-thumb" src="${fotoPieza}" data-cand='${JSON.stringify(candFoto)}' data-i="0" alt="" loading="lazy" onerror="siguienteFotoThumb(this)">` : ''}
+                                <div>
+                                    <div class="card-title nombre-comp">${comp.tipo}</div>
+                                    <div class="card-subtitle marca-modelo"><strong>${comp.marca || '-'}</strong> <span>${comp.modelo || '-'}</span></div>
+                                </div>
                             </div>
                             <div style="text-align: right;">
                                 <div class="badge badge-primary">${kmUso} km</div>
@@ -6879,11 +7119,62 @@ MyBikeGestor`
             });
         }
         
+        // Foto de un componente: icons/componentes/piezas/<nombre-sin-tildes>.jpg (si no existe, no se muestra nada)
+        // Busca, por orden: nombre-disciplina, nombre (y lo mismo sin delantera/trasera/izquierda/derecha)
+        function candidatasFotoComponente(tipo) {
+            const slugify = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            const completo = slugify(tipo);
+            if (!completo) return [];
+            const base = completo.replace(/-(delantera|delantero|trasera|trasero|izquierda|izquierdo|derecha|derecho)$/, '');
+            const disc = slugify(biciActual && biciActual.disciplina);
+            const lista = [];
+            [completo, base].forEach(n => {
+                if (disc) lista.push(`${n}-${disc}`);
+                lista.push(n);
+            });
+            return [...new Set(lista)].map(n => `../icons/componentes/piezas/${n}.jpg`);
+        }
+        // HTML de miniatura para un tipo de pieza (vacío si no hay nombre)
+        function miniaturaPiezaHTML(tipo) {
+            const c = candidatasFotoComponente(tipo);
+            if (!c.length) return '';
+            return `<img class="comp-thumb" src="${c[0]}" data-cand='${JSON.stringify(c)}' data-i="0" alt="" loading="lazy" onerror="siguienteFotoThumb(this)">`;
+        }
+        // Para miniaturas: prueba la siguiente candidata cuando falla la actual
+        function siguienteFotoThumb(img) {
+            const c = JSON.parse(img.dataset.cand || '[]');
+            const i = (parseInt(img.dataset.i || '0', 10)) + 1;
+            if (i < c.length) { img.dataset.i = i; img.src = c[i]; } else { img.remove(); }
+        }
+        // Para fondo de tarjeta: devuelve la primera que existe
+        function probarFotosComponente(cands, ok) {
+            let i = 0;
+            const intentar = () => {
+                if (i >= cands.length) return;
+                const p = new Image();
+                p.onload = () => ok(cands[i]);
+                p.onerror = () => { i++; intentar(); };
+                p.src = cands[i];
+            };
+            intentar();
+        }
+
         // Abrir detalle componente
         function abrirDetalleComponente(comp) {
             componenteActual = comp;
             
             document.getElementById('titulo-detalle-componente').textContent = comp.tipo;
+
+            // Foto del componente como fondo de la tarjeta (solo si existe el archivo)
+            const cardDet = document.getElementById('detalle-comp-card');
+            cardDet.classList.remove('con-foto-fondo');
+            cardDet.style.backgroundImage = '';
+            probarFotosComponente(candidatasFotoComponente(comp.tipo), ruta => {
+                if (componenteActual !== comp) return;
+                cardDet.style.backgroundImage = `linear-gradient(rgba(20,10,10,0.62), rgba(20,10,10,0.82)), url('${ruta}')`;
+                cardDet.classList.add('con-foto-fondo');
+            });
             document.getElementById('detalle-comp-nombre').textContent = comp.tipo;
             document.getElementById('detalle-comp-marca').innerHTML = `<strong>${comp.marca || '-'}</strong>`;
             document.getElementById('detalle-comp-modelo').textContent = comp.modelo || '-';
@@ -7986,11 +8277,56 @@ MyBikeGestor`
                 return;
             }
             container.innerHTML = '';
-            biciActual.cajonPiezas.forEach(pieza => {
-                // Para piezas manuales usar kmAcumulados; para piezas retiradas usar kmAlRetirar - kmInstalacion
-                const kmUso = pieza.manual && pieza.kmAcumulados != null
-                    ? pieza.kmAcumulados
-                    : Math.max(0, (pieza.kmAlRetirar || 0) - (pieza.kmInstalacion || 0));
+            const ajuste = getAjusteCajon();
+            const piezas = [...biciActual.cajonPiezas].sort((a, b) => {
+                if (ajuste.orden === 'km-desc') return kmPiezaCajon(b) - kmPiezaCajon(a);
+                if (ajuste.orden === 'km-asc') return kmPiezaCajon(a) - kmPiezaCajon(b);
+                return new Date(b.fechaRetiro || b.fechaEntrada || 0) - new Date(a.fechaRetiro || a.fechaEntrada || 0);
+            });
+
+            if (ajuste.agrupar === 'si') {
+                // Una sola tarjeta por tipo de pieza; las demás del mismo tipo quedan plegadas bajo un aviso
+                const grupos = [];
+                piezas.forEach(pz => {
+                    const g = grupos.find(x => x[0].tipo === pz.tipo);
+                    if (g) g.push(pz); else grupos.push([pz]);
+                });
+                grupos.forEach(g => {
+                    container.appendChild(crearTarjetaCajon(g[0]));
+                    if (g.length > 1) {
+                        const otras = g.length - 1;
+                        const aviso = document.createElement('button');
+                        aviso.style.cssText = 'display:flex; align-items:center; gap:6px; width:100%; margin:-4px 0 14px; padding:8px 12px; background:none; border:1px dashed #f0a500; border-radius:10px; color:#f0a500; font-family:inherit; font-size:0.82em; font-weight:600; cursor:pointer;';
+                        const textoCerrado = `<i class="ti ti-stack-2"></i> Hay ${otras} ${otras === 1 ? 'pieza más' : 'piezas más'} de este tipo <i class="ti ti-chevron-down" style="margin-left:auto;"></i>`;
+                        const textoAbierto = `<i class="ti ti-stack-2"></i> Ocultar ${otras === 1 ? 'la otra pieza' : 'las otras piezas'} <i class="ti ti-chevron-up" style="margin-left:auto;"></i>`;
+                        aviso.innerHTML = textoCerrado;
+                        const resto = document.createElement('div');
+                        resto.style.display = 'none';
+                        g.slice(1).forEach(pz => resto.appendChild(crearTarjetaCajon(pz)));
+                        aviso.onclick = () => {
+                            const abierto = resto.style.display !== 'none';
+                            resto.style.display = abierto ? 'none' : 'block';
+                            aviso.innerHTML = abierto ? textoCerrado : textoAbierto;
+                        };
+                        container.appendChild(aviso);
+                        container.appendChild(resto);
+                    }
+                });
+            } else {
+                piezas.forEach(pz => container.appendChild(crearTarjetaCajon(pz)));
+            }
+        }
+
+        // Km acumulados de una pieza del cajón (manuales: los que se escribieron; retiradas: km al retirar menos km al instalar)
+        function kmPiezaCajon(pieza) {
+            return Math.max(0, pieza.manual && pieza.kmAcumulados != null
+                ? pieza.kmAcumulados
+                : (pieza.kmAlRetirar || 0) - (pieza.kmInstalacion || 0));
+        }
+
+        function crearTarjetaCajon(pieza) {
+            {
+                const kmUso = kmPiezaCajon(pieza);
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
@@ -8017,8 +8353,8 @@ MyBikeGestor`
                         <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em; font-family:inherit;" onclick="eliminarPiezaCajon('${pieza.id}')"><i class="ti ti-trash"></i> Eliminar</button>
                     </div>
                 `;
-                container.appendChild(card);
-            });
+                return card;
+            }
         }
 
         async function reinstalarPieza(piezaId) {
@@ -8812,6 +9148,7 @@ MyBikeGestor`
         // ========================================
         function cargarHistorial() {
             const container = document.getElementById('lista-historial');
+            document.getElementById('historial-filtro-resumen').style.display = 'none';
             
             if (!biciActual.historial || biciActual.historial.length === 0) {
                 container.innerHTML = `
@@ -8826,7 +9163,31 @@ MyBikeGestor`
             container.innerHTML = '';
             
             // Ordenar por fecha descendente (más reciente primero)
-            const historialOrdenado = [...biciActual.historial].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            const filtro = getFiltroHistorial();
+            const textoFiltro = textoFiltroHistorial(filtro);
+            const historialOrdenado = [...biciActual.historial]
+                .filter(reg => registroPasaFiltro(reg, filtro))
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            // Línea que avisa de que hay un filtro activo y permite cambiarlo
+            const resumen = document.getElementById('historial-filtro-resumen');
+            if (textoFiltro) {
+                resumen.style.display = 'flex';
+                resumen.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; font-size:0.85em;';
+                resumen.innerHTML = `<span class="subtitulo-verde"><i class="ti ti-filter"></i> ${textoFiltro} · ${historialOrdenado.length} de ${biciActual.historial.length}</span>
+                    <button onclick="navegar('sec-ajuste-historial')" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-family:inherit; font-weight:700; padding:0;">Cambiar</button>`;
+            } else {
+                resumen.style.display = 'none';
+            }
+
+            if (historialOrdenado.length === 0) {
+                container.innerHTML = `
+                    <div class="lista-vacia">
+                        <p>Ningún registro coincide con el filtro</p>
+                    </div>
+                `;
+                return;
+            }
 
             historialOrdenado.forEach(reg => {
                 const colorTipo = reg.tipo === 'Sustitución' ? 'var(--danger)' : 
