@@ -5509,7 +5509,10 @@ MyBikeGestor`
                 imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-carretera.jpg';
                 imagenesSeccion['Transmisión'] = '../icons/componentes/transmision-carretera.jpg';
             }
-            if (biciActual.disciplina === 'Gravel') imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-gravel.jpg';
+            if (biciActual.disciplina === 'Gravel') {
+                imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-gravel.jpg';
+                imagenesSeccion['Transmisión'] = '../icons/componentes/transmision-gravel.jpg';
+            }
             // v5: las MTB tienen su propio juego de fotos (amortiguación, tacos, tija telescópica…)
             if (biciActual.disciplina === 'MTB') {
                 Object.assign(imagenesSeccion, {
