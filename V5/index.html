@@ -6258,6 +6258,11 @@ MyBikeGestor`
                     `;
                 }
                 container.appendChild(div);
+                // Foto de la rueda como fondo de la tarjeta (rueda-delantera-<disciplina>.jpg, etc.)
+                probarFotosComponente(candidatasFotoComponente(`Rueda ${lado}`), ruta => {
+                    div.style.backgroundImage = `linear-gradient(rgba(20,10,10,0.38), rgba(20,10,10,0.58)), url('${ruta}')`;
+                    div.classList.add('con-foto-fondo');
+                });
             });
         }
 
@@ -6423,7 +6428,7 @@ MyBikeGestor`
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="comp-fila">
-                                ${miniaturaPiezaHTML(pieza.tipo)}
+                                ${miniaturaPiezaHTML(pieza.tipo, lado)}
                                 <div>
                                 <div class="nombre-comp" style="font-weight:700;">${pieza.tipo}</div>
                                 <div class="marca-modelo"><strong>${pieza.marca || '-'}</strong> <span>${pieza.modelo || ''}</span></div>
@@ -7121,7 +7126,7 @@ MyBikeGestor`
         
         // Foto de un componente: icons/componentes/piezas/<nombre-sin-tildes>.jpg (si no existe, no se muestra nada)
         // Busca, por orden: nombre-disciplina, nombre (y lo mismo sin delantera/trasera/izquierda/derecha)
-        function candidatasFotoComponente(tipo) {
+        function candidatasFotoComponente(tipo, lado) {
             const slugify = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
             const completo = slugify(tipo);
@@ -7129,15 +7134,17 @@ MyBikeGestor`
             const base = completo.replace(/-(delantera|delantero|trasera|trasero|izquierda|izquierdo|derecha|derecho)$/, '');
             const disc = slugify(biciActual && biciActual.disciplina);
             const lista = [];
-            [completo, base].forEach(n => {
+            // En el despiece de una rueda el lado no va en el nombre: se prueba buje-delantero / buje-trasero
+            const sufLado = lado === 'delantera' ? ['delantero', 'delantera'] : (lado === 'trasera' ? ['trasero', 'trasera'] : []);
+            [completo, ...sufLado.map(l => `${base}-${l}`), base].forEach(n => {
                 if (disc) lista.push(`${n}-${disc}`);
                 lista.push(n);
             });
             return [...new Set(lista)].map(n => `../icons/componentes/piezas/${n}.jpg`);
         }
         // HTML de miniatura para un tipo de pieza (vacío si no hay nombre)
-        function miniaturaPiezaHTML(tipo) {
-            const c = candidatasFotoComponente(tipo);
+        function miniaturaPiezaHTML(tipo, lado) {
+            const c = candidatasFotoComponente(tipo, lado);
             if (!c.length) return '';
             return `<img class="comp-thumb" src="${c[0]}" data-cand='${JSON.stringify(c)}' data-i="0" alt="" loading="lazy" onerror="siguienteFotoThumb(this)">`;
         }
