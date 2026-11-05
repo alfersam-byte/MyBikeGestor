@@ -7300,10 +7300,13 @@ MyBikeGestor`
 
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div>
+                            <div class="comp-fila">
+                                ${miniaturaPiezaHTML(tipo)}
+                                <div>
                                 <div class="nombre-comp" style="font-weight:bold;">${tipo}</div>
                                 <div class="marca-modelo">${subtituloCard}</div>
                                 ${extraInfoFinal}
+                                </div>
                             </div>
                             <div style="display:flex;gap:6px;">
                                 ${btnPila}
@@ -7315,7 +7318,7 @@ MyBikeGestor`
                 } else {
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div><div style="font-weight:bold;">${tipo}</div><div style="font-size:0.85em;color:var(--text);">No instalado</div></div>
+                            <div class="comp-fila">${miniaturaPiezaHTML(tipo)}<div><div style="font-weight:bold;">${tipo}</div><div style="font-size:0.85em;color:var(--text);">No instalado</div></div></div>
                             <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">➕</button>
                         </div>
                     `;
