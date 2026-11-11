@@ -9469,7 +9469,15 @@ MyBikeGestor`
         // SISTEMA DE MODALES
         // ========================================
         function abrirModal(modalId) {
-            document.getElementById(modalId).classList.add('activo');
+            const modal = document.getElementById(modalId);
+            modal.classList.add('activo');
+            // Al abrir un formulario, siempre empieza arriba (si no, reaparece donde se quedó la vez anterior)
+            const arriba = () => {
+                modal.scrollTop = 0;
+                modal.querySelectorAll('*').forEach(el => { if (el.scrollTop) el.scrollTop = 0; });
+            };
+            arriba();
+            requestAnimationFrame(arriba);
         }
 
         function cerrarModal(modalId) {
