@@ -7179,7 +7179,7 @@ MyBikeGestor`
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="comp-fila">
-                                ${miniaturaPiezaHTML(comp.tipo)}
+                                ${miniaturaPiezaHTML(comp.tipo, undefined, varianteFotoComp(comp))}
                                 <div>
                                     <div class="card-title nombre-comp">${comp.tipo}</div>
                                     <div class="card-subtitle marca-modelo"><strong>${comp.marca}</strong> <span>${comp.modelo}</span></div>
@@ -7196,7 +7196,7 @@ MyBikeGestor`
                     card.onclick = () => abrirDetalleComponente(comp);
                     const kmUso = calcularKmComponente(comp.kmInstalacion, comp.fechaInstalacion, biciActual);
                     const diasUso = comp.fechaInstalacion ? Math.floor((new Date() - new Date(comp.fechaInstalacion)) / (1000*60*60*24)) : 0;
-                    const candFoto = candidatasFotoComponente(comp.tipo);
+                    const candFoto = candidatasFotoComponente(comp.tipo, undefined, varianteFotoComp(comp));
                     const fotoPieza = candFoto.length ? candFoto[0] : null;
                     card.innerHTML = `
                         <div class="card-header">
@@ -7220,7 +7220,10 @@ MyBikeGestor`
         
         // Foto de un componente: icons/componentes/piezas/<nombre-sin-tildes>.jpg (si no existe, no se muestra nada)
         // Busca, por orden: nombre-disciplina, nombre (y lo mismo sin delantera/trasera/izquierda/derecha)
-        function candidatasFotoComponente(tipo, lado) {
+        function varianteFotoComp(comp) {
+            return (comp && comp.tipo === 'Bielas' && String(comp.configPlatos) === '1') ? 'monoplato' : '';
+        }
+        function candidatasFotoComponente(tipo, lado, variante) {
             const slugify = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
             const completo = slugify(tipo);
@@ -7228,6 +7231,10 @@ MyBikeGestor`
             const base = completo.replace(/-(delantera|delantero|trasera|trasero|izquierda|izquierdo|derecha|derecho)$/, '');
             const disc = slugify(biciActual && biciActual.disciplina);
             const lista = [];
+            if (variante) {
+                if (disc) lista.push(`${completo}-${disc}-${variante}`);
+                lista.push(`${completo}-${variante}`);
+            }
             // En el despiece de una rueda el lado no va en el nombre: se prueba buje-delantero / buje-trasero
             const sufLado = lado === 'delantera' ? ['delantero', 'delantera'] : (lado === 'trasera' ? ['trasero', 'trasera'] : []);
             [completo, ...sufLado.map(l => `${base}-${l}`), base].forEach(n => {
@@ -7237,8 +7244,8 @@ MyBikeGestor`
             return [...new Set(lista)].map(n => `../icons/componentes/piezas/${n}.jpg`);
         }
         // HTML de miniatura para un tipo de pieza (vacío si no hay nombre)
-        function miniaturaPiezaHTML(tipo, lado) {
-            const c = candidatasFotoComponente(tipo, lado);
+        function miniaturaPiezaHTML(tipo, lado, variante) {
+            const c = candidatasFotoComponente(tipo, lado, variante);
             if (!c.length) return '';
             return `<img class="comp-thumb" src="${c[0]}" data-cand='${JSON.stringify(c)}' data-i="0" alt="" loading="lazy" onerror="siguienteFotoThumb(this)">`;
         }
@@ -7271,7 +7278,7 @@ MyBikeGestor`
             const cardDet = document.getElementById('detalle-comp-card');
             cardDet.classList.remove('con-foto-fondo');
             cardDet.style.backgroundImage = '';
-            probarFotosComponente(candidatasFotoComponente(comp.tipo), ruta => {
+            probarFotosComponente(candidatasFotoComponente(comp.tipo, undefined, varianteFotoComp(comp)), ruta => {
                 if (componenteActual !== comp) return;
                 cardDet.style.backgroundImage = `linear-gradient(rgba(20,10,10,0.62), rgba(20,10,10,0.82)), url('${ruta}')`;
                 cardDet.classList.add('con-foto-fondo');
@@ -7361,19 +7368,19 @@ MyBikeGestor`
                     let extraInfo = '';
                     if (tipo === 'Medidor de Potencia' && sub.pila && sub.pila.tipo) {
                         const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
-                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
+                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;"><i class="ti ti-battery-2"></i> ${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
                     } else if (tipo === 'Medidor de Potencia Pedales') {
                         const tipoStr = sub.tipoPedal ? sub.tipoPedal + ' · ' : '';
                         if (sub.pila?.alimentacion === 'Recargable') {
-                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">⚡ ${tipoStr}Recargable USB</div>`;
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;"><i class="ti ti-bolt"></i> ${tipoStr}Recargable USB</div>`;
                         } else if (sub.pila?.alimentacion === 'Pila' && sub.pila?.tipo) {
                             const kmPila = (biciActual.kmTotales || 0) - (sub.pila.km || 0);
-                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${tipoStr}${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;"><i class="ti ti-battery-2"></i> ${tipoStr}${sub.pila.tipo} · ${kmPila} km desde cambio</div>`;
                         } else {
-                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">⚡ ${tipoStr}Sin alimentación configurada</div>`;
+                            extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;"><i class="ti ti-bolt"></i> ${tipoStr}Sin alimentación configurada</div>`;
                         }
                     } else if (tipo === 'Pila' && sub.tipoPila) {
-                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;">🔋 ${sub.tipoPila}</div>`;
+                        extraInfo = `<div style="font-size:0.8em; color:var(--text); margin-top:4px;"><i class="ti ti-battery-2"></i> ${sub.tipoPila}</div>`;
                     }
                     const subtituloCard = tipo === 'Pila'
                         ? `<strong>${sub.marca || ''}</strong> <span>${sub.tipoPila || ''}</span> <span style="color:var(--text);">· ${kmUso} km</span>`
@@ -7383,12 +7390,12 @@ MyBikeGestor`
                     // Botón pila/recarga para medidores
                     let btnPila = '';
                     if (tipo === 'Medidor de Potencia' && sub.pila?.tipo) {
-                        btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')">🔋</button>`;
+                        btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')"><i class="ti ti-battery-2"></i></button>`;
                     } else if (tipo === 'Medidor de Potencia Pedales') {
                         if (sub.pila?.alimentacion === 'Pila' && sub.pila?.tipo) {
-                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')">🔋</button>`;
+                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#f0a500;color:white;border-radius:8px;" onclick="cambiarPilaMedidor('${tipo}')"><i class="ti ti-battery-2"></i></button>`;
                         } else if (sub.pila?.alimentacion === 'Recargable') {
-                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#4caf50;color:white;border-radius:8px;" onclick="registrarRecargaMedidor('${tipo}')">⚡</button>`;
+                            btnPila = `<button class="btn" style="padding:5px 10px;font-size:0.8em;background:#4caf50;color:white;border-radius:8px;" onclick="registrarRecargaMedidor('${tipo}')"><i class="ti ti-bolt"></i></button>`;
                         }
                     }
 
@@ -7404,8 +7411,8 @@ MyBikeGestor`
                             </div>
                             <div style="display:flex;gap:6px;">
                                 ${btnPila}
-                                <button class="btn btn-secondary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">✏️</button>
-                                <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="sustituirSubpieza('${tipo}')">🔄</button>
+                                <button class="btn btn-secondary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')"><i class="ti ti-pencil"></i></button>
+                                <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="sustituirSubpieza('${tipo}')"><i class="ti ti-refresh"></i></button>
                             </div>
                         </div>
                     `;
@@ -7413,7 +7420,7 @@ MyBikeGestor`
                     div.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div class="comp-fila">${miniaturaPiezaHTML(tipo)}<div><div style="font-weight:bold;">${tipo}</div><div style="font-size:0.85em;color:var(--text);">No instalado</div></div></div>
-                            <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')">➕</button>
+                            <button class="btn btn-primary" style="padding:5px 10px;font-size:0.8em;" onclick="editarSubpieza('${tipo}')"><i class="ti ti-plus"></i></button>
                         </div>
                     `;
                 }
@@ -7552,7 +7559,7 @@ MyBikeGestor`
                     </div>
                     <div style="background:var(--light-gray); border-radius:12px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                         <div>
-                            <div style="font-weight:700; font-size:0.95em;">⚡ Medidor de Potencia</div>
+                            <div style="font-weight:700; font-size:0.95em;"><i class="ti ti-bolt"></i> Medidor de Potencia</div>
                             <div style="font-size:0.8em; color:var(--text); margin-top:2px;">Incluye potenciómetro en bielas</div>
                         </div>
                         <label style="position:relative; display:inline-block; width:48px; height:26px; flex-shrink:0; cursor:pointer;">
@@ -7594,7 +7601,7 @@ MyBikeGestor`
                 container.innerHTML = `
                     <div style="background:var(--light-gray); border-radius:12px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                         <div>
-                            <div style="font-weight:700; font-size:0.95em;">⚡ Medidor de Potencia</div>
+                            <div style="font-weight:700; font-size:0.95em;"><i class="ti ti-bolt"></i> Medidor de Potencia</div>
                             <div style="font-size:0.8em; color:var(--text); margin-top:2px;">Pedales con potenciómetro integrado</div>
                         </div>
                         <label style="position:relative; display:inline-block; width:48px; height:26px; flex-shrink:0; cursor:pointer;">
@@ -8606,7 +8613,7 @@ MyBikeGestor`
             modal.className = 'modal activo';
             modal.innerHTML = `
                 <div class="modal-contenido" style="max-width:400px;">
-                    <h3 style="margin-bottom:16px;">🔋 Cambiar Pila</h3>
+                    <h3 style="margin-bottom:16px;"><i class="ti ti-battery-2"></i> Cambiar Pila</h3>
                     <p style="font-size:0.85em;color:var(--text);margin-bottom:16px;">
                         Pila actual: <strong>${pilaVieja.marca || '-'} ${pilaVieja.tipo || '-'}</strong> · 
                         ${Math.max(0, km - (pilaVieja.km || 0))} km desde último cambio
@@ -8727,7 +8734,7 @@ MyBikeGestor`
             modal.className = 'modal activo';
             modal.innerHTML = `
                 <div class="modal-contenido" style="max-width:400px;">
-                    <h3 style="margin-bottom:16px;">⚡ Registrar Carga</h3>
+                    <h3 style="margin-bottom:16px;"><i class="ti ti-bolt"></i> Registrar Carga</h3>
                     <p style="font-size:0.85em;color:var(--text);margin-bottom:16px;">
                         Última carga: <strong>${sub.pila?.fecha || '-'}</strong> · ${kmDesdeUltima} km desde entonces
                     </p>
@@ -8991,7 +8998,7 @@ MyBikeGestor`
                     <div class="form-group"><label>Dientes Roldana Superior</label><input type="number" id="subpieza-dientes-sup" value="${sub?.dientesSup || 11}" step="1"></div>
                     <div class="form-group"><label>Dientes Roldana Inferior</label><input type="number" id="subpieza-dientes-inf" value="${sub?.dientesInf || 11}" step="1"></div>
                 `;
-            } else if (tipo.includes('Plato')) {
+            } else if (/plato/i.test(tipo)) {
                 const sub = existente && componenteActual.subpiezas[tipo];
                 container.innerHTML = `
                     <div class="form-group"><label>Número de Dientes</label><input type="number" id="subpieza-num-dientes" value="${sub?.numDientes || 50}" step="1"></div>
@@ -9002,7 +9009,7 @@ MyBikeGestor`
                 const pilaKmDefault = pila.km !== undefined ? pila.km : (sub ? (sub.kmInstalacion || 0) : (biciActual.kmTotales || 0));
                 container.innerHTML = `
                     <div style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px;">
-                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Pila / Batería</div>
+                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;"><i class="ti ti-battery-2"></i> Pila / Batería</div>
                         
                         <div class="form-group">
                             <label>Marca de la pila</label>
@@ -9049,7 +9056,7 @@ MyBikeGestor`
                         </select>
                     </div>
                     <div style="background:var(--light-gray); border-radius:10px; padding:12px; margin-bottom:16px;">
-                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;">🔋 Alimentación</div>
+                        <div style="font-weight:700; font-size:0.9em; margin-bottom:10px;"><i class="ti ti-battery-2"></i> Alimentación</div>
                         
                         <div class="form-group">
                             <label>Tipo de alimentación</label>
@@ -9153,7 +9160,7 @@ MyBikeGestor`
                 const inf = document.getElementById('subpieza-dientes-inf');
                 if (sup) subpieza.dientesSup = parseFloat(sup.value) || 0;
                 if (inf) subpieza.dientesInf = parseFloat(inf.value) || 0;
-            } else if (subpiezaTipo.includes('Plato')) {
+            } else if (/plato/i.test(subpiezaTipo)) {
                 const dientes = document.getElementById('subpieza-num-dientes');
                 if (dientes) subpieza.numDientes = parseFloat(dientes.value) || 0;
             } else if (subpiezaTipo === 'Medidor de Potencia') {
