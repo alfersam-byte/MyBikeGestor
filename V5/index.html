@@ -8112,6 +8112,7 @@ MyBikeGestor`
                     biciActual.componentesV2[seccionActual] = biciActual.componentesV2[seccionActual].filter(c => c.id !== componenteActual.id);
                     await guardarDatosUsuario();
                     mostrarNotificacion('Componente eliminado', 'info');
+                    cargarListaComponentesSeccion();   // refrescar la lista antes de volver a ella
                     navegar('sec-lista-componentes-seccion');
                 }
             );
