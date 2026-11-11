@@ -6587,6 +6587,8 @@ MyBikeGestor`
                 document.getElementById('pieza-rueda-km').value = rueda ? (rueda.kmInstalacion || 0) : (biciActual.kmTotales || 0);
                 document.getElementById('pieza-rueda-peso-group').style.display = 'none';
                 document.getElementById('pieza-rueda-numradios-group').style.display = 'none';
+                aplicarUltimaMarca('pieza-rueda-marca-select');
+                aplicarUltimoMaterial('pieza-rueda-material');   // si hay una marca reciente, tiene prioridad sobre la de la rueda
             }
             abrirModal('modal-pieza-rueda');
         }
@@ -6614,6 +6616,8 @@ MyBikeGestor`
                 if (pieza) { pieza.tipo = tipo; pieza.marca = marca; pieza.modelo = modelo; pieza.material = material; pieza.peso = peso; pieza.numRadios = numRadios; pieza.precio = precio; pieza.fechaInstalacion = fecha; pieza.kmInstalacion = km; }
             } else {
                 rueda.piezas.push({ id: Date.now().toString(), tipo, marca, modelo, material, peso, numRadios, precio, fechaInstalacion: fecha, kmInstalacion: km });
+                window._ultimaMarcaComp = marca;
+                if (material) window._ultimoMaterialComp = material;
             }
 
             await guardarDatosUsuario();
@@ -7436,7 +7440,21 @@ MyBikeGestor`
             // Pre-rellenar con datos de compra de la bici
             document.getElementById('comp-km-instalacion').value = 0;
             document.getElementById('comp-fecha-instalacion').value = biciActual.fechaCompra || new Date().toISOString().split('T')[0];
-            
+
+            // Repetir la marca del último componente añadido (suelen ser de la misma marca)
+            const ultimaMarca = window._ultimaMarcaComp;
+            if (ultimaMarca) {
+                const selMarca = document.getElementById('comp-marca');
+                if (Array.from(selMarca.options).some(o => o.value === ultimaMarca)) {
+                    selMarca.value = ultimaMarca;
+                } else {
+                    selMarca.value = 'Otra';
+                    document.getElementById('comp-marca-otra').value = ultimaMarca;
+                    document.getElementById('comp-marca-otra-container').style.display = 'block';
+                }
+            }
+            aplicarUltimoMaterial('comp-material', 'comp-material-otro', 'comp-material-otro-container');
+
             abrirModal('modal-componente');
         }
         
@@ -7677,6 +7695,8 @@ MyBikeGestor`
                 }
             } else {
                 biciActual.componentesV2[seccionActual].push(comp);
+                window._ultimaMarcaComp = marca;   // para pre-rellenar el siguiente componente nuevo
+                if (material) window._ultimoMaterialComp = material;
                 biciActual.inversion = (parseFloat(biciActual.inversion || 0) + precio).toFixed(2);
             }
             
@@ -8266,6 +8286,8 @@ MyBikeGestor`
             document.getElementById('cajon-nuevo-km').value = '';
             document.getElementById('cajon-nuevo-precio').value = '';
             document.getElementById('cajon-nuevo-notas').value = '';
+            aplicarUltimaMarca('cajon-nuevo-marca', 'cajon-nuevo-marca-otra', 'cajon-nuevo-marca-otra-container');
+            aplicarUltimoMaterial('cajon-nuevo-material');
             abrirModal('modal-anadir-cajon');
         }
 
@@ -8296,6 +8318,8 @@ MyBikeGestor`
                 fechaEntrada: new Date().toISOString()
             });
 
+            window._ultimaMarcaComp = marca;
+            if (material) window._ultimoMaterialComp = material;
             await guardarDatosUsuario();
             actualizarBotonCajon();
             cerrarModal('modal-anadir-cajon');
@@ -9468,6 +9492,36 @@ MyBikeGestor`
         // ========================================
         // SISTEMA DE MODALES
         // ========================================
+        // Pre-rellena la marca con la del último elemento nuevo añadido (suelen ser de la misma marca)
+        function aplicarUltimaMarca(selectId, otraId, otraContId) {
+            const ultima = window._ultimaMarcaComp;
+            if (!ultima) return;
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            if (Array.from(sel.options).some(o => o.value === ultima)) {
+                sel.value = ultima;
+            } else if (otraId && Array.from(sel.options).some(o => o.value === 'Otra')) {
+                sel.value = 'Otra';
+                document.getElementById(otraId).value = ultima;
+                if (otraContId) document.getElementById(otraContId).style.display = 'block';
+            }
+        }
+
+        // Igual que con la marca: el material del último elemento nuevo añadido
+        function aplicarUltimoMaterial(selectId, otroId, otroContId) {
+            const ultimo = window._ultimoMaterialComp;
+            if (!ultimo) return;
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            if (Array.from(sel.options).some(o => o.value === ultimo)) {
+                sel.value = ultimo;
+            } else if (otroId && Array.from(sel.options).some(o => o.value === 'Otro')) {
+                sel.value = 'Otro';
+                document.getElementById(otroId).value = ultimo;
+                if (otroContId) document.getElementById(otroContId).style.display = 'block';
+            }
+        }
+
         function abrirModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.add('activo');
