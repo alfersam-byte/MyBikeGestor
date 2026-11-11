@@ -1541,8 +1541,13 @@
 
                 <div id="ciclo-con-datos" style="display:none;">
                     <div style="background:var(--light-gray); border-radius:10px; padding:15px; margin-bottom:15px;">
-                        <div style="font-weight:700; font-size:1em;" id="ciclo-nombre-display">-</div>
-                        <div style="font-size:0.85em; color:var(--text); margin-top:4px;" id="ciclo-fecha-display">-</div>
+                        <div class="comp-fila">
+                            <img class="comp-thumb" src="../icons/componentes/piezas/ciclocomputador-gps.jpg" alt="" onerror="this.remove()">
+                            <div>
+                                <div style="font-weight:700; font-size:1em;" id="ciclo-nombre-display">-</div>
+                                <div style="font-size:0.85em; color:var(--text); margin-top:4px;" id="ciclo-fecha-display">-</div>
+                            </div>
+                        </div>
                         <div style="margin-top:12px;">
                             <div style="text-align:center; background:#2D2D2D; border-radius:8px; padding:10px;">
                                 <div style="font-size:0.75em; color:var(--text); font-weight:600;">KM TOTALES</div>
@@ -1691,6 +1696,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -2487,6 +2493,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -2696,6 +2703,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -2867,6 +2875,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -3069,6 +3078,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -3183,6 +3193,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -3386,6 +3397,7 @@
                     <option value="Pro">Pro</option>
                     <option value="Prólogo">Prólogo</option>
                     <option value="RockShox">RockShox</option>
+                    <option value="Roval">Roval</option>
                     <option value="Santa Cruz">Santa Cruz</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Scott">Scott</option>
@@ -3647,6 +3659,7 @@
                     <option value="Mavic">Mavic</option>
                     <option value="Michelin">Michelin</option>
                     <option value="Pirelli">Pirelli</option>
+                    <option value="Roval">Roval</option>
                     <option value="Schwalbe">Schwalbe</option>
                     <option value="Shimano">Shimano</option>
                     <option value="Specialized">Specialized</option>
@@ -7161,9 +7174,12 @@ MyBikeGestor`
                     // borderLeft eliminado
                     card.innerHTML = `
                         <div class="card-header">
-                            <div>
-                                <div class="card-title nombre-comp">${comp.tipo}</div>
-                                <div class="card-subtitle marca-modelo"><strong>${comp.marca}</strong> <span>${comp.modelo}</span></div>
+                            <div class="comp-fila">
+                                ${miniaturaPiezaHTML(comp.tipo)}
+                                <div>
+                                    <div class="card-title nombre-comp">${comp.tipo}</div>
+                                    <div class="card-subtitle marca-modelo"><strong>${comp.marca}</strong> <span>${comp.modelo}</span></div>
+                                </div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="badge badge-primary">${comp._kmTotales} km</div>
@@ -8544,7 +8560,7 @@ MyBikeGestor`
         
         // Editar/Añadir subpieza
         // Marcas genéricas para subpiezas
-        const MARCAS = ['Bafang','Basso','Beeline','BH','Bianchi','BMC','Bontrager','Bosch','Brose','Bryton','Bulls','Campagnolo','Cannondale','Canyon','Cateye','Cervélo','Colnago','Continental','Cube','DT Swiss','Factor','Favero','Fazua','Fizik','Focus','Fox','FSA','Garmin','Giant','Hammerhead','iGPSport','Kodak','Kona','Lezyne','Lifefitness','Look','Magene','Magura','Mahle','Maxxis','Megamo','Merida','Michelin','Orbea','Panasonic','Pinarello','Pirelli','Pivot','Polar','Pro','Prólogo','RockShox','Santa Cruz','Schwalbe','Scott','Selle Italia','Shimano','Sigma','Specialized','Sram','TQ','Trek','Van Rysel','Varta','Wahoo','Wilier','Yamaha','Yeti','Zipp','Otra'];
+        const MARCAS = ['Bafang','Basso','Beeline','BH','Bianchi','BMC','Bontrager','Bosch','Brose','Bryton','Bulls','Campagnolo','Cannondale','Canyon','Cateye','Cervélo','Colnago','Continental','Cube','DT Swiss','Factor','Favero','Fazua','Fizik','Focus','Fox','FSA','Garmin','Giant','Hammerhead','iGPSport','Kodak','Kona','Lezyne','Lifefitness','Look','Magene','Magura','Mahle','Maxxis','Megamo','Merida','Michelin','Orbea','Panasonic','Pinarello','Pirelli','Pivot','Polar','Pro','Prólogo','RockShox','Roval','Santa Cruz','Schwalbe','Scott','Selle Italia','Shimano','Sigma','Specialized','Sram','TQ','Trek','Van Rysel','Varta','Wahoo','Wilier','Yamaha','Yeti','Zipp','Otra'];
         const MATERIALES = ['Acero','Aluminio','Carbono','Caucho','Cromo','Goma','Latón','Plástico','TPU','Titanio','Varios','Otro'];
         const MARCAS_SUBPIEZA_GENERICAS = MARCAS;
 
