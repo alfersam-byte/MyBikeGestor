@@ -1818,6 +1818,43 @@
         </section>
 
         <!-- ========================================
+             SECCIÓN: DETALLE DE UNA PIEZA DE RUEDA
+        ======================================== -->
+        <section id="sec-detalle-pieza-rueda" class="seccion">
+            <div class="topbar">
+                <button class="btn-back" onclick="volver()">←</button>
+                <div class="topbar-title" id="titulo-detalle-pieza-rueda">Pieza</div>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div class="card" id="dpr-card">
+                <div class="card-title nombre-comp" id="dpr-nombre">-</div>
+                <div style="margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                        <div><span style="color: var(--text);">Marca:</span><div class="marca-modelo" style="font-size:0.9em;" id="dpr-marca">-</div></div>
+                        <div><span style="color: var(--text);">Modelo:</span><div style="color:#ffffff;" id="dpr-modelo">-</div></div>
+                        <div><span style="color: var(--text);">Material:</span><div style="font-weight: bold; color: #F0EBEB;" id="dpr-material">-</div></div>
+                        <div><span style="color: var(--text);">Peso:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-peso">-</div></div>
+                        <div><span style="color: var(--text);">Km instalación:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-km">-</div></div>
+                        <div><span style="color: var(--text);">Km actuales:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-km-uso">-</div></div>
+                        <div><span style="color: var(--text);">Fecha inst.:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-fecha">-</div></div>
+                        <div><span style="color: var(--text);">Precio:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-precio">-</div></div>
+                        <div id="dpr-radios-bloque" style="display:none;"><span style="color: var(--text);">Nº de radios:</span><div style="font-weight: bold; color: var(--primary);" id="dpr-radios">-</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-grid-item" style="flex:1;" title="Editar datos de la pieza" onclick="editarPiezaRueda(window._piezaRuedaActualId)"><div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div></button>
+                <button class="btn-grid-item" style="flex:1;" title="Sustituir pieza" onclick="sustituirPiezaRueda(window._piezaRuedaActualId)"><div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div></button>
+                <button class="btn-grid-item" style="flex:1;" title="Registrar reparación" onclick="repararPiezaRueda(window._piezaRuedaActualId)"><div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div></button>
+                <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda(window._piezaRuedaActualId)"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
+            </div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
+        </section>
+
+        <!-- ========================================
              SECCIÓN: ALERTAS DE SUSTITUCIÓN
         ======================================== -->
         <section id="sec-alertas" class="seccion">
@@ -4239,6 +4276,8 @@
                 cargarDesgloseInversion();
             } else if (seccionId === 'sec-detalle-juego-ruedas') {
                 cargarDetalleJuegoRuedas();
+            } else if (seccionId === 'sec-detalle-pieza-rueda') {
+                cargarDetallePiezaRueda();
             } else if (seccionId === 'sec-despiece-rueda') {
                 cargarDespieceRueda();
             } else if (seccionId === 'sec-ruedas-retiradas') {
@@ -5864,14 +5903,15 @@ MyBikeGestor`
                             <div style="font-size:1.3em; font-weight:700; color:var(--secondary);">${formatearDuracion(diasTotales)}</div>
                         </div>
                     </div>
-                    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em;" title="Ver ruedas de este juego" onclick="abrirDetalleJuegoRuedas('${juego.id}')"><i class="ti ti-bike"></i></button>
+                    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;" onclick="event.stopPropagation()">
                         <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em;" title="Editar datos del juego" onclick="editarJuegoRuedas('${juego.id}')"><i class="ti ti-pencil"></i></button>
                         ${!juego.activo ? `<button class="btn btn-primary" style="flex:1; padding:8px; font-size:0.85em; background:var(--secondary);" title="Activar este juego" onclick="activarJuegoRuedas('${juego.id}')"><i class="ti ti-bolt"></i></button>` : ''}
                         <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.85em; background:var(--warning); color:white;" title="Retirar a ruedas retiradas" onclick="retirarJuegoRuedas('${juego.id}')"><i class="ti ti-package"></i></button>
                         <button class="btn btn-danger" style="flex:1; padding:8px; font-size:0.85em;" title="Eliminar definitivamente" onclick="eliminarJuegoRuedas('${juego.id}')"><i class="ti ti-trash"></i></button>
                     </div>
                 `;
+                card.style.cursor = 'pointer';
+                card.onclick = () => abrirDetalleJuegoRuedas(juego.id);
                 container.appendChild(card);
             });
         }
@@ -6246,16 +6286,18 @@ MyBikeGestor`
                         <div style="color:var(--text); font-size:0.8em; margin-top:4px;">
                             Desde: ${formatearFecha(rueda.fechaInstalacion)} · ${formatearDuracion(diasUso)}
                         </div>
-                        <div style="display:flex; gap:8px; margin-top:12px;">
+                        <div style="color:var(--text); font-size:0.8em; margin-top:4px;">
+                            ${numPiezas > 0 ? `${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'} · ` : 'Sin piezas · '}toca para ver el despiece
+                        </div>
+                        <div style="display:flex; gap:8px; margin-top:12px;" onclick="event.stopPropagation()">
                             <button class="btn-grid-item" style="flex:1;" title="Editar rueda" onclick="abrirModalRueda('${lado}', true)"><div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div></button>
                             <button class="btn-grid-item" style="flex:1;" title="Reparar rueda" onclick="repararRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div></button>
                             <button class="btn-grid-item" style="flex:1;" title="Sustituir rueda" onclick="sustituirRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div></button>
                             <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar rueda" onclick="eliminarRueda('${lado}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
-                        <button class="btn btn-secondary" style="width:100%; margin-top:10px; font-size:0.85em;" onclick="abrirDespieceRueda('${lado}')">
-                            <i class="ti ti-list-details"></i> Despiece ${numPiezas > 0 ? `(${numPiezas} ${numPiezas === 1 ? 'pieza' : 'piezas'})` : ''}
-                        </button>
                     `;
+                    div.style.cursor = 'pointer';
+                    div.onclick = () => abrirDespieceRueda(lado);
                 }
                 container.appendChild(div);
                 // Foto de la rueda como fondo de la tarjeta (rueda-delantera-<disciplina>.jpg, etc.)
@@ -6424,34 +6466,65 @@ MyBikeGestor`
                     const diasUso = pieza.fechaInstalacion ? Math.floor((new Date() - new Date(pieza.fechaInstalacion)) / 86400000) : 0;
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.style.marginBottom = '12px';
+                    card.style.cursor = 'pointer';
+                    card.onclick = () => abrirDetallePiezaRueda(pieza.id);
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="comp-fila">
                                 ${miniaturaPiezaHTML(pieza.tipo, lado)}
                                 <div>
-                                <div class="nombre-comp" style="font-weight:700;">${pieza.tipo}</div>
-                                <div class="marca-modelo"><strong>${pieza.marca || '-'}</strong> <span>${pieza.modelo || ''}</span></div>
-                                ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
-                            ${pieza.numRadios ? `<div style="font-size:0.8em; color:var(--text);">${pieza.numRadios} radios</div>` : ''}
+                                    <div class="card-title nombre-comp">${pieza.tipo}</div>
+                                    <div class="card-subtitle marca-modelo"><strong>${pieza.marca || '-'}</strong> <span>${pieza.modelo || ''}</span></div>
+                                    ${pieza.material ? `<div style="font-size:0.8em; color:var(--text);">${pieza.material}</div>` : ''}
                                 </div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="badge badge-primary">${Math.max(0, kmUso)} km</div>
-                                <div style="font-size:0.75em; color:var(--text); margin-top:4px;">${formatearDuracion(diasUso)}</div>
+                                <div style="font-size:0.75em; color:var(--text); margin-top:5px;">${formatearDuracion(diasUso)}</div>
                                 ${pieza.peso ? `<div style="font-size:0.75em; color:var(--text); margin-top:2px;">${pieza.peso}g</div>` : ''}
                             </div>
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:10px;">
-                            <button class="btn-grid-item" style="flex:1;" title="Editar pieza" onclick="editarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-pencil"></i></div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Reparar pieza" onclick="repararPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-tool"></i></div></button>
-                            <button class="btn-grid-item" style="flex:1;" title="Sustituir pieza" onclick="sustituirPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-refresh"></i></div></button>
-                            <button class="btn-grid-item" style="flex:1; color:var(--danger);" title="Eliminar pieza" onclick="eliminarPiezaRueda('${pieza.id}')"><div class="btn-grid-item-icon"><i class="ti ti-trash"></i></div></button>
                         </div>
                     `;
                     lista.appendChild(card);
                 });
             }
+        }
+
+        // Detalle de una pieza de rueda (tarjeta como la de cualquier componente)
+        function abrirDetallePiezaRueda(piezaId) {
+            window._piezaRuedaActualId = piezaId;
+            navegar('sec-detalle-pieza-rueda');
+        }
+
+        function cargarDetallePiezaRueda() {
+            const lado = window._ladoRuedaActual;
+            const rueda = juegosRuedasActual && juegosRuedasActual.ruedas && juegosRuedasActual.ruedas[lado];
+            const pieza = rueda && (rueda.piezas || []).find(p => p.id === window._piezaRuedaActualId);
+            if (!pieza) { navegar('sec-despiece-rueda'); return; }
+
+            document.getElementById('titulo-detalle-pieza-rueda').textContent = pieza.tipo;
+            document.getElementById('dpr-nombre').textContent = pieza.tipo;
+            document.getElementById('dpr-marca').innerHTML = `<strong>${pieza.marca || '-'}</strong>`;
+            document.getElementById('dpr-modelo').textContent = pieza.modelo || '-';
+            document.getElementById('dpr-material').textContent = pieza.material || '-';
+            document.getElementById('dpr-peso').textContent = pieza.peso ? `${pieza.peso}g` : '-';
+            document.getElementById('dpr-km').textContent = pieza.kmInstalacion || '0';
+            document.getElementById('dpr-km-uso').textContent = `${Math.max(0, (biciActual.kmTotales || 0) - (pieza.kmInstalacion || 0))} km`;
+            document.getElementById('dpr-fecha').textContent = formatearFecha(pieza.fechaInstalacion);
+            document.getElementById('dpr-precio').textContent = pieza.precio ? `${pieza.precio}€` : '-';
+            document.getElementById('dpr-radios-bloque').style.display = pieza.numRadios ? 'block' : 'none';
+            document.getElementById('dpr-radios').textContent = pieza.numRadios || '-';
+
+            // Foto de la pieza como fondo de la tarjeta
+            const card = document.getElementById('dpr-card');
+            card.classList.remove('con-foto-fondo');
+            card.style.backgroundImage = '';
+            const idPieza = pieza.id;
+            probarFotosComponente(candidatasFotoComponente(pieza.tipo, lado), ruta => {
+                if (window._piezaRuedaActualId !== idPieza) return;
+                card.style.backgroundImage = `linear-gradient(rgba(20,10,10,0.62), rgba(20,10,10,0.82)), url('${ruta}')`;
+                card.classList.add('con-foto-fondo');
+            });
         }
 
         function abrirModalPiezaRueda(piezaId = null) {
@@ -6534,6 +6607,7 @@ MyBikeGestor`
             cerrarModal('modal-pieza-rueda');
             cargarDespieceRueda();
             cargarDetalleJuegoRuedas();
+            if (document.getElementById('sec-detalle-pieza-rueda').classList.contains('activa')) cargarDetallePiezaRueda();
             mostrarNotificacion('Pieza guardada', 'exito');
         }
 
@@ -6619,8 +6693,8 @@ MyBikeGestor`
                     const rueda = juegosRuedasActual.ruedas[window._ladoRuedaActual];
                     rueda.piezas = rueda.piezas.filter(p => p.id !== piezaId);
                     await guardarDatosUsuario();
-                    cargarDespieceRueda();
                     cargarDetalleJuegoRuedas();
+                    navegar('sec-despiece-rueda');   // si se eliminó desde la tarjeta, volver a la lista
                     mostrarNotificacion('Pieza eliminada', 'info');
                 }
             );
@@ -7913,6 +7987,7 @@ MyBikeGestor`
                 await guardarDatosUsuario();
                 cerrarModal('modal-sustituir');
                 cargarDespieceRueda();
+                if (document.getElementById('sec-detalle-pieza-rueda').classList.contains('activa')) cargarDetallePiezaRueda();
                 mostrarNotificacion('Pieza sustituida', 'exito');
                 return;
             }
