@@ -5714,7 +5714,7 @@ MyBikeGestor`
                 'MTB': ['Horquilla', 'Amortiguador', 'Rodamientos/Casquillos', 'Mando Remoto Trasero', 'Mando Remoto Delantero']
             },
             'Sistema Eléctrico': {
-                'todos': ['Motor', 'Batería Principal', 'Batería Secundaria', 'Cargador', 'Display/Consola', 'Controlador', 'Sensor de Torque']
+                'todos': ['Motor', 'Batería Principal', 'Batería Secundaria', 'Cargador', 'Display/Consola', 'Mando de Asistencia', 'Controlador', 'Sensor de Torque']
             }
         };
         
@@ -7221,7 +7221,13 @@ MyBikeGestor`
         // Foto de un componente: icons/componentes/piezas/<nombre-sin-tildes>.jpg (si no existe, no se muestra nada)
         // Busca, por orden: nombre-disciplina, nombre (y lo mismo sin delantera/trasera/izquierda/derecha)
         function varianteFotoComp(comp) {
-            return (comp && comp.tipo === 'Bielas' && String(comp.configPlatos) === '1') ? 'monoplato' : '';
+            if (comp && comp.tipo === 'Bielas' && String(comp.configPlatos) === '1') return 'monoplato';
+            if (comp && comp.tipo === 'Motor') {
+                const t = String(comp['elec-tipo-motor'] || '');
+                if (/delantero/i.test(t)) return 'delantero';
+                if (/trasero/i.test(t)) return 'trasero';
+            }
+            return '';
         }
         function candidatasFotoComponente(tipo, lado, variante) {
             const slugify = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
