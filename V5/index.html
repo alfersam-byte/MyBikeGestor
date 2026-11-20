@@ -5690,7 +5690,7 @@ MyBikeGestor`
                 'Carretera': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
                 'Gravel': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
                 'MTB': ['Cuadro', 'Dirección', 'Cierre Tija', 'Patilla de Cambio'],
-                'Indoor': ['Cuadro/Estructura', 'Manillar', 'Tija Sillín'],
+                'Indoor': ['Cuadro/Estructura'],
                 'todos': ['Cuadro', 'Horquilla', 'Dirección', 'Cierre Tija', 'Patilla de Cambio']
             },
             'Transmisión': {
@@ -5793,6 +5793,14 @@ MyBikeGestor`
             if (biciActual.disciplina === 'Gravel') {
                 imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-gravel.jpg';
                 imagenesSeccion['Transmisión'] = '../icons/componentes/transmision-gravel.jpg';
+            }
+            // v5: las bicis Indoor tienen sus propias fotos de sección
+            if (biciActual.disciplina === 'Indoor') {
+                Object.assign(imagenesSeccion, {
+                    'Cuadro': '../icons/componentes/indoor-cuadro.jpg',
+                    'Transmisión': '../icons/componentes/indoor-transmision.jpg',
+                    'Periféricos': '../icons/componentes/indoor-perifericos.jpg'
+                });
             }
             // v5: las MTB tienen su propio juego de fotos (amortiguación, tacos, tija telescópica…)
             if (biciActual.disciplina === 'MTB') {
