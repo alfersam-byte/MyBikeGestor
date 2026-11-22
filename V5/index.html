@@ -1878,10 +1878,12 @@
         <section id="sec-desglose-peso" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title">⚖️ Desglose de Peso</div>
+                <div class="topbar-title topbar-title-largo">Desglose de Peso</div>
                 <div style="width:40px;"></div>
             </div>
             <div id="contenido-desglose-peso" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -1890,10 +1892,12 @@
         <section id="sec-desglose-inversion" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title">💰 Desglose de Inversión</div>
+                <div class="topbar-title topbar-title-largo">Desglose de Inversión</div>
                 <div style="width:40px;"></div>
             </div>
             <div id="contenido-desglose-inversion" class="mt-20"></div>
+
+            <button class="btn-back btn-back-fijo" onclick="volver()" title="Volver">←</button>
         </section>
 
         <!-- ========================================
@@ -6956,7 +6960,7 @@ MyBikeGestor`
             const unidadTotal = unidad === 'g' ? `${(total/1000).toFixed(2)} kg` : `${parseFloat(total).toFixed(2)}€`;
             card.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <div style="font-weight:700; font-size:1em;">${titulo}</div>
+                    <div style="font-weight:700; font-size:1em; color:var(--primary);">${titulo}</div>
                     <div style="font-weight:700; color:${color};">${unidadTotal}</div>
                 </div>
                 ${items.map(i => `
@@ -7103,7 +7107,7 @@ MyBikeGestor`
                 }));
                 const totalCajon = itemsCajon.reduce((s, i) => s + i.valor, 0);
                 totalGeneral += totalCajon;
-                container.appendChild(_crearTarjetaDesglose('📦 Componentes en el cajón', itemsCajon, totalCajon, '€', 'var(--warning)'));
+                container.appendChild(_crearTarjetaDesglose('Componentes en el cajón', itemsCajon, totalCajon, '€', 'var(--warning)'));
             }
 
             // Juegos de ruedas no activos (disponibles o retirados) con precio
@@ -7121,7 +7125,7 @@ MyBikeGestor`
                 if (itemsJuego.length > 0) {
                     const totalJuego = itemsJuego.reduce((s, i) => s + i.valor, 0);
                     totalGeneral += totalJuego;
-                    const estado = juego.retirado ? '🗄️ Retirado' : '⚪ Disponible';
+                    const estado = juego.retirado ? '<i class="ti ti-archive"></i> Retirado' : '<i class="ti ti-circle"></i> Disponible';
                     container.appendChild(_crearTarjetaDesglose(`${estado} · ${juego.marca || 'Juego'} ${juego.modelo || ''}`.trim(), itemsJuego, totalJuego, '€', 'var(--warning)'));
                 }
             });
