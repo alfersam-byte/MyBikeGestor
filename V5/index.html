@@ -1726,7 +1726,7 @@
 
             <div class="form-group">
                 <label>Disciplina</label>
-                <select id="nueva-disciplina">
+                <select id="nueva-disciplina" onchange="actualizarCamposVariante()">
                     <option value="Carretera">Carretera</option>
                     <option value="MTB">MTB</option>
                     <option value="Gravel">Gravel</option>
@@ -1741,6 +1741,15 @@
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" id="nueva-es-electrica" style="width: 20px; height: 20px; cursor: pointer;">
                 </label>
+            </div>
+
+            <div class="form-group" id="grupo-tipo-mtb" style="display: none;">
+                <label>Tipo de MTB</label>
+                <select id="nueva-tipo-mtb">
+                    <option value="">Sin indicar</option>
+                    <option value="rigida">Rígida</option>
+                    <option value="doble">Doble suspensión</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -5172,6 +5181,7 @@ MyBikeGestor`
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
             const esElectrica = document.getElementById('nueva-es-electrica').checked;
+            const tipoMtb = disciplina === 'MTB' ? document.getElementById('nueva-tipo-mtb').value : '';
             const fechaCompra = document.getElementById('nueva-fecha').value;
             const kmIniciales = parseFloat(document.getElementById('nueva-km').value) || 0;
 
@@ -5192,6 +5202,7 @@ MyBikeGestor`
                 modelo: modelo,
                 disciplina: disciplina,
                 esElectrica: esElectrica,
+                tipoMtb: tipoMtb,
                 fotoBici: null,
                 fechaCompra: fechaCompra,
                 kmTotales: kmIniciales,
@@ -5213,6 +5224,8 @@ MyBikeGestor`
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
             document.getElementById('nueva-es-electrica').checked = false;
+            document.getElementById('nueva-tipo-mtb').value = '';
+            actualizarCamposVariante();
             eliminarFotoBici();
 
             mostrarNotificacion('¡Bicicleta creada correctamente!', 'exito');
@@ -5369,6 +5382,8 @@ MyBikeGestor`
             document.getElementById('nueva-modelo').value = biciActual.modelo || '';
             document.getElementById('nueva-disciplina').value = biciActual.disciplina || 'Carretera';
             document.getElementById('nueva-es-electrica').checked = biciActual.esElectrica || false;
+            document.getElementById('nueva-tipo-mtb').value = biciActual.tipoMtb || '';
+            actualizarCamposVariante();
             document.getElementById('nueva-fecha').value = biciActual.fechaCompra || '';
             document.getElementById('nueva-km').value = biciActual.kmTotales || 0;
 
@@ -5582,6 +5597,8 @@ MyBikeGestor`
             document.getElementById('nueva-fecha').value = '';
             document.getElementById('nueva-km').value = '0';
             document.getElementById('nueva-es-electrica').checked = false;
+            document.getElementById('nueva-tipo-mtb').value = '';
+            actualizarCamposVariante();
             eliminarFotoBici();
 
             volver();
@@ -5602,6 +5619,7 @@ MyBikeGestor`
             const modelo = document.getElementById('nueva-modelo').value.trim();
             const disciplina = document.getElementById('nueva-disciplina').value;
             const esElectrica = document.getElementById('nueva-es-electrica').checked;
+            const tipoMtb = disciplina === 'MTB' ? document.getElementById('nueva-tipo-mtb').value : '';
             const fotoBici = biciActual.fotoBici || null;
             const fechaCompra = document.getElementById('nueva-fecha').value;
             const kmTotales = parseFloat(document.getElementById('nueva-km').value) || 0;
@@ -5624,7 +5642,7 @@ MyBikeGestor`
             // Actualizar conservando componentes, historial, etc.
             datosUsuario.garaje[biciIndex] = {
                 ...datosUsuario.garaje[biciIndex],
-                alias, marca, modelo, disciplina, esElectrica, fotoBici, fechaCompra, kmTotales
+                alias, marca, modelo, disciplina, esElectrica, tipoMtb, fotoBici, fechaCompra, kmTotales
             };
 
             biciActual = datosUsuario.garaje[biciIndex];
@@ -5714,7 +5732,7 @@ MyBikeGestor`
                 'todos': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS', 'Sensor de Cadencia', 'Sensor de Velocidad', 'Luz Delantera', 'Luz Trasera'],
                 'Gravel': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS', 'Sensor de Cadencia', 'Sensor de Velocidad', 'Luz Delantera', 'Luz Trasera', 'Guardabarros Delantero', 'Guardabarros Trasero', 'Bolsa de Manillar', 'Bolsa de Cuadro', 'Bolsa de Horquilla', 'Bolsa de Sillín', 'Alforja Trasera'],
                 'MTB': ['Manillar', 'Potencia', 'Tija', 'Sillín', 'Puños/Cinta', 'Portabidones', 'Acople GPS', 'Ciclocomputador GPS', 'Sensor de Cadencia', 'Sensor de Velocidad', 'Luz Delantera', 'Luz Trasera', 'Guardabarros Delantero', 'Guardabarros Trasero', 'Bolsa de Manillar', 'Bolsa de Cuadro', 'Bolsa de Horquilla', 'Bolsa de Sillín', 'Alforja Trasera'],
-                'Indoor': ['Consola', 'Manillar', 'Tija Sillín', 'Sillín', 'Portabidones', 'Acople GPS/Ciclocomputador', 'Soporte Tablet/Móvil', 'Ventilador', 'Alfombrilla Protectora', 'Protector Anticorrosión/Sudor']
+                'Indoor': ['Consola', 'Manillar', 'Tija Sillín', 'Sillín', 'Acople GPS/Ciclocomputador', 'Soporte Tablet/Móvil', 'Ventilador', 'Alfombrilla Protectora', 'Protector Anticorrosión/Sudor']
             },
             'Suspensiones': {
                 'MTB': ['Horquilla', 'Amortiguador', 'Rodamientos/Casquillos', 'Mando Remoto Trasero', 'Mando Remoto Delantero']
@@ -5795,6 +5813,7 @@ MyBikeGestor`
             if (biciActual.disciplina === 'Carretera') {
                 imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-carretera.jpg';
                 imagenesSeccion['Transmisión'] = '../icons/componentes/transmision-carretera.jpg';
+                imagenesSeccion['Cuadro'] = '../icons/componentes/carretera-cuadro.jpg';
             }
             if (biciActual.disciplina === 'Gravel') {
                 imagenesSeccion['Periféricos'] = '../icons/componentes/perifericos-gravel.jpg';
@@ -5818,6 +5837,10 @@ MyBikeGestor`
                     'Periféricos': '../icons/componentes/mtb-perifericos.jpg',
                     'Suspensiones': '../icons/componentes/suspensiones.jpg'
                 });
+                imagenesSeccion['Cuadro'] = '../icons/componentes/mtb-cuadro-' + tipoCuadroMTB(biciActual) + '.jpg';
+            }
+            if (biciActual.disciplina === 'Gravel') {
+                imagenesSeccion['Cuadro'] = '../icons/componentes/gravel-cuadro.jpg';
             }
             
             secciones.forEach(seccion => {
@@ -7234,7 +7257,21 @@ MyBikeGestor`
         
         // Foto de un componente: icons/componentes/piezas/<nombre-sin-tildes>.jpg (si no existe, no se muestra nada)
         // Busca, por orden: nombre-disciplina, nombre (y lo mismo sin delantera/trasera/izquierda/derecha)
+        // MTB: rígida o doble (si tiene Amortiguador registrado) y eléctrica o no, para las fotos de cuadro
+        function actualizarCamposVariante() {
+            const g = document.getElementById('grupo-tipo-mtb');
+            const d = document.getElementById('nueva-disciplina');
+            if (g && d) g.style.display = d.value === 'MTB' ? '' : 'none';
+        }
+        function tipoCuadroMTB(bici) {
+            if (!bici || bici.disciplina !== 'MTB') return '';
+            // Si el usuario indicó el tipo, manda; si no, se deduce de si tiene Amortiguador registrado
+            const susp = (bici.componentesV2 && bici.componentesV2['Suspensiones']) || [];
+            const doble = bici.tipoMtb ? bici.tipoMtb === 'doble' : susp.some(c => c && /amortiguador/i.test(c.tipo || ''));
+            return (doble ? 'doble' : 'rigida') + (bici.esElectrica ? '-electrica' : '');
+        }
         function varianteFotoComp(comp) {
+            if (comp && comp.tipo === 'Cuadro' && biciActual && biciActual.disciplina === 'MTB') return tipoCuadroMTB(biciActual);
             if (comp && comp.tipo === 'Bielas' && String(comp.configPlatos) === '1') return 'monoplato';
             if (comp && comp.tipo === 'Motor') {
                 const t = String(comp['elec-tipo-motor'] || '');
