@@ -1736,7 +1736,7 @@
             </div>
 
             <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
-                <label style="margin-bottom: 0;">⚡ ¿Es eléctrica?</label>
+                <label style="margin-bottom: 0;"><i class="ti ti-bolt" style="color:#f39c12;"></i> ¿Es eléctrica?</label>
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" id="nueva-es-electrica" style="width: 20px; height: 20px; cursor: pointer;">
                 </label>
@@ -1932,7 +1932,7 @@
         <section id="sec-bicis-retiradas" class="seccion">
             <div class="topbar">
                 <button class="btn-back" onclick="volver()">←</button>
-                <div class="topbar-title">Bicis Retiradas 📦</div>
+                <div class="topbar-title">Bicis Retiradas <i class="ti ti-package"></i></div>
                 <div style="width: 40px;"></div>
             </div>
 
@@ -2418,7 +2418,7 @@
                 <button onclick="guardarFotoBiciModal()" style="background:#2ECC71; color:white; border:none; padding:12px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer;">Guardar</button>
                 <button onclick="cerrarModalFotoBici()" style="background:rgba(255,255,255,0.15); color:white; border:none; padding:12px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer;">Cancelar</button>
             </div>
-            <button onclick="eliminarFotoBiciPersonalizada()" style="width:100%; background:rgba(220,50,50,0.3); color:#ff6b6b; border:1px solid rgba(220,50,50,0.5); padding:10px; border-radius:8px; font-size:0.9em; cursor:pointer;">🗑 Volver a foto genérica</button>
+            <button onclick="eliminarFotoBiciPersonalizada()" style="width:100%; background:rgba(220,50,50,0.3); color:#ff6b6b; border:1px solid rgba(220,50,50,0.5); padding:10px; border-radius:8px; font-size:0.9em; cursor:pointer;"><i class="ti ti-trash"></i> Volver a foto genérica</button>
         </div>
     </div>
 
@@ -2655,7 +2655,7 @@
             <!-- Datos del nuevo componente -->
             <div id="sustituir-desde-cajon-container" style="display:none; margin-bottom:20px;">
                 <div style="background:#FFF3E0; border:2px solid #FF6B00; border-radius:12px; padding:15px;">
-                    <div style="font-weight:700; color:#FF6B00; margin-bottom:10px;">📦 Tienes piezas en el cajón</div>
+                    <div style="font-weight:700; color:#FF6B00; margin-bottom:10px;"><i class="ti ti-package"></i> Tienes piezas en el cajón</div>
                     <select id="sustituir-cajon-select" onchange="toggleDesdeСajon()" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:0.95em;">
                         <option value="">— Ver lista de piezas —</option>
                     </select>
@@ -2798,12 +2798,12 @@
                 <label style="font-weight: 700; margin-bottom: 10px; display:block;">¿Qué hacemos con el componente actual?</label>
                 <div style="display: flex; gap: 10px;">
                     <button type="button" onclick="guardarSustitucion('historial')" style="flex:1; cursor:pointer; text-align:center; padding: 12px; border-radius: 8px; border: 2px solid var(--primary); background: #2D2D2D;">
-                        <div style="font-size: 1.3em;">🗑️</div>
+                        <div style="font-size: 1.3em;"><i class="ti ti-trash"></i></div>
                         <div style="font-size: 0.8em; font-weight: 600; margin-top: 4px;">Desechar</div>
                         <div style="font-size: 0.72em; color: var(--text); margin-top: 2px;">Registrar y eliminar</div>
                     </button>
                     <button type="button" onclick="guardarSustitucion('cajon')" style="flex:1; cursor:pointer; text-align:center; padding: 12px; border-radius: 8px; border: 2px solid #FF6B00; background: #2D2D2D;">
-                        <div style="font-size: 1.3em;">📦</div>
+                        <div style="font-size: 1.3em;"><i class="ti ti-package"></i></div>
                         <div style="font-size: 0.8em; font-weight: 600; margin-top: 4px;">Al cajón</div>
                         <div style="font-size: 0.72em; color: var(--text); margin-top: 2px;">Guardar para reutilizar</div>
                     </button>
@@ -5094,7 +5094,7 @@ MyBikeGestor`
             if (!bicisRetiradas || bicisRetiradas.length === 0) {
                 container.innerHTML = `
                     <div class="lista-vacia">
-                        <div class="lista-vacia-icon">📦</div>
+                        <div class="lista-vacia-icon"><i class="ti ti-package"></i></div>
                         <p>No hay bicis retiradas</p>
                     </div>
                 `;
@@ -5125,10 +5125,10 @@ MyBikeGestor`
                     </div>
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
                         <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.85em;" onclick="reactivarBici('${bici.id}')">
-                            ↩️ Reactivar
+                            <i class="ti ti-arrow-back-up"></i> Reactivar
                         </button>
                         <button class="btn btn-danger" style="flex: 1; padding: 8px; font-size: 0.85em;" onclick="eliminarBiciRetirada('${bici.id}')">
-                            🗑️ Eliminar
+                            <i class="ti ti-trash"></i> Eliminar
                         </button>
                     </div>
                 `;
@@ -5359,7 +5359,7 @@ MyBikeGestor`
 
             // Modo edición: cambiar textos
             document.getElementById('titulo-nueva-bici').textContent = 'Editar Bici';
-            document.getElementById('btn-guardar-bici').textContent = '💾 Guardar Cambios';
+            document.getElementById('btn-guardar-bici').textContent = 'Guardar Cambios';
             document.getElementById('btn-back-nueva-bici').setAttribute('onclick', "cancelarFormBici()");
 
             // Rellenar formulario con datos actuales
@@ -7389,7 +7389,7 @@ MyBikeGestor`
                         `<div><span style="color:var(--text);">${c.label}:</span><div style="font-weight:bold;">${comp[c.id]}${c.suffix ? ' ' + c.suffix : ''}</div></div>`
                     ).join('');
                     contenedorElectrico.style.display = filas ? 'block' : 'none';
-                    contenedorElectrico.innerHTML = filas ? `<div class="card" style="margin-top:15px;"><div class="card-title">⚡ Datos eléctricos</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.9em;margin-top:15px;">${filas}</div></div>` : '';
+                    contenedorElectrico.innerHTML = filas ? `<div class="card" style="margin-top:15px;"><div class="card-title"><i class="ti ti-bolt"></i> Datos eléctricos</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.9em;margin-top:15px;">${filas}</div></div>` : '';
                 } else {
                     contenedorElectrico.style.display = 'none';
                     contenedorElectrico.innerHTML = '';
@@ -7836,7 +7836,7 @@ MyBikeGestor`
                 <div class="modal-contenido" style="max-width:420px;max-height:80vh;overflow-y:auto;">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
                         <button onclick="document.getElementById('${modalId}').remove()" style="background:none;border:none;font-size:1.4em;cursor:pointer;padding:0;line-height:1;">←</button>
-                        <h2 style="margin:0;font-size:1.1em;">📋 Historial GPS</h2>
+                        <h2 style="margin:0;font-size:1.1em;"><i class="ti ti-clipboard-list"></i> Historial GPS</h2>
                     </div>
                     <p style="font-size:0.85em;color:var(--text-light);margin-bottom:12px;">${ciclo.marca || ''} ${ciclo.modelo || ''}</p>
                     ${entradasHTML}
